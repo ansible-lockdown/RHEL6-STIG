@@ -1,0 +1,76 @@
+---
+# Setup variables based on operating system
+- name: Set gpg_key_url for CentOS
+  set_fact: gpg_key_url=http://mirror.centos.org/centos/RPM-GPG-KEY-{{ ansible_distribution }}-{{ ansible_distribution_major_version }}
+  when: "ansible_distribution == 'CentOS'"
+  tags: cat1
+
+
+# CAT I Findings
+- name: V-38653 High  The snmpd service must not use a default password
+  replace: backup=yes dest=/etc/snmp/snmpd.conf regexp=(^com2sec.*default\s+)public replace=\1{{ rhel6_stig_snmp_community }}
+  ignore_errors: yes
+  tags: cat1
+
+- name: V-38491 High  There must be no hosts.equiv file on the system
+  file: state=absent dest=/etc/hosts.equiv
+  tags: cat1
+
+- name: List users on system
+  command: ls /home
+  register: users
+  tags: cat1
+
+- name: V-38491 High  There must be no .rhosts files on the system
+  file: state=absent dest=/home/{{ item }}/.rhosts
+  with_items: users.stdout_lines
+  tags: cat1
+
+- name: V-38666 High  The system must use and update a DoD-approved virus scan program
+  shell: grep uvscan /etc/cron* /var/spool/cron/*
+  register: av_present
+  ignore_errors: yes
+  tags: cat1
+
+- name: V-38666 High  The system must use and update a DoD-approved virus scan program
+  debug: msg="No AV software present"
+  when: av_present.rc != 0
+  tags: cat1
+
+- name: V-38666 High  The system must use and update a DoD-approved virus scan program
+  command: find /usr/local/uvscan -type f -mtime +7
+  register: av_defs
+  ignore_errors: yes
+  tags: cat1
+
+- name: V-38666 High  The system must use and update a DoD-approved virus scan program
+  debug: msg="AV definitions are outdated"
+  when: av_defs.stdout_lines
+  tags: cat1
+
+- name: V-38668 High  The x86 Ctrl-Alt-Delete key sequence must be disabled
+  copy: src=control-alt-delete.override dest=/etc/init/control-alt-delete.override owner=root group=root mode=0644
+  tags: cat1
+
+- name: V-38462 High  The RPM package management tool must cryptographically verify the authenticity of all software packages during installation.
+  lineinfile: state=absent dest={{ item }} regexp=nosignature
+  with_items:
+    - /etc/rpmrc
+    - /usr/lib/rpm/rpmrc
+    - /usr/lib/rpm/redhat/rpmrc
+    - ~root/.rpmrc
+  tags: cat1
+
+- name: V-38497 High  The system must not have accounts configured with blank or null passwords
+  replace: dest=/etc/pam.d/system-auth-ac regexp='nullok\s'
+  tags: cat1
+
+- name: V-38677 High  The NFS server must not have the insecure file locking option enabled
+  replace: dest=/etc/exports regexp='insecure_locks'
+  tags: cat1
+
+- name: V-38476 High  Vendor-provided cryptographic certificates must be installed to verify the integrity of system software.
+  rpm_key: state=present key={{ gpg_key_url }}
+  tags: test
+
+

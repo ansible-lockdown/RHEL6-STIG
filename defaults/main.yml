@@ -1,0 +1,7 @@
+---
+rhel6_stig_cat1: true
+rhel6_stig_cat2: false
+rhel6_stig_cat3: false
+
+# Changing system defaults
+rhel6_stig_snmp_community: borealis
