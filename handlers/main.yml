@@ -1,2 +1,12 @@
 ---
-# handlers file for disa-stig-rhel-6
+- name: restart ntpd
+  service: name=ntpd state=restarted
+
+- name: restart ssh
+  service: name=sshd state=restarted
+
+- name: restart snmp
+  service: name=snmpd state=restarted
+
+- name: restart xinetd
+  service: name=xinetd state=restarted

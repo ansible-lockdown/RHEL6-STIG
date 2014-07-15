@@ -5,11 +5,17 @@
   when: "ansible_distribution == 'CentOS'"
   tags: cat1
 
+- name: Set gpg_key_url for Red Hat 6
+  set_fact: gpg_key_url=https://www.redhat.com/security/fd431d51.txt
+  when: "ansible_distribution == 'Red Hat'"
+  tags: cat1
+
 
 # CAT I Findings
 - name: V-38653 High  The snmpd service must not use a default password
   replace: backup=yes dest=/etc/snmp/snmpd.conf regexp=(^com2sec.*default\s+)public replace=\1{{ rhel6_stig_snmp_community }}
   ignore_errors: yes
+  notify: restart snmp
   tags: cat1
 
 - name: V-38491 High  There must be no hosts.equiv file on the system
@@ -71,6 +77,42 @@
 
 - name: V-38476 High  Vendor-provided cryptographic certificates must be installed to verify the integrity of system software.
   rpm_key: state=present key={{ gpg_key_url }}
-  tags: test
+  tags: cat1
 
+- name: V-38607 High  The SSH daemon must be configured to use only the SSHv2 protocol
+  lineinfile: state=present dest=/etc/ssh/sshd_config regexp='^(#)?Protocol \d' line='Protocol 2'
+  notify: restart ssh
+  tags: [ 'ssh' , 'cat1' ]
 
+- name: V-38602 High  The rlogind service must not be running
+  service: name=rlogin enabled=no state=stopped
+  ignore_errors: yes
+  tags: cat1
+
+- name: V-38594 High  The rshd service must not be running
+  service: name=rshd enabled=no state=stopped
+  ignore_errors: yes
+  tags: cat1
+
+- name: V-38591 High  The rsh-server package must not be installed
+  yum: name=rsh-server state=absent
+  tags: cat1
+
+- name: V-38598 High  The rexecd service must not be running
+  service: name=rexec enabled=no state=stopped
+  ignore_errors: yes
+  tags: cat1
+
+- name: V-38587 High  The telnet-server package must not be installed
+  yum: name=telnet-server state=absent
+  tags: cat1
+
+- name: V-38701 High  The TFTP daemon must operate in secure mode which provides access only to a single directory on the host file system
+  lineinfile: state=present dest=/etc/xinetd.d/tftp regexp='server_args' line='        server_args             = -s /var/lib/tftpboot'
+  notify: restart xinetd
+  tags: cat1
+
+- name: V-38614 High  The SSH daemon must not allow authentication using an empty password
+  lineinfile: state=present dest=/etc/ssh/sshd_config regexp='^(#)?PermitEmptyPasswords' line='PermitEmptyPasswords no'
+  tags: [ 'ssh' , 'cat1' ]
+  notify: restart ssh
