@@ -10,3 +10,6 @@
 
 - name: restart xinetd
   service: name=xinetd state=restarted
+
+- name: restart auditd
+  service: name=auditd state=restarted

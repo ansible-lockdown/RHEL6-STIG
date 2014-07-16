@@ -1,0 +1,59 @@
+---
+- name: V-38612 Medium  The SSH daemon must not allow host-based authentication
+  lineinfile: state=present dest=/etc/ssh/sshd_config regexp='^(#)?HostbasedAuthentication' line='HostbasedAuthentication no'
+  tags: [ 'ssh' , 'cat2' ]
+  notify: restart ssh
+
+- name: V-38580 Medium  Copy STIG compliant audit.rules
+  template: src=audit.rules.j2 dest=/etc/audit/audit.rules owner=root group=root mode=0640 backup=yes
+  tags: cat2
+  notify: restart auditd
+
+- name: V-38459 Medium  The /etc/group file must be group-owned by root
+  file: dest=/etc/group owner=root group=root mode=0644
+  tags: cat2
+
+- name: V-38643 Medium  There must be no world-writable files on the system
+  command: find / -xdev -type f -perm -002
+  register: world_writable_files
+  tags: cat2
+
+- name: The following files are world writable. This is a finding.
+  debug: var=world_writable_files.stdout_lines
+  when: world_writable_files.stdout_lines
+  tags: cat2
+
+- pause:
+  when: world_writable_files.stdout_lines
+  tags: cat2
+
+- name: Check if IPv6 is enabled
+  shell: ip addr | grep inet6
+  register: ipv6test
+  ignore_errors: yes
+  tags: cat2
+
+- name: V-38551 Medium  The operating system must connect to external networks or information systems only through managed IPv6 interfaces consisting of boundary protection devices arranged in accordance with an organizational security architecture
+  service: name=ip6tables enabled=yes state=started
+  when: ipv6test.stdout
+  ignore_errors: yes
+  tags: cat2
+
+- name: V-38499 Medium  The /etc/passwd file must not contain password hashes
+  shell: "awk -F: '($2 != \"x\") {print}' /etc/passwd"
+  register: etc_password_hash_check
+  ignore_errors: yes
+  tags: cat2
+
+- name: The /etc/passwd file contains password hashes. This is a finding.
+  debug: var=etc_password_hash_check.stdout_lines
+  when: etc_password_hash_check.stdout
+  tags: cat2
+
+- pause:
+  when: etc_password_hash_check.stdout
+  tags: cat2
+
+- name: V-38450 Medium  The /etc/passwd file must be owned by root
+  file: dest=/etc/passwd owner=root group=root mode=0644
+  tags: test
