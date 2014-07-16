@@ -54,6 +54,19 @@
   when: etc_password_hash_check.stdout
   tags: cat2
 
-- name: V-38450 Medium  The /etc/passwd file must be owned by root
-  file: dest=/etc/passwd owner=root group=root mode=0644
-  tags: test
+- name: V-38450 V-38451 Medium  The /etc/passwd file must be owned and group owned by root
+  file: path=/etc/passwd owner=root group=root mode=0644
+  tags: cat2
+
+- name: V-38581 Medium  The system boot loader configuration file(s) must be group-owned by root
+  file: path=/boot/grub/grub.conf owner=root group=root mode=0600
+  tags: cat2
+
+- name: V-38458 Medium  The /etc/group file must be owned by root
+  file: path=/etc/group owner=root group=root mode=0644
+  tags: cat2
+
+- name: V-38658 Medium  The system must prohibit the reuse of passwords within twenty-four iterations
+  lineinfile: state=present dest=/etc/pam.d/system-auth regexp='(password\s+sufficient\s+pam_unix.so)' line='\1 sha512 shadow nullok try_first_pass use_authtok remember=24' backrefs=yes backup=yes
+  tags: cat2
+
