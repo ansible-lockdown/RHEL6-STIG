@@ -1,9 +1,11 @@
-Role Name
-========
+RHEL 6 DISA STIG
+================
 
 Configure RHEL 6 machine to be DISA STIG compliant. CAT I findings will be corrected by default. CAT II and CAT III findings can be corrected by setting the appropriate variable.
 
-Based on [Red Hat Enterprise Linux 6 Security Technical Implementation Guide 2013-06-03](http://www.stigviewer.com/stig/red_hat_enterprise_linux_6/). 
+Based on [Red Hat Enterprise Linux 6 Security Technical Implementation Guide 2013-06-03](http://www.stigviewer.com/stig/red_hat_enterprise_linux_6/).
+
+Inspiration and some config files taken from [RedHatGov](https://github.com/RedHatGov) [stig-fix-el6](https://github.com/RedHatGov/stig-fix-el6).
 
 Requirements
 ------------
@@ -24,7 +26,7 @@ Role Variables
 Dependencies
 ------------
 
-None.
+Ansible > 1.6
 
 Example Playbook
 -------------------------
