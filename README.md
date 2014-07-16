@@ -19,7 +19,7 @@ Role Variables
 
 **rhel6_stig_cat2**:           Correct CAT II findings (Default: false)
 
-**rhel6_stig_cat3**:           Correct CAT III1 findings (Default: false)
+**rhel6_stig_cat3**:           Correct CAT III findings (Default: false)
 
 **rhel6_stig_snmp_community**  borealis
 
