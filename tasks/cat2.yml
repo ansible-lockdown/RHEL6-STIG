@@ -30,7 +30,7 @@
   tags: cat2
 
 - pause:
-  when: world_writable_files.stdout_lines and fullauto
+  when: world_writable_files.stdout_lines and not fullauto
   tags: cat2
 
 
@@ -61,7 +61,7 @@
   tags: cat2
 
 - pause:
-  when: etc_password_hash_check.stdout and fullauto
+  when: etc_password_hash_check.stdout and not fullauto
   tags: cat2
 
 
@@ -94,5 +94,24 @@
   ignore_errors: yes
   when: xinetd_services.stdout.find('\ton\n') == -1
   tags: cat2
+
+
+# List nfs mounts that are missing the nodev option and ask the sys admin to correct this in /etc/fstab
+# This would be a bit tricky to automatically fix in /etc/fstab.
+- name: Checking for nfs mounts missing the 'nodev' option
+  shell: mount | grep 'type nfs' | grep -v 'nodev'
+  ignore_errors: yes
+  register: nfs_mounts_missing_nodev
+  tags: test
+
+- name: V-38652 Medium  Remote file systems must be mounted with the nodev option
+  debug: var=nfs_mounts_missing_nodev.stdout_lines
+  when: nfs_mounts_missing_nodev.stdout
+  tags: test
+
+- pause:
+  when: nfs_mounts_missing_nodev.stdout and not fullauto
+  tags: test
+
 
 
