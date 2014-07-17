@@ -23,6 +23,8 @@ Role Variables
 
 **rhel6_stig_snmp_community**  borealis
 
+**fullauto**                   Run the role without pausing (Default: false)
+
 Dependencies
 ------------
 

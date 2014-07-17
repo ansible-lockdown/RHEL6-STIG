@@ -5,3 +5,6 @@ rhel6_stig_cat3: false
 
 # Changing system defaults
 rhel6_stig_snmp_community: borealis
+
+# Set this to true to omit all the pauses in the role
+fullauto: false
