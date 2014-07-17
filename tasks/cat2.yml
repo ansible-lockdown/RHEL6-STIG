@@ -4,15 +4,21 @@
   tags: [ 'ssh' , 'cat2' ]
   notify: restart ssh
 
+
+# This audit.rules file is from https://github.com/RedHatGov/stig-fix-el6/tree/master/config
+# I modified it slightly by turning it into a template
 - name: V-38580 Medium  Copy STIG compliant audit.rules
   template: src=audit.rules.j2 dest=/etc/audit/audit.rules owner=root group=root mode=0640 backup=yes
   tags: cat2
   notify: restart auditd
 
+
 - name: V-38459 Medium  The /etc/group file must be group-owned by root
   file: dest=/etc/group owner=root group=root mode=0644
   tags: cat2
 
+
+# Search for world writable files and print them out if any are found
 - name: V-38643 Medium  There must be no world-writable files on the system
   command: find / -xdev -type f -perm -002
   register: world_writable_files
@@ -24,9 +30,11 @@
   tags: cat2
 
 - pause:
-  when: world_writable_files.stdout_lines
+  when: world_writable_files.stdout_lines and fullauto
   tags: cat2
 
+
+# See if IPv6 is enabled before enabling ip6tables
 - name: Check if IPv6 is enabled
   shell: ip addr | grep inet6
   register: ipv6test
@@ -39,6 +47,8 @@
   ignore_errors: yes
   tags: cat2
 
+
+# Look in /etc/password for hashes and print them out if any are found
 - name: V-38499 Medium  The /etc/passwd file must not contain password hashes
   shell: "awk -F: '($2 != \"x\") {print}' /etc/passwd"
   register: etc_password_hash_check
@@ -51,8 +61,9 @@
   tags: cat2
 
 - pause:
-  when: etc_password_hash_check.stdout
+  when: etc_password_hash_check.stdout and fullauto
   tags: cat2
+
 
 - name: V-38450 V-38451 Medium  The /etc/passwd file must be owned and group owned by root
   file: path=/etc/passwd owner=root group=root mode=0644
@@ -69,4 +80,19 @@
 - name: V-38658 Medium  The system must prohibit the reuse of passwords within twenty-four iterations
   lineinfile: state=present dest=/etc/pam.d/system-auth regexp='(password\s+sufficient\s+pam_unix.so)' line='\1 sha512 shadow nullok try_first_pass use_authtok remember=24' backrefs=yes backup=yes
   tags: cat2
+
+
+# List all xinetd services then look for 'on' in the output
+# If any xinted service is found to be on, skip these tasks since xinetd can be on if a service is using it
+- name: Checking if any xinetd services are enabled
+  shell: "chkconfig --list | sed -n '/xinetd based services/,$p'"
+  register: xinetd_services
+  tags: cat2
+
+- name: V-38582 Medium  The xinetd service must be disabled if no network services utilizing it are enabled
+  service: name=xinetd enabled=no state=stopped
+  ignore_errors: yes
+  when: xinetd_services.stdout.find('\ton\n') == -1
+  tags: cat2
+
 
