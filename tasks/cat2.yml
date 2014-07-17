@@ -29,7 +29,8 @@
   when: world_writable_files.stdout_lines
   tags: cat2
 
-- pause:
+- name: V-38643 Medium  There must be no world-writable files on the system
+  pause: prompt="World writable files are present on the system. This is a finding. Press Enter to continue."
   when: world_writable_files.stdout_lines and not fullauto
   tags: cat2
 
@@ -55,12 +56,13 @@
   ignore_errors: yes
   tags: cat2
 
-- name: The /etc/passwd file contains password hashes. This is a finding.
+- name: The following password hashes were found in /etc/passwd. This is a finding.
   debug: var=etc_password_hash_check.stdout_lines
   when: etc_password_hash_check.stdout
   tags: cat2
 
-- pause:
+- name: V-38499 Medium  The /etc/passwd file must not contain password hashes
+  pause: prompt="The following password hashes were found in /etc/passwd. This is a finding. Press Enter to continue."
   when: etc_password_hash_check.stdout and not fullauto
   tags: cat2
 
@@ -109,7 +111,8 @@
   when: nfs_mounts_missing_nodev.stdout
   tags: cat2
 
-- pause:
+- name: V-38652 Medium  Remote file systems must be mounted with the 'nodev' option
+  pause: prompt="There are nfs mounts without the 'nodev' option set. This is a finding. Press Enter to continue."
   when: nfs_mounts_missing_nodev.stdout and not fullauto
   tags: cat2
 
@@ -127,7 +130,8 @@
   when: nfs_mounts_missing_nosuid.stdout
   tags: cat2
 
-- pause:
+- name: V-38652 Medium  Remote file systems must be mounted with the nosuid option
+  pause: prompt="There are nfs mounts without the 'nosuid' option set. This is a finding. Press Enter to continue."
   when: nfs_mounts_missing_nosuid.stdout and not fullauto
   tags: cat2
 
@@ -137,5 +141,28 @@
   notify: unload usb-storage
   tags: cat2
 
+- name: V-38443 Medium  The /etc/gshadow file must be owned by root
+  file: path=/etc/gshadow owner=root group=root mode=0000
+  tags: cat2
 
+- name: V-38526 Medium  The system must not accept ICMPv4 secure redirect packets on any interface
+  sysctl: name=net.ipv4.conf.all.secure_redirects value=0 state=present reload=yes ignoreerrors=yes
+  tags: cat2
+
+- name: V-38524 Medium  The system must not accept ICMPv4 redirect packets on any interface
+  sysctl: name=net.ipv4.conf.all.accept_redirects value=0 state=present reload=yes ignoreerrors=yes
+  tags: cat2
+
+# - name: V-38488 Medium  The operating system must conduct backups of user-level information contained in the operating system per organization defined frequency to conduct backups consistent with recovery time and recovery point objectives
+
+- name: Checking for remote log servers
+  shell: grep -Er '(^[^#]?\*\.\*\s+@{1,2})|(\*\.\*\s+omrelp)' /etc/rsyslog.conf /etc/rsyslog.d/
+  ignore_errors: yes
+  register: remote_logging_servers
+  tags: cat2
+
+- name: V-38520 Medium  The operating system must back up audit records on an organization defined frequency onto a different system or media than the system being audited
+  pause: prompt="No remote logging server is configured. Press Enter to continue."
+  when: not remote_logging_servers.stdout and not fullauto
+  tags: cat2
 
