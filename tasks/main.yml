@@ -1,4 +1,21 @@
 ---
+# Setup variables based on operating system
+- name: Set gpg_key_url for CentOS
+  set_fact: gpg_key_url=http://mirror.centos.org/centos/RPM-GPG-KEY-{{ ansible_distribution }}-{{ ansible_distribution_major_version }}
+  when: "ansible_distribution == 'CentOS'"
+  tags: [ 'cat1' , 'cat2' , 'cat3']
+
+- name: Set gpg_key_url for Red Hat 6
+  set_fact: gpg_key_url=https://www.redhat.com/security/fd431d51.txt
+  when: "ansible_distribution == 'Red Hat'"
+  tags: [ 'cat1' , 'cat2' , 'cat3']
+
+# List users in order to look files inside each home directory
+- name: List users on system
+  command: "awk -F: '{print $1}' /etc/passwd"
+  register: users
+  tags: [ 'cat1' , 'cat2' , 'cat3' , 'test']
+
 - { include: cat1.yml, when: rhel6_stig_cat1 }
 - { include: cat2.yml, when: rhel6_stig_cat2 }
 # - { include: cat3.yml, when: rhel6_stig_cat3 }

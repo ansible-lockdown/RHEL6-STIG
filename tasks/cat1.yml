@@ -1,16 +1,4 @@
 ---
-# Setup variables based on operating system
-- name: Set gpg_key_url for CentOS
-  set_fact: gpg_key_url=http://mirror.centos.org/centos/RPM-GPG-KEY-{{ ansible_distribution }}-{{ ansible_distribution_major_version }}
-  when: "ansible_distribution == 'CentOS'"
-  tags: cat1
-
-- name: Set gpg_key_url for Red Hat 6
-  set_fact: gpg_key_url=https://www.redhat.com/security/fd431d51.txt
-  when: "ansible_distribution == 'Red Hat'"
-  tags: cat1
-
-
 # CAT I Findings
 - name: V-38653 High  The snmpd service must not use a default password
   replace: backup=yes dest=/etc/snmp/snmpd.conf regexp=(^com2sec.*default\s+)public replace=\1{{ rhel6_stig_snmp_community }}
@@ -22,15 +10,8 @@
   file: state=absent dest=/etc/hosts.equiv
   tags: cat1
 
-
-# List users in order to look for .rhosts file inside each home directory
-- name: List users on system
-  command: ls /home
-  register: users
-  tags: cat1
-
 - name: V-38491 High  There must be no .rhosts files on the system
-  file: state=absent dest=/home/{{ item }}/.rhosts
+  file: state=absent dest=~{{ item }}/.rhosts
   with_items: users.stdout_lines
   tags: cat1
 
