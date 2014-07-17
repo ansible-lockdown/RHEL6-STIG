@@ -13,3 +13,6 @@
 
 - name: restart auditd
   service: name=auditd state=restarted
+
+- name: unload usb-storage
+  modprobe: name=usb-storage state=absent
