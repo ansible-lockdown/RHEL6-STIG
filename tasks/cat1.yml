@@ -22,6 +22,8 @@
   file: state=absent dest=/etc/hosts.equiv
   tags: cat1
 
+
+# List users in order to look for .rhosts file inside each home directory
 - name: List users on system
   command: ls /home
   register: users
@@ -32,7 +34,8 @@
   with_items: users.stdout_lines
   tags: cat1
 
-- name: V-38666 High  The system must use and update a DoD-approved virus scan program
+
+- name: Looking for the presence of a DoD-approved virus scan program
   shell: grep uvscan /etc/cron* /var/spool/cron/*
   register: av_present
   ignore_errors: yes
@@ -43,7 +46,8 @@
   when: av_present.rc != 0
   tags: cat1
 
-- name: V-38666 High  The system must use and update a DoD-approved virus scan program
+
+- name: Looking for virus definitions older than seven days
   command: find /usr/local/uvscan -type f -mtime +7
   register: av_defs
   ignore_errors: yes
@@ -54,11 +58,12 @@
   when: av_defs.stdout_lines
   tags: cat1
 
+
 - name: V-38668 High  The x86 Ctrl-Alt-Delete key sequence must be disabled
   copy: src=control-alt-delete.override dest=/etc/init/control-alt-delete.override owner=root group=root mode=0644
   tags: cat1
 
-- name: V-38462 High  The RPM package management tool must cryptographically verify the authenticity of all software packages during installation.
+- name: V-38462 High  The RPM package management tool must cryptographically verify the authenticity of all software packages during installation
   lineinfile: state=absent dest={{ item }} regexp=nosignature
   with_items:
     - /etc/rpmrc
