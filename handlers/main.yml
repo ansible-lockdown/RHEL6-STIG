@@ -5,7 +5,7 @@
 - name: restart ssh
   service: name=sshd state=restarted
 
-- name: restart snmp
+- name: restart snmpd
   service: name=snmpd state=restarted
 
 - name: restart xinetd
