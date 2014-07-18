@@ -31,7 +31,15 @@ Role Variables
 
 **fullauto**                   Run the role without pausing (Default: false)
 
-**root_email_address**          Address where system email is sent
+**root_email_address**          Address where system email is sent (Default: foo@baz.com)
+
+**xwindows_required**           Whether or not X Windows is is use on taregt systems. Disables some changes if X Windows is not in use.
+
+**pass_min_length**             Minimum password length (Default: 14)
+
+**pass_min_days**               Minimum password age in days (Default: 1)
+
+**pass_max_days**               Maximum password age in days (Default: 60)
 
 Dependencies
 ------------

@@ -6,9 +6,15 @@ rhel6_stig_cat3: false
 
 # Changing system defaults
 rhel6_stig_snmp_community: B0re4lis
+pass_min_length: 14
+pass_min_days: 1
+pass_max_days: 60
 
 # Set this to true to omit all the pauses in the role
 fullauto: false
 
 # Email address for root mail
 root_email_address: foo@baz.com
+
+# Set to 'true' if X Windows is needed in your environment
+xwindows_required: false
