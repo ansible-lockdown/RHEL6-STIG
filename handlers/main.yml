@@ -16,3 +16,6 @@
 
 - name: unload usb-storage
   modprobe: name=usb-storage state=absent
+
+- name: update postfix aliases.db
+  command: newaliases

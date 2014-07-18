@@ -3,6 +3,12 @@ RHEL 6 DISA STIG
 
 Configure RHEL 6 machine to be DISA STIG compliant. CAT I findings will be corrected by default. CAT II and CAT III findings can be corrected by setting the appropriate variable.
 
+This role **will make changes to the system** that could break things. This is not an auditing tool but rather a remediation tool to be used after an audit has been conducted.
+
+When the role is running, you will most likely see a good number of failures. This is caused by using the `shell` module to run `grep` and look for output. If not output is returned, the `shell` module will fail. However, this is usally a good sign because no output means no finding.
+
+The role tries to be helpful and pause to let you know it found something. You can disable this behaviour if you want to run it unattended by setting `fullauto` to `true`.
+
 Based on [Red Hat Enterprise Linux 6 Security Technical Implementation Guide 2013-06-03](http://www.stigviewer.com/stig/red_hat_enterprise_linux_6/).
 
 Inspiration and some config files taken from [RedHatGov](https://github.com/RedHatGov) [stig-fix-el6](https://github.com/RedHatGov/stig-fix-el6).
@@ -24,6 +30,8 @@ Role Variables
 **rhel6_stig_snmp_community**  borealis
 
 **fullauto**                   Run the role without pausing (Default: false)
+
+**root_email_address**          Address where system email is sent
 
 Dependencies
 ------------
