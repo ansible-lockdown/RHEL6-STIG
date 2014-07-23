@@ -147,11 +147,11 @@
 
 - name: V-38526 Medium  The system must not accept ICMPv4 secure redirect packets on any interface
   sysctl: name=net.ipv4.conf.all.secure_redirects value=0 state=present reload=yes ignoreerrors=yes
-  tags: [ 'cat2' , 'V-38526' ]
+  tags: [ 'cat2' , 'V-38526' , 'icmp_redirects' ]
 
 - name:  Medium  The system must not accept ICMPv4 redirect packets on any interface
   sysctl: name=net.ipv4.conf.all.accept_redirects value=0 state=present reload=yes ignoreerrors=yes
-  tags: [ 'cat2' , 'V-38524' ]
+  tags: [ 'cat2' , 'V-38524' , 'icmp_redirects' ]
 
 # - name: V-38488 Medium  The operating system must conduct backups of user-level information contained in the operating system per organization defined frequency to conduct backups consistent with recovery time and recovery point objectives
 
