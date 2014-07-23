@@ -4,45 +4,45 @@
   replace: backup=yes dest=/etc/snmp/snmpd.conf regexp=(^com2sec.*default\s+)public replace=\1{{ rhel6_stig_snmp_community }}
   ignore_errors: yes
   notify: restart snmpd
-  tags: cat1
+  tags: [ 'cat1' , 'V-38653' ]
 
 - name: V-38491 High  There must be no hosts.equiv file on the system
   file: state=absent dest=/etc/hosts.equiv
-  tags: cat1
+  tags: [ 'cat1' , 'V-38491' ]
 
 - name: V-38491 High  There must be no .rhosts files on the system
   file: state=absent dest=~{{ item }}/.rhosts
   with_items: users.stdout_lines
-  tags: cat1
+  tags: [ 'cat1' , 'V-38491' ]
 
 
 - name: Looking for the presence of a DoD-approved virus scan program
   shell: grep uvscan /etc/cron* /var/spool/cron/*
   register: av_present
   ignore_errors: yes
-  tags: cat1
+  tags: [ 'cat1' , 'V-38666' ]
 
 - name: V-38666 High  The system must use and update a DoD-approved virus scan program
   debug: msg="No AV software present"
   when: av_present.rc != 0
-  tags: cat1
+  tags: [ 'cat1' , 'V-38666' ]
 
 
 - name: Looking for virus definitions older than seven days
   command: find /usr/local/uvscan -type f -mtime +7
   register: av_defs
   ignore_errors: yes
-  tags: cat1
+  tags: [ 'cat1' , 'V-38666' ]
 
 - name: V-38666 High  The system must use and update a DoD-approved virus scan program
   debug: msg="AV definitions are outdated"
   when: av_defs.stdout_lines
-  tags: cat1
+  tags: [ 'cat1' , 'V-38666' ]
 
 
 - name: V-38668 High  The x86 Ctrl-Alt-Delete key sequence must be disabled
   copy: src=control-alt-delete.override dest=/etc/init/control-alt-delete.override owner=root group=root mode=0644
-  tags: cat1
+  tags: [ 'cat1' , 'V-38668' ]
 
 - name: V-38462 High  The RPM package management tool must cryptographically verify the authenticity of all software packages during installation
   lineinfile: state=absent dest={{ item }} regexp=nosignature
@@ -51,54 +51,54 @@
     - /usr/lib/rpm/rpmrc
     - /usr/lib/rpm/redhat/rpmrc
     - ~root/.rpmrc
-  tags: cat1
+  tags: [ 'cat1' , 'V-38462' ]
 
 - name: V-38497 High  The system must not have accounts configured with blank or null passwords
   replace: dest=/etc/pam.d/system-auth-ac regexp='nullok\s'
-  tags: cat1
+  tags: [ 'cat1' , 'V-38497' ]
 
 - name: V-38677 High  The NFS server must not have the insecure file locking option enabled
   replace: dest=/etc/exports regexp='insecure_locks'
-  tags: cat1
+  tags: [ 'cat1' , 'V-38677' ]
 
 - name: V-38476 High  Vendor-provided cryptographic certificates must be installed to verify the integrity of system software.
   rpm_key: state=present key={{ gpg_key_url }}
-  tags: cat1
+  tags: [ 'cat1' , 'V-38476' ]
 
 - name: V-38607 High  The SSH daemon must be configured to use only the SSHv2 protocol
   lineinfile: state=present dest=/etc/ssh/sshd_config regexp='^(#)?Protocol \d' line='Protocol 2'
   notify: restart ssh
-  tags: [ 'ssh' , 'cat1' ]
+  tags: [ 'ssh' , 'cat1' , 'V-38607' ]
 
 - name: V-38602 High  The rlogind service must not be running
   service: name=rlogin enabled=no state=stopped
   ignore_errors: yes
-  tags: cat1
+  tags: [ 'cat1' , 'V-38602' ]
 
 - name: V-38594 High  The rshd service must not be running
   service: name=rshd enabled=no state=stopped
   ignore_errors: yes
-  tags: cat1
+  tags: [ 'cat1' , 'V-38594' ]
 
 - name: V-38591 High  The rsh-server package must not be installed
   yum: name=rsh-server state=absent
-  tags: cat1
+  tags: [ 'cat1' , 'V-38591' ]
 
 - name: V-38598 High  The rexecd service must not be running
   service: name=rexec enabled=no state=stopped
   ignore_errors: yes
-  tags: cat1
+  tags: [ 'cat1' , 'V-38598' ]
 
 - name: V-38587 High  The telnet-server package must not be installed
   yum: name=telnet-server state=absent
-  tags: cat1
+  tags: [ 'cat1' , 'V-38587' ]
 
 - name: V-38701 High  The TFTP daemon must operate in secure mode which provides access only to a single directory on the host file system
   lineinfile: state=present dest=/etc/xinetd.d/tftp regexp='server_args' line='        server_args             = -s /var/lib/tftpboot'
   notify: restart xinetd
-  tags: cat1
+  tags: [ 'cat1' , 'V-38701' ]
 
 - name: V-38614 High  The SSH daemon must not allow authentication using an empty password
   lineinfile: state=present dest=/etc/ssh/sshd_config regexp='^(#)?PermitEmptyPasswords' line='PermitEmptyPasswords no'
-  tags: [ 'ssh' , 'cat1' ]
+  tags: [ 'ssh' , 'cat1' , 'V-38614' ]
   notify: restart ssh

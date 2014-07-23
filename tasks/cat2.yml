@@ -1,7 +1,7 @@
 ---
 - name: V-38612 Medium  The SSH daemon must not allow host-based authentication
   lineinfile: state=present dest=/etc/ssh/sshd_config regexp='^(#)?HostbasedAuthentication' line='HostbasedAuthentication no'
-  tags: [ 'ssh' , 'cat2' ]
+  tags: [ 'ssh' , 'cat2', 'V-38612' ]
   notify: restart ssh
 
 
@@ -9,30 +9,30 @@
 # I modified it slightly by turning it into a template
 - name: V-38580 Medium  Copy STIG compliant audit.rules
   template: src=audit.rules.j2 dest=/etc/audit/audit.rules owner=root group=root mode=0640 backup=yes
-  tags: cat2
+  tags: [ 'cat2' , 'V-38580' ]
   notify: restart auditd
 
 
 - name: V-38459 Medium  The /etc/group file must be group-owned by root
   file: dest=/etc/group owner=root group=root mode=0644
-  tags: cat2
+  tags: [ 'cat2' , 'V-38459' ]
 
 
 # Search for world writable files and print them out if any are found
 - name: V-38643 Medium  There must be no world-writable files on the system
   command: find / -xdev -type f -perm -002
   register: world_writable_files
-  tags: cat2
+  tags: [ 'cat2' , 'V-38643' ]
 
 - name: The following files are world writable. This is a finding.
   debug: var=world_writable_files.stdout_lines
   when: world_writable_files.stdout_lines
-  tags: cat2
+  tags: [ 'cat2' , 'V-38643' ]
 
 - name: V-38643 Medium  There must be no world-writable files on the system
   pause: prompt="World writable files are present on the system. This is a finding. Press Enter to continue"
   when: world_writable_files.stdout_lines and not fullauto
-  tags: cat2
+  tags: [ 'cat2' , 'V-38643' ]
 
 
 # See if IPv6 is enabled before enabling ip6tables
@@ -40,13 +40,13 @@
   shell: ip addr | grep inet6
   register: ipv6test
   ignore_errors: yes
-  tags: cat2
+  tags: [ 'cat2' , 'V-38551' ]
 
 - name: V-38551 Medium  The operating system must connect to external networks or information systems only through managed IPv6 interfaces consisting of boundary protection devices arranged in accordance with an organizational security architecture
   service: name=ip6tables enabled=yes state=started
   when: ipv6test.stdout
   ignore_errors: yes
-  tags: cat2
+  tags: [ 'cat2' , 'V-38551' ]
 
 
 # Look in /etc/password for hashes and print them out if any are found
@@ -54,34 +54,34 @@
   shell: "awk -F: '($2 != \"x\") {print}' /etc/passwd"
   register: etc_password_hash_check
   ignore_errors: yes
-  tags: cat2
+  tags: [ 'cat2' , 'V-38499' ]
 
 - name: The following password hashes were found in /etc/passwd. This is a finding.
   debug: var=etc_password_hash_check.stdout_lines
   when: etc_password_hash_check.stdout
-  tags: cat2
+  tags: [ 'cat2' , 'V-38499' ]
 
 - name: V-38499 Medium  The /etc/passwd file must not contain password hashes
   pause: prompt="The following password hashes were found in /etc/passwd. This is a finding. Press Enter to continue"
   when: etc_password_hash_check.stdout and not fullauto
-  tags: cat2
+  tags: [ 'cat2' , 'V-38499' ]
 
 
 - name: V-38450 V-38451 Medium  The /etc/passwd file must be owned and group owned by root
   file: path=/etc/passwd owner=root group=root mode=0644
-  tags: cat2
+  tags: [ 'cat2' , 'V-38450' ]
 
 - name: V-38581 Medium  The system boot loader configuration file(s) must be group-owned by root
   file: path=/boot/grub/grub.conf owner=root group=root mode=0600
-  tags: cat2
+  tags: [ 'cat2' , 'V-38581' ]
 
 - name: V-38458 Medium  The /etc/group file must be owned by root
   file: path=/etc/group owner=root group=root mode=0644
-  tags: cat2
+  tags: [ 'cat2' , 'V-38458' ]
 
 - name: V-38658 Medium  The system must prohibit the reuse of passwords within twenty-four iterations
   lineinfile: state=present dest=/etc/pam.d/system-auth regexp='(password\s+sufficient\s+pam_unix.so)' line='\1 sha512 shadow nullok try_first_pass use_authtok remember=24' backrefs=yes backup=yes
-  tags: cat2
+  tags: [ 'cat2' , 'V-38658' ]
 
 
 # List all xinetd services then look for 'on' in the output
@@ -89,13 +89,13 @@
 - name: Checking if any xinetd services are enabled
   shell: "chkconfig --list | sed -n '/xinetd based services/,$p'"
   register: xinetd_services
-  tags: cat2
+  tags: [ 'cat2' , 'V-38582' ]
 
 - name: V-38582 Medium  The xinetd service must be disabled if no network services utilizing it are enabled
   service: name=xinetd enabled=no state=stopped
   ignore_errors: yes
   when: xinetd_services.stdout.find('\ton\n') == -1
-  tags: cat2
+  tags: [ 'cat2' , 'V-38582' ]
 
 
 # List nfs mounts that are missing the nodev option and ask the sys admin to correct this in /etc/fstab
@@ -104,17 +104,17 @@
   shell: mount | grep 'type nfs' | grep -v 'nodev'
   ignore_errors: yes
   register: nfs_mounts_missing_nodev
-  tags: cat2
+  tags: [ 'cat2' , 'V-38652' ]
 
 - name: V-38652 Medium  Remote file systems must be mounted with the 'nodev' option
   debug: var=nfs_mounts_missing_nodev.stdout_lines
   when: nfs_mounts_missing_nodev.stdout
-  tags: cat2
+  tags: [ 'cat2' , 'V-38652' ]
 
 - name: V-38652 Medium  Remote file systems must be mounted with the 'nodev' option
   pause: prompt="There are nfs mounts without the 'nodev' option set. This is a finding. Press Enter to continue"
   when: nfs_mounts_missing_nodev.stdout and not fullauto
-  tags: cat2
+  tags: [ 'cat2' , 'V-38652' ]
 
 
 # List nfs mounts that are missing the 'nosuid' option and ask the sys admin to correct this in /etc/fstab
@@ -123,35 +123,35 @@
   shell: mount | grep 'type nfs' | grep -v 'nosuid'
   ignore_errors: yes
   register: nfs_mounts_missing_nosuid
-  tags: cat2
+  tags: [ 'cat2' , 'V-38652' ]
 
 - name: V-38652 Medium  Remote file systems must be mounted with the nosuid option
   debug: var=nfs_mounts_missing_nosuid.stdout_lines
   when: nfs_mounts_missing_nosuid.stdout
-  tags: cat2
+  tags: [ 'cat2' , 'V-38652' ]
 
 - name: V-38652 Medium  Remote file systems must be mounted with the nosuid option
   pause: prompt="There are nfs mounts without the 'nosuid' option set. This is a finding. Press Enter to continue"
   when: nfs_mounts_missing_nosuid.stdout and not fullauto
-  tags: cat2
+  tags: [ 'cat2' , 'V-38652' ]
 
 
 - name: V-38490 Medium  The operating system must enforce requirements for the connection of mobile devices to operating systems
   kernel_blacklist: name=usb-storage
   notify: unload usb-storage
-  tags: cat2
+  tags: [ 'cat2' , 'V-38490' ]
 
 - name: V-38443 Medium  The /etc/gshadow file must be owned by root
   file: path=/etc/gshadow owner=root group=root mode=0000
-  tags: cat2
+  tags: [ 'cat2' , 'V-38443' ]
 
 - name: V-38526 Medium  The system must not accept ICMPv4 secure redirect packets on any interface
   sysctl: name=net.ipv4.conf.all.secure_redirects value=0 state=present reload=yes ignoreerrors=yes
-  tags: cat2
+  tags: [ 'cat2' , 'V-38526' ]
 
-- name: V-38524 Medium  The system must not accept ICMPv4 redirect packets on any interface
+- name:  Medium  The system must not accept ICMPv4 redirect packets on any interface
   sysctl: name=net.ipv4.conf.all.accept_redirects value=0 state=present reload=yes ignoreerrors=yes
-  tags: cat2
+  tags: [ 'cat2' , 'V-38524' ]
 
 # - name: V-38488 Medium  The operating system must conduct backups of user-level information contained in the operating system per organization defined frequency to conduct backups consistent with recovery time and recovery point objectives
 
@@ -159,29 +159,29 @@
   shell: grep -Er '(^[^#]?\*\.\*\s+@{1,2})|(\*\.\*\s+omrelp)' /etc/rsyslog.conf /etc/rsyslog.d/
   ignore_errors: yes
   register: remote_logging_servers
-  tags: cat2
+  tags: [ 'cat2' , 'V-38520' ]
 
 - name: V-38520 Medium  The operating system must back up audit records on an organization defined frequency onto a different system or media than the system being audited
   pause: prompt="No remote logging server is configured. Press Enter to continue"
   when: not remote_logging_servers.stdout and not fullauto
-  tags: cat2
+  tags: [ 'cat2' , 'V-38520' ]
 
 - name: V-38521 Medium  The operating system must support the requirement to centrally manage the content of audit records generated by organization defined information system components
   pause: prompt="No remote logging server is configured. Press Enter to continue"
   when: not remote_logging_servers.stdout and not fullauto
-  tags: cat2
+  tags: [ 'cat2' , 'V-38521' ]
 
 - name: "V-38485 Medium  The operating system, upon successful logon, must display to the user the date and time of the last logon or access via a local console or tty"
   file: path={{ item }} state=absent
   with_flattened:
     - /etc/hushlogins
     - users.stdout_lines
-  tags: cat2
+  tags: [ 'cat2' , 'V-38485' ]
 
 - name: "V-38484 Medium  The operating system, upon successful logon, must display to the user the date and time of the last logon or access via ssh"
   lineinfile: state=present dest=/etc/ssh/sshd_config regexp='^(#)?PrintLastLog' line='PrintLastLog yes'
   notify: restart ssh
-  tags: cat2
+  tags: [ 'cat2' , 'V-38484' ]
 
 # - name: V-38486 Medium  The operating system must conduct backups of system-level information contained in the information system per organization defined frequency to conduct backups that are consistent with recovery time and recovery point objectives
 
@@ -190,46 +190,46 @@
   command: yum check-update
   register: yum_update_status
   ignore_errors: yes
-  tags: cat2
+  tags: [ 'cat2' , 'V-38481' ]
 
 - name: V-38481 Medium  System security patches and updates must be installed and up-to-date
   pause: prompt="All available updates not installed. This is a finding. Press Enter to continue"
   when: yum_update_status.rc != 0
-  tags: cat2
+  tags: [ 'cat2' , 'V-38481' ]
 
 
 - name: V-38529 Medium  The system must not accept IPv4 source-routed packets by default
   sysctl: name=net.ipv4.conf.default.accept_source_route value=0 state=present reload=yes ignoreerrors=yes
-  tags: cat2
+  tags: [ 'cat2' , 'V-38529' ]
 
 
 - name: Checking group group-ownership of audit files
   shell: rpm -V audit | grep '^......G'
   ignore_errors: yes
   register: audit_group_ownership
-  tags: cat2
+  tags: [ 'cat2' , 'V-38665' ]
 
 - name: V-38665 Medium  The system package management tool must verify group-ownership on all files and directories associated with the audit package
   command: rpm --setugids audit
   when: audit_group_ownership.stdout
-  tags: cat2
+  tags: [ 'cat2' , 'V-38665' ]
 
 
 - name: Checking user ownership of audit files
   shell: rpm -V audit | grep '^......U'
   ignore_errors: yes
   register: audit_user_ownership
-  tags: cat2
+  tags: [ 'cat2' , 'V-38664' ]
 
 - name: V-38664 Medium  The system package management tool must verify ownership on all files and directories associated with the audit package
   command: rpm --setugids audit
   when: audit_user_ownership.stdout
-  tags: cat2
+  tags: [ 'cat2' , 'V-38664' ]
 
 - name: V-38667 Medium  The system must have a host-based intrusion detection tool installed
   pause: prompt="Verify that a host-based intrusion detection tool is installed. Press Enter to continue"
   when: not fullauto
-  tags: cat2
+  tags: [ 'cat2' , 'V-38667' ]
 
 
 # Look for prior versions of SNMP in use and disable them if found
@@ -237,37 +237,37 @@
   shell: "grep -E 'v1|v2c|com2sec' /etc/snmp/snmpd.conf | grep -v '^#'"
   ignore_errors: yes
   register: snmp_version_check
-  tags: cat2
+  tags: [ 'cat2' , 'V-38660' ]
 
 - name: V-38660 Medium  The snmpd service must use only SNMP protocol version 3 or newer
   replace: dest=/etc/snmp/snmpd.conf regexp='(^.*)(v1|v2c|com2sec)(.*$)' replace='#\1\2\3' backup=yes
   notify: restart snmpd
   when: snmp_version_check.stdout
-  tags: cat2
+  tags: [ 'cat2' , 'V-38660' ]
 
 - name: Previos versions of SNMP disabled
   pause: prompt="Versions of SNMP prior to version 3 were found and disabled. More work must be done to fully convert to SNMPv3. Press Enter to continue"
   when: snmp_version_check.stdout
-  tags: cat2
+  tags: [ 'cat2' , 'V-38660' ]
 
 
 - name: Checking permissions of audit files
   shell: rpm -V audit | grep '^.M'
   ignore_errors: yes
   register: audit_permissions
-  tags: cat2
+  tags: [ 'cat2' , 'V-38663' ]
 
 - name: V-38663 Medium  The system package management tool must verify permissions on all files and directories associated with the audit package
   command: rpm --setperms audit
   when: audit_permissions.stdout
-  tags: cat2
+  tags: [ 'cat2' , 'V-38663' ]
 
 
 - name: V-38446 Medium  The mail system must forward all mail for root to one or more system administrators
   lineinfile: "state=present backup=yes dest=/etc/aliases regexp='^root:' line='root:        {{ root_email_address }}'"
   when: root_email_address
   notify: update postfix aliases.db
-  tags: cat2
+  tags: [ 'cat2' , 'V-38446' ]
 
 - name: V-38466 Medium  Library files must be owned by root
   file: dest={{ item }} owner=root recurse=yes
@@ -276,7 +276,7 @@
     - /lib64
     - /usr/lib
     - /usr/lib64
-  tags: cat2
+  tags: [ 'cat2' , 'V-38466' ]
 
 
 - name: V-38465 Medium  Library files must have mode 0755 or less permissive
@@ -286,7 +286,7 @@
     - /lib64
     - /usr/lib
     - /usr/lib64
-  tags: cat2
+  tags: [ 'cat2' , 'V-38465' ]
 
 - name: V-38464 Medium  The audit system must take appropriate action when there are disk errors on the audit storage volume
         V-38468 Medium  The audit system must take appropriate action when the audit storage volume is full
@@ -294,11 +294,11 @@
         V-38470 Medium  The audit system must alert designated staff members when the audit storage volume approaches capacity
   template: src=auditd.conf.j2 dest=/etc/audit/auditd.conf owner=root group=root mode=0640 backup=yes
   notify: restart auditd
-  tags: cat2
+  tags: [ 'cat2' , 'V-38464' , 'V-38468' , 'V-38678' , 'V-38470' ]
 
 - name: V-38461 Medium  The /etc/group file must have mode 0644 or less permissive
   file: dest=/etc/group owner=root group=root mode=0644
-  tags: cat2
+  tags: [ 'cat2' , 'V-38461' ]
 
 - name: V-38469 Medium  All system command files must have mode 0755 or less permissive
   command: "find -L {{ item }} -perm /022 -exec chmod go-w '{}' ';'"
@@ -309,56 +309,56 @@
     - /sbin
     - /usr/sbin
     - /usr/local/sbin
-  tags: cat2
+  tags: [ 'cat2' , 'V-38469' ]
 
 - name: V-38553  Medium  The operating system must prevent public IPv6 access into an organizations internal networks, except as appropriately mediated by managed interfaces employing boundary protection devices
   service: name=ip6tables enabled=yes state=started
   when: ipv6test.stdout
-  tags: cat2
+  tags: [ 'cat2' , 'V-38553' ]
 
 - name: V-38498 Medium  Audit log files must have mode 0640 or less permissive
         V-38445 Medium  Audit log files must be group-owned by root
   file: dest=/var/log/audit/audit.log owner=root group=root mode=0600
-  tags: cat2
+  tags: [ 'cat2' , 'V-38498' , 'V-38445' ]
 
 - name: V-38555 Medium  The system must employ a local IPv4 firewall
   service: name=iptables enabled=yes state=started
-  tags: cat2
+  tags: [ 'cat2' , 'V-38555' ]
 
 - name: V-38492 Medium  The system must prevent the root account from logging in from virtual consoles
   lineinfile: state=absent dest=/etc/securetty regexp='^.*vc/\d' backup=yes
-  tags: cat2
+  tags: [ 'cat2' , 'V-38492' ]
 
 - name: V-38493 Medium  Audit log directories must have mode 0755 or less permissive
   file: dest=/var/log/audit owner=root group=root mode=0750
-  tags: cat2
+  tags: [ 'cat2' , 'V-38493' ]
 
 - name: "V-38496 Medium  Default system accounts, other than root, must be locked"
   command: passwd -l {{ item }}
   with_items: system_users.stdout_lines
-  tags: cat2
+  tags: [ 'cat2' , 'V-38496' ]
 
 - name: V-38523 Medium  The system must not accept IPv4 source-routed packets on any interface
   sysctl: name=net.ipv4.conf.all.accept_source_route value=0 state=present reload=yes ignoreerrors=yes
-  tags: cat2
+  tags: [ 'cat2' , 'V-38523' ]
 
 # - name: V-38673 Medium  The operating system must ensure unauthorized, security-relevant configuration changes detected are tracked
 # - name: V-38670  Medium  The operating system must detect unauthorized changes to software and information
 
 - name: V-38671 Medium  The sendmail package must be removed
   yum: name=sendmail state=absent
-  tags: cat2
+  tags: [ 'cat2' , 'V-38671' ]
 
 - name: V-38674 Medium  X Windows must not be enabled unless required
   lineinfile: state=present dest=/etc/inittab regexp='^id:' line='id:3:initdefault:' backup=yes
   when: not xwindows_required
-  tags: cat2
+  tags: [ 'cat2' , 'V-38674' ]
 
 - name: V-38630 Medium  The graphical desktop environment must automatically lock after 15 minutes of inactivity and the system must require user to re-authenticate to unlock the environment
   command: gconftool-2 --direct --config-source xml:readwrite:/etc/gconf/gconf.xml.mandatory --type bool --set /apps/gnome-screensaver/idle_activation_enabled true
   ignore_errors: yes
   when: not xwindows_required
-  tags: cat2
+  tags: [ 'cat2' , 'V-38630' ]
 
 
 # Get a list of interface config files. Exclude those with the current year in the name.
@@ -368,27 +368,27 @@
   shell: ls /etc/sysconfig/network-scripts/ifcfg-eth* | grep -v $(date +%Y)
   ignore_errors: yes
   register: interface_config_files
-  tags: cat2
+  tags: [ 'cat2' , 'V-38679' ]
 
 - name: V-38679 Medium  The DHCP client must be disabled if not needed
   lineinfile: "state=present dest={{ item }} regexp='^BOOTPROTO=' line='BOOTPROTO=\"static\"' backup=yes"
   with_items: interface_config_files.stdout_lines
   register: dhcp_change
   when: interface_config_files.stdout
-  tags: cat2
+  tags: [ 'cat2' , 'V-38679' ]
 
 - name: Changed to static IP address
   pause: prompt="The network configuration was changed from dynamic to static. You need to set an IP address in /etc/sysconfig/network-scripts/ifcfg-eth*. Press Enter to continue"
   when: dhcp_change.changed
-  tags: cat2
+  tags: [ 'cat2' , 'V-38679' ]
 
 - name: V-38475 Medium  The system must require passwords to contain a minimum of 14 characters
   lineinfile: "state=present dest=/etc/login.defs regexp='^PASS_MIN_LEN' line='PASS_MIN_LEN    {{ pass_min_length }}' backup=yes"
-  tags: cat2
+  tags: [ 'cat2' , 'V-38475' ]
 
 - name: V-38477 Medium  Users must not be able to change passwords more than once every 24 hours
   lineinfile: "state=present dest=/etc/login.defs regexp='^PASS_MIN_DAYS' line='PASS_MIN_DAYS   {{ pass_min_days }}' backup=yes"
-  tags: cat2
+  tags: [ 'cat2' , 'V-38477' ]
 
 - name: V-38472 Medium  All system command files must be owned by root
   file: dest={{ item }} owner=root recurse=yes
@@ -399,12 +399,12 @@
     - /sbin
     - /usr/sbin
     - /usr/local/sbin
-  tags: cat2
+  tags: [ 'cat2' , 'V-38472' ]
 
 - name: V-38479 Medium  User passwords must be changed at least every 60 days
   lineinfile: "state=present dest=/etc/login.defs regexp='^PASS_MAX_DAYS' line='PASS_MAX_DAYS   {{ pass_max_days }}' backup=yes"
-  tags: cat2
+  tags: [ 'cat2' , 'V-38479' ]
 
 - name: V-38542 Medium  The system must use a reverse-path filter for IPv4 network traffic when possible on all interfaces
   sysctl: name=net.ipv4.conf.all.rp_filter value=1 state=present reload=yes ignoreerrors=yes
-  tags: cat2
+  tags: [ 'cat2' , 'V-38542' ]
