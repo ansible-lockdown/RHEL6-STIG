@@ -149,7 +149,7 @@
   sysctl: name=net.ipv4.conf.all.secure_redirects value=0 state=present reload=yes ignoreerrors=yes
   tags: [ 'cat2' , 'V-38526' , 'icmp_redirects' ]
 
-- name:  Medium  The system must not accept ICMPv4 redirect packets on any interface
+- name: V-38524 Medium  The system must not accept ICMPv4 redirect packets on any interface
   sysctl: name=net.ipv4.conf.all.accept_redirects value=0 state=present reload=yes ignoreerrors=yes
   tags: [ 'cat2' , 'V-38524' , 'icmp_redirects' ]
 
