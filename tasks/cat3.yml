@@ -2,3 +2,7 @@
 - name: V-38533 Low The system must ignore IPv4 ICMP redirect messages.
   sysctl: name=net.ipv4.conf.default.accept_redirects value=0 state=present reload=yes ignoreerrors=yes
   tags: [ 'cat3' , 'V-38533' , 'icmp_redirects' ]
+
+- name: Disable TCP timestamp responses
+  sysctl: name=net.ipv4.tcp_timestamps value=0 state=present reloda=yes ignoreerrors=yes
+  tags: [ 'cat3' , 'V-38533' , 'icmp_timestamps' ]
