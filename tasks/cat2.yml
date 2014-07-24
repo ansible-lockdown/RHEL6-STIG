@@ -237,18 +237,18 @@
   shell: "grep -E 'v1|v2c|com2sec' /etc/snmp/snmpd.conf | grep -v '^#'"
   ignore_errors: yes
   register: snmp_version_check
-  tags: [ 'cat2' , 'V-38660' ]
+  tags: [ 'cat2' , 'V-38660', 'snmp' ]
 
 - name: V-38660 Medium  The snmpd service must use only SNMP protocol version 3 or newer
   replace: dest=/etc/snmp/snmpd.conf regexp='(^.*)(v1|v2c|com2sec)(.*$)' replace='#\1\2\3' backup=yes
   notify: restart snmpd
   when: snmp_version_check.stdout
-  tags: [ 'cat2' , 'V-38660' ]
+  tags: [ 'cat2' , 'V-38660' , 'snmp' ]
 
 - name: Previos versions of SNMP disabled
   pause: prompt="Versions of SNMP prior to version 3 were found and disabled. More work must be done to fully convert to SNMPv3. Press Enter to continue"
   when: snmp_version_check.stdout
-  tags: [ 'cat2' , 'V-38660' ]
+  tags: [ 'cat2' , 'V-38660' , 'snmp' ]
 
 
 - name: Checking permissions of audit files

@@ -4,7 +4,7 @@
   replace: backup=yes dest=/etc/snmp/snmpd.conf regexp=(^com2sec.*default\s+)public replace=\1{{ rhel6_stig_snmp_community }}
   ignore_errors: yes
   notify: restart snmpd
-  tags: [ 'cat1' , 'V-38653' ]
+  tags: [ 'cat1' , 'V-38653' , 'snmp' ]
 
 - name: V-38491 High  There must be no hosts.equiv file on the system
   file: state=absent dest=/etc/hosts.equiv
