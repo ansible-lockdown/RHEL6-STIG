@@ -37,10 +37,11 @@
 
 
 - name: V-38551 Medium  The operating system must connect to external networks or information systems only through managed IPv6 interfaces consisting of boundary protection devices arranged in accordance with an organizational security architecture
+        V-38549 Medium  The system must employ a local IPv6 firewall
   service: name=ip6tables enabled=yes state=started
   when: rhel6stig_ipv6_in_use
   ignore_errors: yes
-  tags: [ 'cat2' , 'V-38551' , 'ipv6' ]
+  tags: [ 'cat2' , 'V-38551' , V-38549' 'ipv6' ]
 
 
 # Look in /etc/password for hashes and print them out if any are found
@@ -443,6 +444,16 @@
   copy: backup=yes src=disable-ipv6.conf dest=/etc/modprobe.d/disable-ipv6.conf owner=root group=root mode=0644
   when: not rhel6stig_ipv6_in_use
   tags: [ 'cat2' , 'V-38546' , 'ipv6' ]
+
+- name: V-38548 Medium  The system must ignore ICMPv6 redirects by default
+  sysctl: name=net.ipv6.conf.default.accept_redirects value=0 state=present reload=yes ignoreerrors=yes
+  tags: [ 'cat2' , 'V-38548' , 'icmp_redirects' , 'kernel_parameters' , 'network' , 'ipv6' ]
+
+- name: "V-38689 Medium  The Department of Defense (DoD) login banner must be displayed immediately prior to, or as part of, graphical desktop environment login prompts"
+  command: gdm gconftool-2 --type string --set /apps/gdm/simple-greeter/banner_message_text "*******************************************************************************"""*     YOU ARE ACCESSING A U.S. GOVERNMENT (USG) INFORMATION SYSTEM  (IS)      *"""*               THAT IS PROVIDED FOR USG-AUTHORIZED USE ONLY.                 *"""*                                                                             *"""*      BY USING THIS IS (WHICH INCLUDES ANY DEVICE ATTACHED TO THIS IS),      *"""*                 YOU CONSENT TO THE FOLLOWING CONDITIONS:                    *"""*                                                                             *"""*   THE USG  ROUTINELY INTERCEPTS  AND MONITORS COMMUNICATIONS ON THIS IS FOR *"""* PURPOSES INCLUDING,  BUT NOT LIMITED TO, PENETRATION TESTING, COMSEC MONIT- *"""* ORING, NETWORK OPERATIONS  AND  DEFENSE,  PERSONNEL  MISCONDUCT  (PM),  LAW *"""* ENFORCEMENT, AND COUNTERINTELLIGENCE (CI) INVESTIGATIONS.                   *"""*   AT ANY TIME, THE USG MAY INSPECT AND SEIZE DATA STORED ON THIS IS.        *"""*   COMMUNICATIONS USING,  OR DATA STORED ON,  THIS IS ARE NOT  PRIVATE,  ARE *"""* SUBJECT  TO ROUTINE MONITORING, INTERCEPTION,  AND SEARCH,  AND MAY BE DIS- *"""* CLOSED OR USED FOR ANY USG AUTHORIZED PURPOSE.                              *"""*   THIS IS INCLUDES SECURITY MEASURES (e.g., AUTHENTICATION AND ACCESS CONT- *"""* ROLS) TO PROTECT USG INTERESTS--NOT FOR YOUR PERSONAL BENEFIT OR PRIVACY.   *"""*   NOTWITHSTANDING THE ABOVE,  USING THIS IS DOES  NOT CONSTITUTE CONSENT TO *"""* PM, LE, OR CI INVESTIGATIVE SEARCHING OR MONITORING OF THE CONTENT OF PRIV- *"""* ILEGED COMMUNICATIONS, OR WORK PRODUCT, RELATED TO  PERSONAL REPRESENTATION *"""* OR   SERVICES   BY   ATTORNEYS,   PSYCHOTHERAPISTS,  OR  CLERGY,  AND THEIR *"""* ASSISTANTS.   SUCH   COMMUNICATIONS  AND  WORK   PRODUCT  ARE  PRIVATE  AND *"""* CONFIDENTIAL. SEE USER AGREEMENT FOR DETAILS.                               *"""*******************************************************************************""""
+  when: rhel6stig_xwindows_required
+  tags: [ 'cat2' , 'V-38689' , 'logon_settings' , 'xwindows' , 'gui' ]
+
 
 
 
