@@ -22,6 +22,7 @@
 - name: V-38643 Medium  There must be no world-writable files on the system
   command: find / -xdev -type f -perm -002
   register: world_writable_files
+  changed_when: false
   tags: [ 'cat2' , 'V-38643', 'file_perms' ]
 
 - name: The following files are world writable. This is a finding.
@@ -38,6 +39,7 @@
 # See if IPv6 is enabled before enabling ip6tables
 - name: Check if IPv6 is enabled
   shell: ip addr | grep inet6
+  changed_when: false
   register: ipv6test
   ignore_errors: yes
   tags: [ 'cat2' , 'V-38551' , 'ipv6' ]
@@ -52,6 +54,7 @@
 # Look in /etc/password for hashes and print them out if any are found
 - name: V-38499 Medium  The /etc/passwd file must not contain password hashes
   shell: "awk -F: '($2 != \"x\") {print}' /etc/passwd"
+  changed_when: false
   register: etc_password_hash_check
   ignore_errors: yes
   tags: [ 'cat2' , 'V-38499' , 'passwords' ]
@@ -88,6 +91,7 @@
 # If any xinted service is found to be on, skip these tasks since xinetd can be on if a service is using it
 - name: Checking if any xinetd services are enabled
   shell: "chkconfig --list | sed -n '/xinetd based services/,$p'"
+  changed_when: false
   register: xinetd_services
   tags: [ 'cat2' , 'V-38582' , 'xinetd' , 'services' ]
 
@@ -102,6 +106,7 @@
 # This would be a bit tricky to automatically fix in /etc/fstab.
 - name: Checking for nfs mounts missing the 'nodev' option
   shell: mount | grep 'type nfs' | grep -v 'nodev'
+  changed_when: false
   ignore_errors: yes
   register: nfs_mounts_missing_nodev
   tags: [ 'cat2' , 'V-38652' , 'nfs' ]
@@ -121,6 +126,7 @@
 # This would be a bit tricky to automatically fix in /etc/fstab.
 - name: Checking for nfs mounts missing the 'nosuid' option
   shell: mount | grep 'type nfs' | grep -v 'nosuid'
+  changed_when: false
   ignore_errors: yes
   register: nfs_mounts_missing_nosuid
   tags: [ 'cat2' , 'V-38652' , 'nfs' ]
@@ -157,6 +163,7 @@
 
 - name: Checking for remote log servers
   shell: grep -Er '(^[^#]?\*\.\*\s+@{1,2})|(\*\.\*\s+omrelp)' /etc/rsyslog.conf /etc/rsyslog.d/
+  changed_when: false
   ignore_errors: yes
   register: remote_logging_servers
   tags: [ 'cat2' , 'V-38520' , 'logging' ]
@@ -188,6 +195,7 @@
 
 - name: Checking for updates
   command: yum check-update
+  changed_when: false
   register: yum_update_status
   ignore_errors: yes
   tags: [ 'cat2' , 'V-38481' , 'yum' , 'updates' ]
@@ -205,24 +213,28 @@
 
 - name: Checking group group-ownership of audit files
   shell: rpm -V audit | grep '^......G'
+  changed_when: false
   ignore_errors: yes
   register: audit_group_ownership
   tags: [ 'cat2' , 'V-38665' , 'file_perms' ]
 
 - name: V-38665 Medium  The system package management tool must verify group-ownership on all files and directories associated with the audit package
   command: rpm --setugids audit
+  changed_when: false
   when: audit_group_ownership.stdout
   tags: [ 'cat2' , 'V-38665' , 'file_perms' , 'rpm' ]
 
 
 - name: Checking user ownership of audit files
   shell: rpm -V audit | grep '^......U'
+  changed_when: false
   ignore_errors: yes
   register: audit_user_ownership
   tags: [ 'cat2' , 'V-38664' , 'file_perms' , 'auditd' , 'rpm' ]
 
 - name: V-38664 Medium  The system package management tool must verify ownership on all files and directories associated with the audit package
   command: rpm --setugids audit
+  changed_when: false
   when: audit_user_ownership.stdout
   tags: [ 'cat2' , 'V-38664' , 'file_perms' , 'auditd' , 'rpm' ]
 
@@ -235,6 +247,7 @@
 # Look for prior versions of SNMP in use and disable them if found
 - name: Checking SNMP versions in use
   shell: "grep -E 'v1|v2c|com2sec' /etc/snmp/snmpd.conf | grep -v '^#'"
+  changed_when: false
   ignore_errors: yes
   register: snmp_version_check
   tags: [ 'cat2' , 'V-38660', 'snmp' ]
@@ -253,6 +266,7 @@
 
 - name: Checking permissions of audit files
   shell: rpm -V audit | grep '^.M'
+  changed_when: false
   ignore_errors: yes
   register: audit_permissions
   tags: [ 'cat2' , 'V-38663' , 'file_perms' , 'auditd' , 'rpm' ]
@@ -366,6 +380,7 @@
 # are named like 'ifcfg-eth0.2014-07-18@13:19~' and will match the glob.
 - name: List interface config files
   shell: ls /etc/sysconfig/network-scripts/ifcfg-eth* | grep -v $(date +%Y)
+  changed_when: false
   ignore_errors: yes
   register: interface_config_files
   tags: [ 'cat2' , 'V-38679' , 'network' , 'dhcp' ]
@@ -412,6 +427,27 @@
 - name: V-38544 Medium  The system must use a reverse-path filter for IPv4 network traffic when possible by default.
   sysctl: name=net.ipv4.conf.default.rp_filter value=1 state=present reload=yes ignoreerrors=yes
   tags: [ 'cat2' , 'V-38544' , 'kernel_parameters' , 'network' , 'reverse_path_filter' ]
+
+
+# Get a list of all repo files on remote system
+# Ideally, this would be done using with_fileglobs instead of two separate actions,
+# but with_fileglobs only operates on the host filesystem, not the remote.
+- name: List yum repository files
+  shell: ls /etc/yum.repos.d/*.repo
+  changed_when: false
+  register: yum_repos
+  ignore_errors: yes
+  tags: [ 'cat2' , 'V-38483' , 'test' , 'rpm' , 'gpgcheck' ]
+
+- name: V-38483 Medium  The system package management tool must cryptographically verify the authenticity of system software packages during installation
+  replace: backup=yes dest={{ item }} regexp='^gpgcheck=0' replace='gpgcheck=1'
+  tags: [ 'cat2' , 'V-38483' , 'rpm' , 'gpgcheck' ]
+  with_flattened:
+    - /etc/yum.conf
+    - yum_repos.stdout_lines
+
+
+
 
 # --- BREAK --- #
 

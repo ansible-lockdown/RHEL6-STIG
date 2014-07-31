@@ -14,11 +14,13 @@
 - name: List users accounts
   command: "awk -F: '{print $1}' /etc/passwd"
   register: users
+  changed_when: false
   tags: [ 'cat1' , 'cat2' , 'cat3' , 'test']
 
 - name: List system accounts
   shell: "grep -Ev '/home|root' /etc/passwd | cut -d : -f 1"
   register: system_users
+  changed_when: false
   tags: [ 'cat1' , 'cat2' , 'cat3' , 'test']
 
 - { include: cat1.yml, when: rhel6stig_cat1 }
