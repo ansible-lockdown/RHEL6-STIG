@@ -1,7 +1,7 @@
 ---
 # CAT I Findings
 - name: V-38653 High  The snmpd service must not use a default password
-  replace: backup=yes dest=/etc/snmp/snmpd.conf regexp=(^com2sec.*default\s+)public replace=\1{{ rhel6_stig_snmp_community }}
+  replace: backup=yes dest=/etc/snmp/snmpd.conf regexp=(^com2sec.*default\s+)public replace=\1{{ rhel6stig_snmp_community }}
   ignore_errors: yes
   notify: restart snmpd
   tags: [ 'cat1' , 'V-38653' , 'snmp' ]
@@ -24,7 +24,7 @@
 
 - name: V-38666 High  The system must use and update a DoD-approved virus scan program
   pause: prompt="No AV software present. Press ENTER to continue"
-  when: av_present.rc != 0 and not fullauto
+  when: av_present.rc != 0 and not rhel6stig_fullauto
   tags: [ 'cat1' , 'V-38666' ]
 
 
@@ -36,7 +36,7 @@
 
 - name: V-38666 High  The system must use and update a DoD-approved virus scan program
   pause: prompt="AV definitions are outdated. Press ENTER to continue"
-  when: av_defs.stdout_lines and not fullauto
+  when: av_defs.stdout_lines and not rhel6stig_fullauto
   tags: [ 'cat1' , 'V-38666' ]
 
 
