@@ -36,17 +36,9 @@
   tags: [ 'cat2' , 'V-38643', 'file_perms' ]
 
 
-# See if IPv6 is enabled before enabling ip6tables
-- name: Check if IPv6 is enabled
-  shell: ip addr | grep inet6
-  changed_when: false
-  register: ipv6test
-  ignore_errors: yes
-  tags: [ 'cat2' , 'V-38551' , 'ipv6' ]
-
 - name: V-38551 Medium  The operating system must connect to external networks or information systems only through managed IPv6 interfaces consisting of boundary protection devices arranged in accordance with an organizational security architecture
   service: name=ip6tables enabled=yes state=started
-  when: ipv6test.stdout
+  when: rhel6stig_ipv6_in_use
   ignore_errors: yes
   tags: [ 'cat2' , 'V-38551' , 'ipv6' ]
 
@@ -327,7 +319,7 @@
 
 - name: V-38553  Medium  The operating system must prevent public IPv6 access into an organizations internal networks, except as appropriately mediated by managed interfaces employing boundary protection devices
   service: name=ip6tables enabled=yes state=started
-  when: ipv6test.stdout
+  when: rhel6stig_ipv6_in_use
   tags: [ 'cat2' , 'V-38553' , 'kernel_parameters' , 'network' , 'ipv6' ]
 
 - name: V-38498 Medium  Audit log files must have mode 0640 or less permissive
@@ -446,6 +438,11 @@
     - /etc/yum.conf
     - yum_repos.stdout_lines
 
+
+- name: V-38546 Medium  The IPv6 protocol handler must not be bound to the network stack unless needed
+  copy: backup=yes src=disable-ipv6.conf dest=/etc/modprobe.d/disable-ipv6.conf owner=root group=root mode=0644
+  when: not rhel6stig_ipv6_in_use
+  tags: [ 'cat2' , 'V-38546' , 'ipv6' ]
 
 
 

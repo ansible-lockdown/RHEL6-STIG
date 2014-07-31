@@ -1,7 +1,7 @@
 RHEL 6 DISA STIG
 ================
 
-Configure RHEL 6 machine to be DISA STIG compliant. CAT I findings will be corrected by default. CAT II and CAT III findings can be corrected by setting the appropriate variable.
+Configure RHEL 6 machine to be DISA STIG compliant. CAT I findings will be corrected by default. CAT II and CAT III findings can be corrected by setting the appropriate variable to enable those playbooks.
 
 This role **will make changes to the system** that could break things. This is not an auditing tool but rather a remediation tool to be used after an audit has been conducted.
 
@@ -40,6 +40,8 @@ Role Variables
 **rhel6stig_pass_min_days**               Minimum password age in days (Default: 1)
 
 **rhel6stig_pass_max_days**               Maximum password age in days (Default: 60)
+
+**rhel6stig_ipv6_in_use**       Whether or not ipv6 is in use of the target system. This is set automatically to 'true' if ipv6 is found to be in use. (Default: false)
 
 Dependencies
 ------------

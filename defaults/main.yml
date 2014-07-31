@@ -18,3 +18,7 @@ rhel6stig_root_email_address: foo@baz.com
 
 # Set to 'true' if X Windows is needed in your environment
 rhel6stig_xwindows_required: false
+
+# Assume ipv6 is disabled on the target system.
+# This will be changed to 'true' via set_fact in main.yml
+rhel6stig_ipv6_in_use: false

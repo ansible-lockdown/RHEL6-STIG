@@ -23,6 +23,19 @@
   changed_when: false
   tags: [ 'cat1' , 'cat2' , 'cat3' , 'test']
 
+# See if IPv6 is enabled and set a fact
+- name: Check if IPv6 is enabled
+  shell: ip addr | grep inet6
+  changed_when: false
+  register: rhel6stig_ipv6test
+  ignore_errors: yes
+  tags: [ 'ipv6' , 'test' ]
+
+- name: Set ipv6_in_use to 'true'
+  set_fact: ipv6_in_use=true
+  when: rhel6stig_ipv6test.stdout
+  tags: [ 'ipv6' , 'test' ]
+
 - { include: cat1.yml, when: rhel6stig_cat1 }
 - { include: cat2.yml, when: rhel6stig_cat2 }
 - { include: cat3.yml, when: rhel6stig_cat3 }
