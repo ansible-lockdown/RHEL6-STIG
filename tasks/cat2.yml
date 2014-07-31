@@ -202,7 +202,7 @@
 
 - name: V-38481 Medium  System security patches and updates must be installed and up-to-date
   pause: prompt="All available updates not installed. This is a finding. Press Enter to continue"
-  when: yum_update_status.rc != 0
+  when: yum_update_status.rc != 0 and not rhel6stig_fullauto
   tags: [ 'cat2' , 'V-38481' , 'yum' , 'updates' ]
 
 
@@ -260,7 +260,7 @@
 
 - name: Previous versions of SNMP disabled
   pause: prompt="Versions of SNMP prior to version 3 were found and disabled. More work must be done to fully convert to SNMPv3. Press Enter to continue"
-  when: snmp_version_check.stdout
+  when: snmp_version_check.stdout and not rhel6stig_fullauto
   tags: [ 'cat2' , 'V-38660' , 'snmp' ]
 
 
@@ -394,7 +394,7 @@
 
 - name: Changed to static IP address
   pause: prompt="The network configuration was changed from dynamic to static. You need to set an IP address in /etc/sysconfig/network-scripts/ifcfg-eth*. Press Enter to continue"
-  when: dhcp_change.changed
+  when: dhcp_change.changed and not rhel6stig_fullauto
   tags: [ 'cat2' , 'V-38679' , 'network' , 'dhcp' ]
 
 - name: V-38475 Medium  The system must require passwords to contain a minimum of 14 characters
