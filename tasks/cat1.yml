@@ -94,8 +94,8 @@
   tags: [ 'cat1' , 'V-38587' , 'telnet', 'unsecure_services' ]
 
 - name: V-38701 High  The TFTP daemon must operate in secure mode which provides access only to a single directory on the host file system
-  lineinfile: state=present dest=/etc/xinetd.d/tftp regexp='server_args' line='        server_args             = -s /var/lib/tftpboot'
-  notify: restart xinetd
+  lineinfile: "state=present dest=/etc/xinetd.d/tftp regexp='server_args' line='\tserver_args\t\t= -s /var/lib/tftpboot'"
+  notify: reload xinetd
   tags: [ 'cat1' , 'V-38701' , 'tftp' , 'unsecure_services' ]
 
 - name: V-38614 High  The SSH daemon must not allow authentication using an empty password

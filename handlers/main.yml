@@ -11,6 +11,9 @@
 - name: restart xinetd
   service: name=xinetd state=restarted
 
+- name: reload xinetd
+  service: name=xinetd state=reloaded
+
 - name: restart auditd
   service: name=auditd state=restarted
 
