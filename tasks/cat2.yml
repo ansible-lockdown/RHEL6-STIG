@@ -487,6 +487,15 @@
   tags: [ 'cat2' , 'V-38686' , 'firewall' ]
   notify: restart iptables
 
+- name: V-38682 Medium  The Bluetooth kernel module must be disabled
+  kernel_blacklist: name={{ item }}
+  with_items:
+    - bluetooth
+    - net-pf-31
+  tags: [ 'V-38682' , 'kernel_modules' , 'bluetooth' ]
+
+
+
 
 # --- BREAK --- #
 

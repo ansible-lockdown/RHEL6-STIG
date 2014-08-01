@@ -27,6 +27,7 @@
 - name: Check if IPv6 is enabled
   shell: ip addr | grep inet6
   changed_when: false
+  failed_when: false
   register: rhel6stig_ipv6test
   ignore_errors: yes
   tags: [ 'ipv6' , 'test' ]
