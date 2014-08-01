@@ -534,7 +534,12 @@
 
 - name: V-38579 Medium  The system boot loader configuration file(s) must be owned by root
   file: path=/boot/grub/grub.conf owner=root group=root mode=0600
-  tags: [ 'V-38579' , 'grub' , 'file_perms' , 'test' ]
+  tags: [ 'V-38579' , 'grub' , 'file_perms' ]
+
+- name: V-38613 Medium  The system must not permit root logins using remote access programs such as ssh
+  lineinfile: "state=present backup=yes dest=/etc/ssh/sshd_config regexp='^(#)?PermitRootLogin' line='PermitRootLogin no'"
+  tags: [ 'V-38613' , 'ssh' , 'config' , 'test' ]
+  notify: restart ssh
 
 # --- BREAK --- #
 
