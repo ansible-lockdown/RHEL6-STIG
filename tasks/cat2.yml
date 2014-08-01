@@ -449,12 +449,37 @@
   sysctl: name=net.ipv6.conf.default.accept_redirects value=0 state=present reload=yes ignoreerrors=yes
   tags: [ 'cat2' , 'V-38548' , 'icmp_redirects' , 'kernel_parameters' , 'network' , 'ipv6' ]
 
+
+# DOD login banner for GUI environments
 - name: "V-38689 Medium  The Department of Defense (DoD) login banner must be displayed immediately prior to, or as part of, graphical desktop environment login prompts"
-  command: gdm gconftool-2 --type string --set /apps/gdm/simple-greeter/banner_message_text "*******************************************************************************"""*     YOU ARE ACCESSING A U.S. GOVERNMENT (USG) INFORMATION SYSTEM  (IS)      *"""*               THAT IS PROVIDED FOR USG-AUTHORIZED USE ONLY.                 *"""*                                                                             *"""*      BY USING THIS IS (WHICH INCLUDES ANY DEVICE ATTACHED TO THIS IS),      *"""*                 YOU CONSENT TO THE FOLLOWING CONDITIONS:                    *"""*                                                                             *"""*   THE USG  ROUTINELY INTERCEPTS  AND MONITORS COMMUNICATIONS ON THIS IS FOR *"""* PURPOSES INCLUDING,  BUT NOT LIMITED TO, PENETRATION TESTING, COMSEC MONIT- *"""* ORING, NETWORK OPERATIONS  AND  DEFENSE,  PERSONNEL  MISCONDUCT  (PM),  LAW *"""* ENFORCEMENT, AND COUNTERINTELLIGENCE (CI) INVESTIGATIONS.                   *"""*   AT ANY TIME, THE USG MAY INSPECT AND SEIZE DATA STORED ON THIS IS.        *"""*   COMMUNICATIONS USING,  OR DATA STORED ON,  THIS IS ARE NOT  PRIVATE,  ARE *"""* SUBJECT  TO ROUTINE MONITORING, INTERCEPTION,  AND SEARCH,  AND MAY BE DIS- *"""* CLOSED OR USED FOR ANY USG AUTHORIZED PURPOSE.                              *"""*   THIS IS INCLUDES SECURITY MEASURES (e.g., AUTHENTICATION AND ACCESS CONT- *"""* ROLS) TO PROTECT USG INTERESTS--NOT FOR YOUR PERSONAL BENEFIT OR PRIVACY.   *"""*   NOTWITHSTANDING THE ABOVE,  USING THIS IS DOES  NOT CONSTITUTE CONSENT TO *"""* PM, LE, OR CI INVESTIGATIVE SEARCHING OR MONITORING OF THE CONTENT OF PRIV- *"""* ILEGED COMMUNICATIONS, OR WORK PRODUCT, RELATED TO  PERSONAL REPRESENTATION *"""* OR   SERVICES   BY   ATTORNEYS,   PSYCHOTHERAPISTS,  OR  CLERGY,  AND THEIR *"""* ASSISTANTS.   SUCH   COMMUNICATIONS  AND  WORK   PRODUCT  ARE  PRIVATE  AND *"""* CONFIDENTIAL. SEE USER AGREEMENT FOR DETAILS.                               *"""*******************************************************************************""""
+  command: "gconftool-2 --direct --config-source xml:readwrite:/etc/gconf/gconf.xml.mandatory --type string --set /apps/gdm/simple-greeter/banner_message_text '  You are accessing a U.S. Government (USG) Information System (IS) that is provided for USG-authorized use only.\n  By using this IS (which includes any device attached to this IS), you consent to the following conditions:\n\n  The USG routinely intercepts and monitors communications on this IS for purposes including, but not limited to, penetration testing, COMSEC monitoring, network operations and defense, personnel misconduct (PM), law enforcement (LE), and counterintelligence (CI) investigations.\n  At any time, the USG may inspect and seize data stored on this IS.\n  Communications using, or data stored on, this IS are not private, are subject to routine monitoring, interception, and search, and may be disclosed or used for any USG-authorized purpose.\n  This IS includes security measures (e.g., authentication and access controls) to protect USG interests -- not for your personal benefit or privacy.\n  Notwithstanding the above, using this IS does not constitute consent to PM, LE or CI investigative searching or monitoring of the content of privileged communications, or work product, related to personal representation or services by attorneys, psychotherapists, or clergy, and their assistants. Such communications and work product are private and confidential. See User Agreement for details.'"
   when: rhel6stig_xwindows_required
-  tags: [ 'cat2' , 'V-38689' , 'logon_settings' , 'xwindows' , 'gui' ]
+  tags: [ 'cat2' , 'V-38689' , 'logon_settings' , 'xwindows' , 'gui' , 'dod_logon_banner' ]
+  notify: restart gdm
 
+- name: "V-38688  Medium  A login banner must be displayed immediately prior to, or as part of, graphical desktop environment login prompts."
+  command: "gconftool-2 --direct --config-source xml:readwrite:/etc/gconf/gconf.xml.mandatory --type bool --set /apps/gdm/simple-greeter/banner_message_enable true"
+  when: rhel6stig_xwindows_required
+  tags: [ 'cat2' , 'V-38689' , 'logon_settings' , 'xwindows' , 'gui' , 'dod_logon_banner' ]
+  notify: restart gdm
 
+- name: V-38689 Medium  Disable restart buttons on graphical logon screen
+  command: "gconftool-2 --direct --config-source xml:readwrite:/etc/gconf/gconf.xml.mandatory --type bool --set /apps/gdm/simple-greeter/disable_restart_buttons true"
+  when: rhel6stig_xwindows_required
+  tags: [ 'cat2' , 'V-38689' , 'logon_settings' , 'xwindows' , 'gui' , 'dod_logon_banner' ]
+  notify: restart gdm
+
+- name: V-38689 Medium  Disable user list on graphical logon screen
+  command: "gconftool-2 --direct --config-source xml:readwrite:/etc/gconf/gconf.xml.mandatory --type bool --set /apps/gdm/simple-greeter/disable_user_list true"
+  when: rhel6stig_xwindows_required
+  tags: [ 'cat2' , 'V-38689' , 'logon_settings' , 'xwindows' , 'gui' , 'dod_logon_banner' ]
+  notify: restart gdm
+
+- name: V-38689 Medium  Left justify banner text on graphical logon screen
+  lineinfile: state=present backup=yes dest=/usr/share/gdm/gdm-greeter-login-window.ui regexp='^(.*)<property name="justify">\w+</property>' line='\1<property name="justify">left</property>' backrefs=yes
+  when: rhel6stig_xwindows_required
+  tags: [ 'cat2' , 'V-38689' , 'logon_settings' , 'xwindows' , 'gui' , 'dod_logon_banner' ]
+  notify: restart gdm
 
 
 # --- BREAK --- #

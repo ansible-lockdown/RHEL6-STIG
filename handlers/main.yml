@@ -19,3 +19,6 @@
 
 - name: update postfix aliases.db
   command: newaliases
+
+- name: restart gdm
+  shell: telinit 3; sleep 2; telinit 5
