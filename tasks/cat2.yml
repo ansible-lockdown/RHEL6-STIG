@@ -550,6 +550,10 @@
   lineinfile: "state=present backup=yes dest=/etc/login.defs regexp='ENCRYPT_METHOD' line='ENCRYPT_METHOD SHA512 '"
   tags: [ 'V-38576' , 'passwords' ]
 
+- name: V-38489 Medium  A file integrity tool must be installed
+  yum: name=aide state=present
+  tags: [ 'V-38489' , 'file_integrity' , 'aide' , 'test' ]
+
 
 # --- BREAK --- #
 
