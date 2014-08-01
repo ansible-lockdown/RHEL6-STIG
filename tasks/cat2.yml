@@ -460,19 +460,7 @@
 - name: "V-38688  Medium  A login banner must be displayed immediately prior to, or as part of, graphical desktop environment login prompts."
   command: "gconftool-2 --direct --config-source xml:readwrite:/etc/gconf/gconf.xml.mandatory --type bool --set /apps/gdm/simple-greeter/banner_message_enable true"
   when: rhel6stig_xwindows_required
-  tags: [ 'cat2' , 'V-38689' , 'logon_settings' , 'xwindows' , 'gui' , 'dod_logon_banner' ]
-  notify: restart gdm
-
-- name: V-38689 Medium  Disable restart buttons on graphical logon screen
-  command: "gconftool-2 --direct --config-source xml:readwrite:/etc/gconf/gconf.xml.mandatory --type bool --set /apps/gdm/simple-greeter/disable_restart_buttons true"
-  when: rhel6stig_xwindows_required
-  tags: [ 'cat2' , 'V-38689' , 'logon_settings' , 'xwindows' , 'gui' , 'dod_logon_banner' ]
-  notify: restart gdm
-
-- name: V-38689 Medium  Disable user list on graphical logon screen
-  command: "gconftool-2 --direct --config-source xml:readwrite:/etc/gconf/gconf.xml.mandatory --type bool --set /apps/gdm/simple-greeter/disable_user_list true"
-  when: rhel6stig_xwindows_required
-  tags: [ 'cat2' , 'V-38689' , 'logon_settings' , 'xwindows' , 'gui' , 'dod_logon_banner' ]
+  tags: [ 'cat2' , 'V-38688' , 'logon_settings' , 'xwindows' , 'gui' , 'dod_logon_banner' ]
   notify: restart gdm
 
 - name: V-38689 Medium  Left justify banner text on graphical logon screen
@@ -480,6 +468,24 @@
   when: rhel6stig_xwindows_required
   tags: [ 'cat2' , 'V-38689' , 'logon_settings' , 'xwindows' , 'gui' , 'dod_logon_banner' ]
   notify: restart gdm
+
+- name: ????? Medium  Disable restart buttons on graphical logon screen
+  command: "gconftool-2 --direct --config-source xml:readwrite:/etc/gconf/gconf.xml.mandatory --type bool --set /apps/gdm/simple-greeter/disable_restart_buttons true"
+  when: rhel6stig_xwindows_required
+  tags: [ 'cat2' , '?????' , 'logon_settings' , 'xwindows' , 'gui' , 'dod_logon_banner' ]
+  notify: restart gdm
+
+- name: ????? Medium  Disable user list on graphical logon screen
+  command: "gconftool-2 --direct --config-source xml:readwrite:/etc/gconf/gconf.xml.mandatory --type bool --set /apps/gdm/simple-greeter/disable_user_list true"
+  when: rhel6stig_xwindows_required
+  tags: [ 'cat2' , '?????' , 'logon_settings' , 'xwindows' , 'gui' , 'dod_logon_banner' ]
+  notify: restart gdm
+
+
+- name: V-38686  Medium  The system's local firewall must implement a deny-all, allow-by-exception policy for forwarded packets
+  lineinfile: "state=present backup=yes dest=/etc/sysconfig/iptables regexp=':FORWARD' line=':FORWARD DROP [0:0]'"
+  tags: [ 'cat2' , 'V-38686' , 'firewall' ]
+  notify: restart iptables
 
 
 # --- BREAK --- #

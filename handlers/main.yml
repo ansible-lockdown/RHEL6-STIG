@@ -22,3 +22,6 @@
 
 - name: restart gdm
   shell: telinit 3; sleep 2; telinit 5
+
+- name: restart iptables
+  service: name=iptables state=restarted
