@@ -494,9 +494,17 @@
     - net-pf-31
   tags: [ 'V-38682' , 'kernel_modules' , 'bluetooth' ]
 
+- name: V-38609 Medium  The TFTP service must not be running
+  lineinfile: "state=present backup=yes dest=/etc/xinetd.d/tftp regexp='disable.*=' line='\tdisable\t\t\t= yes'"
+  ignore_errors: yes
+  when: not rhel6stig_tftp_required
+  tags: [ 'V-38609' , 'tftp-server' , 'unsecure_services' , 'test' ]
+  notify: reload xinetd
+
 - name: V-38606 Medium  The tftp-server package must not be installed
   yum: name=tftp-server state=absent
-  tags: [ 'V-38606' , 'tftp' , 'tftp-server' , 'unauthorized_packages' ]
+  when: not rhel6stig_tftp_required
+  tags: [ 'V-38606' , 'tftp-server' , 'unauthorized_packages' ]
 
 - name: V-38605 Medium  The cron service must be running
   service: name=crond state=started enabled=yes
@@ -517,14 +525,12 @@
 
 - name: V-38600 Medium  The system must not send ICMPv4 redirects by default
   sysctl: name=net.ipv4.conf.default.send_redirects value=0 state=present reload=yes ignoreerrors=yes
-  tags: [ 'cat2' , 'V-38600' , 'icmp_redirects' , 'kernel_parameters' , 'network' , 'test' ]
+  tags: [ 'cat2' , 'V-38600' , 'icmp_redirects' , 'kernel_parameters' , 'network' ]
 
 - name: V-38449 Medium  The /etc/gshadow file must have mode 0000
         V-38448 Medium  The /etc/gshadow file must be group-owned by root
   file: path=/etc/gshadow owner=root group=root mode=0000
   tags: [ 'V-38449' , 'V-38448' , 'file_perms' ]
-
-
 
 
 # --- BREAK --- #
