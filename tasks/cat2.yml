@@ -553,7 +553,11 @@
 
 - name: V-38489 Medium  A file integrity tool must be installed
   yum: name=aide state=present
-  tags: [ 'V-38489' , 'file_integrity' , 'aide' , 'test' ]
+  tags: [ 'V-38489' , 'file_integrity' , 'aide' ]
+
+- name: V-38698 Medium  The operating system must employ automated mechanisms to detect the presence of unauthorized software on organizational information systems and notify designated organizational officials in accordance with the organization defined frequency
+  cron: name='Run AIDE integrity check once a month' day=7 hour=02 minute=10 job='/usr/sbin/aide --check'
+  tags: [ 'V-38698' , 'cron' , 'file_integrity' , 'aid.' ]
 
 
 # --- BREAK --- #
