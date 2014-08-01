@@ -78,7 +78,7 @@
 - name: "V-38658 Medium  The system must prohibit the reuse of passwords within twenty-four iterations\n
         V-38574 Medium  The system must use a FIPS 140-2 approved cryptographic hashing algorithm for generating account password hashes (system-auth)"
   lineinfile: state=present backup=yes backrefs=yes dest=/etc/pam.d/system-auth-ac regexp='(password\s+sufficient\s+pam_unix.so)' line='\1 {{ rhel6stig_system_auth_ac_parameters }}'
-  tags: [ 'cat2' , 'V-38658' , 'V-38574' , 'passwords' , 'test' ]
+  tags: [ 'cat2' , 'V-38658' , 'V-38574' , 'passwords' ]
 
 
 # List all xinetd services then look for 'on' in the output
@@ -539,9 +539,16 @@
 
 - name: V-38613 Medium  The system must not permit root logins using remote access programs such as ssh
   lineinfile: "state=present backup=yes dest=/etc/ssh/sshd_config regexp='^(#)?PermitRootLogin' line='PermitRootLogin no'"
-  tags: [ 'V-38613' , 'ssh' , 'config' , 'test' ]
+  tags: [ 'V-38613' , 'ssh' , 'config' ]
   notify: restart ssh
 
+- name: V-38577 Medium  The system must use a FIPS 140-2 approved cryptographic hashing algorithm for generating account password hashes (libuser.conf)
+  lineinfile: "state=present backup=yes dest=/etc/libuser.conf regexp='crypt_style' line='crypt_style = sha512'"
+  tags: [ 'V-38577' , 'passwords' ]
+
+- name: V-38576 Medium  The system must use a FIPS 140-2 approved cryptographic hashing algorithm for generating account password hashes (login.defs)
+  lineinfile: "state=present backup=yes dest=/etc/login.defs regexp='ENCRYPT_METHOD' line='ENCRYPT_METHOD SHA512 '"
+  tags: [ 'V-38576' , 'passwords' ]
 
 
 # --- BREAK --- #
