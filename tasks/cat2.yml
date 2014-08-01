@@ -430,7 +430,7 @@
   changed_when: false
   register: yum_repos
   ignore_errors: yes
-  tags: [ 'cat2' , 'V-38483' , 'test' , 'rpm' , 'gpgcheck' ]
+  tags: [ 'cat2' , 'V-38483' , 'rpm' , 'gpgcheck' , 'test' ]
 
 - name: V-38483 Medium  The system package management tool must cryptographically verify the authenticity of system software packages during installation
   replace: backup=yes dest={{ item }} regexp='^gpgcheck=0' replace='gpgcheck=1'
@@ -498,7 +498,7 @@
   lineinfile: "state=present backup=yes dest=/etc/xinetd.d/tftp regexp='disable.*=' line='\tdisable\t\t\t= yes'"
   ignore_errors: yes
   when: not rhel6stig_tftp_required
-  tags: [ 'V-38609' , 'tftp-server' , 'unsecure_services' , 'test' ]
+  tags: [ 'V-38609' , 'tftp-server' , 'unsecure_services' ]
   notify: reload xinetd
 
 - name: V-38606 Medium  The tftp-server package must not be installed
@@ -532,6 +532,9 @@
   file: path=/etc/gshadow owner=root group=root mode=0000
   tags: [ 'V-38449' , 'V-38448' , 'file_perms' ]
 
+- name: V-38579 Medium  The system boot loader configuration file(s) must be owned by root
+  file: path=/boot/grub/grub.conf owner=root group=root mode=0600
+  tags: [ 'V-38579' , 'grub' , 'file_perms' , 'test' ]
 
 # --- BREAK --- #
 
