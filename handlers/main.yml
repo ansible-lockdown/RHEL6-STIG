@@ -28,3 +28,6 @@
 
 - name: restart iptables
   service: name=iptables state=restarted
+
+- name: restart vsftpd
+  service: name=vsftpd state=restarted

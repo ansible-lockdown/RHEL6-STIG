@@ -620,6 +620,11 @@
   with_items: users.stdout_lines
   tags: [ 'cat2' , 'V-38619' , 'netrc' ]
 
+- name: V-38599 Medium  The FTPS/FTP service on the system must be configured with the Department of Defense (DoD) login banner
+  lineinfile: "state=present backup=yes dest=/etc/vsftpd/vsftpd.conf regexp='^#?banner_file' line='banner_file=/etc/issue'"
+  ignore_errors: yes
+  tags: [ 'cat2' , 'V-38599' , 'vsftp' , 'dod_logon_banner' , 'logon_settings' ]
+  notify: restart vsftpd
 
 # --- BREAK --- #
 
