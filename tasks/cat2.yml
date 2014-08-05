@@ -63,7 +63,8 @@
   tags: [ 'cat2' , 'V-38499' , 'passwords' ]
 
 
-- name: V-38450 V-38451 Medium  The /etc/passwd file must be owned and group owned by root
+- name: "V-38450 V-38451 Medium  The /etc/passwd file must be owned and group owned by root\n
+         V-38457 Medium  The /etc/passwd file must have mode 0644 or less permissive"
   file: path=/etc/passwd owner=root group=root mode=0644
   tags: [ 'cat2' , 'V-38450' , 'passwords' ]
 
