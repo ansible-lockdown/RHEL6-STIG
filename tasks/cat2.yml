@@ -586,6 +586,11 @@
   ignore_errors: yes
   tags: [ 'V-38691' , 'bluetooth' ]
 
+- name: V-38511 Medium  IP forwarding for IPv4 must not be enabled, unless the system is a router
+  sysctl: name=net.ipv4.ip_forward value=0 state=present reload=yes ignoreerrors=yes
+  when: not rhel6stig_system_is_router
+  tags: [ 'V-38511' , 'kernel_parameters' , 'network' ]
+
 # --- BREAK --- #
 
 

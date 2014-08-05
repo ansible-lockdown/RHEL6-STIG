@@ -48,6 +48,8 @@ Role Variables
 
 **rhel6stig_tftp_required**  Whether or not TFTP is required. This will prevent the removal of `tftp` and `tftp-server` packages. It will also  reconfigure the `tftp-server` to run securely. (Default: false)
 Dependencies
+
+**rhel6stig_system_is_router** Whether on not the target system is acting as a router. Disables settings that would break the system if it is a acting as a router. (Default: false)
 ------------
 
 Ansible > 1.6

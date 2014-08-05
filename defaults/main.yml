@@ -28,3 +28,8 @@ rhel6stig_ipv6_in_use: false
 # This will prevent the removal of tftp and tftp-server packges
 # and configure tftp to run securely
 rhel6stig_tftp_required: false
+
+# Set to true is system is acting as a router
+# This will disable changing net.ipv4 settings as well as
+# allow the kernel to forward packets
+rhel6stig_system_is_router: false
