@@ -593,7 +593,11 @@
 
 - name: V-38597 Medium  The system must limit the ability of processes to have simultaneous write and execute access to memory
   sysctl: name=kernel.exec-shield value=1 state=present reload=yes ignoreerrors=yes
-  tags: [ 'V-38597' , 'kernel_parameters' , 'test' ]
+  tags: [ 'V-38597' , 'kernel_parameters' ]
+
+- name: V-38596 Medium  The system must implement virtual address space randomization
+  sysctl: name=kernel.randomize_va_space state=present reload=yes ignoreerrors=yes
+  tags: [ 'V-38596' , 'kernel_parameters' ]
 
 # --- BREAK --- #
 
