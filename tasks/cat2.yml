@@ -496,32 +496,32 @@
   with_items:
     - bluetooth
     - net-pf-31
-  tags: [ 'V-38682' , 'kernel_modules' , 'bluetooth' ]
+  tags: [ 'cat2' , 'V-38682' , 'kernel_modules' , 'bluetooth' ]
 
 - name: V-38609 Medium  The TFTP service must not be running
   lineinfile: "state=present backup=yes dest=/etc/xinetd.d/tftp regexp='disable.*=' line='\tdisable\t\t\t= yes'"
   ignore_errors: yes
   when: not rhel6stig_tftp_required
-  tags: [ 'V-38609' , 'tftp-server' , 'unsecure_services' ]
+  tags: [ 'cat2' , 'V-38609' , 'tftp-server' , 'unsecure_services' ]
   notify: reload xinetd
 
 - name: V-38606 Medium  The tftp-server package must not be installed
   yum: name=tftp-server state=absent
   when: not rhel6stig_tftp_required
-  tags: [ 'V-38606' , 'tftp-server' , 'unauthorized_packages' ]
+  tags: [ 'cat2' , 'V-38606' , 'tftp-server' , 'unauthorized_packages' ]
 
 - name: V-38605 Medium  The cron service must be running
   service: name=crond state=started enabled=yes
-  tags: [ 'V-38605' , 'cron' , 'services' , 'mandatory_services' ]
+  tags: [ 'cat2' , 'V-38605' , 'cron' , 'services' , 'mandatory_services' ]
 
 - name: V-38604 Medium  The ypbind service must not be running
   service: name=ypbind state=stopped enabled=no
   ignore_errors: yes
-  tags: [ 'V-38604' , 'service' , 'unsecure_services' , 'ypbind' ]
+  tags: [ 'cat2' , 'V-38604' , 'service' , 'unsecure_services' , 'ypbind' ]
 
 - name: V-38603 Medium  The ypserv package must not be installed
   yum: name=ypserv state=absent
-  tags: [ 'V-38603' , 'unauthorized_packages' , 'ypserv' ]
+  tags: [ 'cat2' , 'V-38603' , 'unauthorized_packages' , 'ypserv' ]
 
 - name: V-38601 Medium  The system must not send ICMPv4 redirects from any interface
   sysctl: name=net.ipv4.conf.all.send_redirects value=0 state=present reload=yes ignoreerrors=yes
@@ -534,32 +534,32 @@
 - name: V-38449 Medium  The /etc/gshadow file must have mode 0000
         V-38448 Medium  The /etc/gshadow file must be group-owned by root
   file: path=/etc/gshadow owner=root group=root mode=0000
-  tags: [ 'V-38449' , 'V-38448' , 'file_perms' ]
+  tags: [ 'cat2' , 'V-38449' , 'V-38448' , 'file_perms' ]
 
 - name: V-38579 Medium  The system boot loader configuration file(s) must be owned by root
   file: path=/boot/grub/grub.conf owner=root group=root mode=0600
-  tags: [ 'V-38579' , 'grub' , 'file_perms' ]
+  tags: [ 'cat2' , 'V-38579' , 'grub' , 'file_perms' ]
 
 - name: V-38613 Medium  The system must not permit root logins using remote access programs such as ssh
   lineinfile: "state=present backup=yes dest=/etc/ssh/sshd_config regexp='^(#)?PermitRootLogin' line='PermitRootLogin no'"
-  tags: [ 'V-38613' , 'ssh' , 'config' ]
+  tags: [ 'cat2' , 'V-38613' , 'ssh' , 'config' ]
   notify: restart ssh
 
 - name: V-38577 Medium  The system must use a FIPS 140-2 approved cryptographic hashing algorithm for generating account password hashes (libuser.conf)
   lineinfile: "state=present backup=yes dest=/etc/libuser.conf regexp='crypt_style' line='crypt_style = sha512'"
-  tags: [ 'V-38577' , 'passwords' ]
+  tags: [ 'cat2' , 'V-38577' , 'passwords' ]
 
 - name: V-38576 Medium  The system must use a FIPS 140-2 approved cryptographic hashing algorithm for generating account password hashes (login.defs)
   lineinfile: "state=present backup=yes dest=/etc/login.defs regexp='ENCRYPT_METHOD' line='ENCRYPT_METHOD SHA512 '"
-  tags: [ 'V-38576' , 'passwords' ]
+  tags: [ 'cat2' , 'V-38576' , 'passwords' ]
 
 - name: V-38489 Medium  A file integrity tool must be installed
   yum: name=aide state=present
-  tags: [ 'V-38489' , 'file_integrity' , 'aide' ]
+  tags: [ 'cat2' , 'V-38489' , 'file_integrity' , 'aide' ]
 
 - name: V-38698 Medium  The operating system must employ automated mechanisms to detect the presence of unauthorized software on organizational information systems and notify designated organizational officials in accordance with the organization defined frequency
   cron: name='Run AIDE integrity check once a month' day=7 hour=02 minute=10 job='/usr/sbin/aide --check'
-  tags: [ 'V-38698' , 'cron' , 'file_integrity' , 'aide' ]
+  tags: [ 'cat2' , 'V-38698' , 'cron' , 'file_integrity' , 'aide' ]
 
 - name: "V-38519 Medium  All rsyslog-generated log files must be group-owned by root\n
          V-38518  Medium  All rsyslog-generated log files must be owned by root."
@@ -571,7 +571,7 @@
     - /var/log/cron
     - /var/log/spooler
     - /var/log/boot.log
-  tags: [ 'V-38519' , 'file_perms' ]
+  tags: [ 'cat2' , 'V-38519' , 'file_perms' ]
 
 - name: "V-38517 Medium  The Transparent Inter-Process Communication (TIPC) protocol must be disabled unless required
          V-38515  Medium  The Stream Control Transmission Protocol (SCTP) must be disabled unless required\n
@@ -581,25 +581,25 @@
     - tipc
     - sctp
     - dccp
-  tags: [ 'V-38517' , 'V-38515' , 'V-38514' , 'tipc' , 'sctp' , 'dccp' , 'kernel_modules' ]
+  tags: [ 'cat2' , 'V-38517' , 'V-38515' , 'V-38514' , 'tipc' , 'sctp' , 'dccp' , 'kernel_modules' ]
 
 - name: V-38691 Medium  The Bluetooth service must be disabled
   service: name=bluetooth state=stopped enabled=no
   ignore_errors: yes
-  tags: [ 'V-38691' , 'bluetooth' ]
+  tags: [ 'cat2' , 'V-38691' , 'bluetooth' ]
 
 - name: V-38511 Medium  IP forwarding for IPv4 must not be enabled, unless the system is a router
   sysctl: name=net.ipv4.ip_forward value=0 state=present reload=yes ignoreerrors=yes
   when: not rhel6stig_system_is_router
-  tags: [ 'V-38511' , 'kernel_parameters' , 'network' ]
+  tags: [ 'cat2' , 'V-38511' , 'kernel_parameters' , 'network' ]
 
 - name: V-38597 Medium  The system must limit the ability of processes to have simultaneous write and execute access to memory
   sysctl: name=kernel.exec-shield value=1 state=present reload=yes ignoreerrors=yes
-  tags: [ 'V-38597' , 'kernel_parameters' ]
+  tags: [ 'cat2' , 'V-38597' , 'kernel_parameters' ]
 
 - name: V-38596 Medium  The system must implement virtual address space randomization
   sysctl: name=kernel.randomize_va_space state=present reload=yes ignoreerrors=yes
-  tags: [ 'V-38596' , 'kernel_parameters' ]
+  tags: [ 'cat2' , 'V-38596' , 'kernel_parameters' ]
 
 # - name: V-38595 Medium  The system must be configured to require the use of a CAC, PIV compliant hardware token, or Alternate Logon Token (ALT) for authentication
 
@@ -608,11 +608,11 @@
   with_items:
     - issue
     - issue.net
-  tags: [ 'V-38593' , 'logon_settings' , 'dod_logon_banner' ]
+  tags: [ 'cat2' , 'V-38593' , 'logon_settings' , 'dod_logon_banner' ]
 
 - name: Use /etc/issue for SSH logon banner
   lineinfile: "state=present backup=yes dest=/etc/ssh/sshd_config regexp='^#?Banner' line='Banner /etc/issue'"
-  tags: [ 'V-38593' , 'ssh' , 'logon_settings' , 'dod_logon_banner' ]
+  tags: [ 'cat2' , 'V-38593' , 'ssh' , 'logon_settings' , 'dod_logon_banner' ]
   notify: restart ssh
 
 - name: V-38619 Medium  There must be no .netrc files on the system
