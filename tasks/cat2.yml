@@ -591,6 +591,10 @@
   when: not rhel6stig_system_is_router
   tags: [ 'V-38511' , 'kernel_parameters' , 'network' ]
 
+- name: V-38597 Medium  The system must limit the ability of processes to have simultaneous write and execute access to memory
+  sysctl: name=kernel.exec-shield value=1 state=present reload=yes ignoreerrors=yes
+  tags: [ 'V-38597' , 'kernel_parameters' , 'test' ]
+
 # --- BREAK --- #
 
 
