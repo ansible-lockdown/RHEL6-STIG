@@ -599,6 +599,20 @@
   sysctl: name=kernel.randomize_va_space state=present reload=yes ignoreerrors=yes
   tags: [ 'V-38596' , 'kernel_parameters' ]
 
+# - name: V-38595 Medium  The system must be configured to require the use of a CAC, PIV compliant hardware token, or Alternate Logon Token (ALT) for authentication
+
+- name: V-38593 Medium  The Department of Defense (DoD) login banner must be displayed immediately prior to, or as part of, console login prompts
+  copy: src=issue dest=/etc/{{ item }} owner=root group=root mode=0644 backup=yes
+  with_items:
+    - issue
+    - issue.net
+  tags: [ 'V-38593' , 'logon_settings' , 'dod_logon_banner' ]
+
+- name: Use /etc/issue for SSH logon banner
+  lineinfile: "state=present backup=yes dest=/etc/ssh/sshd_config regexp='^#?Banner' line='Banner /etc/issue'"
+  tags: [ 'V-38593' , 'ssh' , 'logon_settings' , 'dod_logon_banner' ]
+  notify: restart ssh
+
 # --- BREAK --- #
 
 
