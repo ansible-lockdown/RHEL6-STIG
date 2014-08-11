@@ -50,6 +50,8 @@ Role Variables
 Dependencies
 
 **rhel6stig_system_is_router** Whether on not the target system is acting as a router. Disables settings that would break the system if it is a acting as a router. (Default: false)
+
+**rhel6stig_change_grub_password** Whether or not to update the grub password even if a hash already exists in `/boot/grub/grub.conf`. (Default: false)
 ------------
 
 Ansible > 1.6

@@ -626,6 +626,21 @@
   tags: [ 'cat2' , 'V-38599' , 'vsftp' , 'dod_logon_banner' , 'logon_settings' ]
   notify: restart vsftpd
 
+
+# Check for the presence of a bootloader password.
+# If one is not found, add it to grub.conf
+- name: Check for password in grub.conf
+  command: grep password /boot/grub/grub.conf
+  register: grub_password_check
+  changed_when: false
+  ignore_errors: yes
+  tags: [ 'cat2' , 'V-3858' , 'grub_password' ]
+
+- name: V-38585 Medium  The system boot loader must require authentication
+  lineinfile: "state=present backup=yes dest=/boot/grub/grub.conf regexp='password' line='password --encrypted {{ rhel6stig_bootloader_password }}' insertafter='^#\\s'"
+  when: grub_password_check.rc != 0 or rhel6stig_change_grub_password
+  tags: [ 'cat2' , 'V-3858' , 'grub_password' ]
+
 # --- BREAK --- #
 
 

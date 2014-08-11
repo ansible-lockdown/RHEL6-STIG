@@ -33,3 +33,8 @@ rhel6stig_tftp_required: false
 # This will disable changing net.ipv4 settings as well as
 # allow the kernel to forward packets
 rhel6stig_system_is_router: false
+
+# Force the grub password to be updated
+# If a password entry is found in grub.conf, the password will not be changed
+# unless this variable is set to 'true'
+rhel6stig_change_grub_password: false
