@@ -52,6 +52,8 @@ Dependencies
 **rhel6stig_system_is_router** Whether on not the target system is acting as a router. Disables settings that would break the system if it is a acting as a router. (Default: false)
 
 **rhel6stig_change_grub_password** Whether or not to update the grub password even if a hash already exists in `/boot/grub/grub.conf`. (Default: false)
+
+Dependencies
 ------------
 
 Ansible > 1.6
@@ -59,11 +61,22 @@ Ansible > 1.6
 Example Playbook
 -------------------------
 
-Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:
+Make sure to include the vars_prompt section in your playbook. It is needed for the tasks that set the grub password.
 
     - hosts: servers
+      sudo: yes
+
       roles:
          - { role: disa-stig-rhel6, rhel6stig_cat1: true, rhel6stig_cat2: true, rhel6stig_cat3: false }
+
+    vars_prompt:
+        - name: rhel6stig_bootloader_password
+          prompt: "Enter grub password"
+          default: Gr!_!B-Kn0c|/\
+          private: yes
+          encrypt: "sha512_crypt"
+          confirm: yes
+          salt_size: 8
 
 License
 -------
