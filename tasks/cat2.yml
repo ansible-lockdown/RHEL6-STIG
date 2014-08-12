@@ -703,8 +703,11 @@
 
 - name: V-38628 Medium  The operating system must produce audit records containing sufficient information to establish the identity of any user/subject associated with the event
   service: name=auditd state=started enabled=yes
-  tags: [ 'cat2' , 'V-38623' , 'auditd' , 'test' ]
+  tags: [ 'cat2' , 'V-38623' , 'auditd' ]
 
+- name: V-38588 Medium  The system must not permit interactive boot
+  lineinfile: "state=present backup=yes dest=/etc/sysconfig/init regexp='^PROMPT=' line='PROMPT=no'"
+  tags: [ 'cat2' , 'V-38588' , 'interactive_boot' ]
 
 # --- BREAK --- #
 
