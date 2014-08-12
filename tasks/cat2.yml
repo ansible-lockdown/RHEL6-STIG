@@ -711,7 +711,12 @@
 
 - name: V-38539 Medium  The system must be configured to use TCP syncookies
   sysctl: name=net.ipv4.tcp_syncookies value=1 state=present reload=yes ignoreerrors=yes
-  tags: [ 'cat2' , 'V-38539' , 'tcp_syncookies' , 'kernel_parameters' , 'network' , 'test' ]
+  tags: [ 'cat2' , 'V-38539' , 'tcp_syncookies' , 'kernel_parameters' , 'network' ]
+
+- name: V-38513 Medium  The systems local IPv4 firewall must implement a deny-all, allow-by-exception policy for inbound packets
+  lineinfile: "state=present backup=yes dest=/etc/sysconfig/iptables regexp=':INPUT' line=':INPUT DROP [0:0]'"
+  tags: [ 'cat2' , 'V-38513' , 'firewall' ]
+  notify: restart iptables
 
 # --- BREAK --- #
 
