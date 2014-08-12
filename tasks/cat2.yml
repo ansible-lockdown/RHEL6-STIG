@@ -722,6 +722,13 @@
   sysctl: name=net.ipv4.conf.default.secure_redirects value=0 state=present reload=yes ignoreerrors=yes
   tags: [ 'cat2' , 'V-38544' , 'icmp_redirects' , 'kernel_parameters' , 'network' ]
 
+# - name: V-38439 Medium  The system must provide automated support for account management functions
+
+- name: V-38638 Medium  The graphical desktop environment must have automatic lock enabled
+  command: gconftool-2 --direct --config-source xml:readwrite:/etc/gconf/gconf.xml.mandatory --type bool --set /apps/gnome-screensaver/lock_enabled true
+  when: not rhel6stig_xwindows_required
+  tags: [ 'cat2' , 'V-38638' , 'gui' , 'screen_lock' ]
+
 # --- BREAK --- #
 
 - name: V-38586 Medium  The system must require authentication upon booting into single-user and maintenance modes.
