@@ -683,23 +683,28 @@
 - name: Check for LDAP
   stat: path=/etc/pam_ldap.conf
   register: ldap_test
-  tags: [ 'cat2' , 'test' ]
+  tags: [ 'cat2' , 'V-38625' ]
 
 - name: V-38625 Medium  If the system is using LDAP for authentication or account information, the system must use a TLS connection using FIPS 140-2 approved cryptographic algorithms
   lineinfile: "state=present backup=yes dest=/etc/pam_ldap.conf regexp='^#?ssl start_tls' line='ssl start_tls'"
   when: ldap_test.stat.exists
-  tags: [ 'cat2' , 'v-38625' , 'ldap' , 'test' ]
+  tags: [ 'cat2' , 'v-38625' , 'ldap' ]
 
 - name: V-38626 Medium  The LDAP client must use a TLS connection using trust certificates signed by the site CA
   lineinfile: "state=present backup=yes dest=/etc/pam_ldap.conf regexp='^#?tls_cacertdir' line='tls_cacertdir /etc/ssl/certs'"
   when: ldap_test.stat.exists
-  tags: [ 'cat2' , 'V-38626' , 'ldap' , 'test' ]
+  tags: [ 'cat2' , 'V-38626' , 'ldap' ]
 
 - name: V-38629 Medium  The graphical desktop environment must set the idle timeout to no more than 15 minutes
   command: gconftool-2 --direct --config-source xml:readwrite:/etc/gconf/gconf.xml.mandatory --type int --set /apps/gnome-screensaver/idle_delay 15
   ignore_errors: yes
   when: not rhel6stig_xwindows_required
   tags: [ 'cat2' , 'V-38629' , 'gui' , 'screen_lock' ]
+
+- name: V-38628 Medium  The operating system must produce audit records containing sufficient information to establish the identity of any user/subject associated with the event
+  service: name=auditd state=started enabled=yes
+  tags: [ 'cat2' , 'V-38623' , 'auditd' , 'test' ]
+
 
 # --- BREAK --- #
 
