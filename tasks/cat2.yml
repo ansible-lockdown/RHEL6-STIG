@@ -649,7 +649,7 @@
 
 - name: "V-38504 Medium  The /etc/shadow file must have mode 0000\n    V-38502 Medium  The /etc/shadow file must be owned by root\n    V-38503 Medium  The /etc/shadow file must be group-owned by root"
   file: dest=/etc/shadow owner=root group=root mode=0000
-  tags: [ 'cat2' , 'V-38504' , 'V-38502' , 'V-38503' , 'file_perms' , 'test']
+  tags: [ 'cat2' , 'V-38504' , 'V-38502' , 'V-38503' , 'file_perms' ]
 
 - name: List accounst with UID 0
   shell: "awk -F: '($3 == \"0\") {print}' /etc/passwd | grep -v root"
@@ -670,8 +670,12 @@
 
 - name: V-38621 Medium  The system clock must be synchronized to an authoritative DoD time source
   template: src=ntp.conf.j2 dest=/etc/ntp.conf backup=yes owner=root group=root mode=0644
-  tags: [ 'cat2' , 'V-38621' , 'ntp' , 'test' ]
+  tags: [ 'cat2' , 'V-38621' , 'ntp' ]
   notify: restart ntpd
+
+- name: V-38620 Medium  The system clock must be synchronized continuously, or at least daily
+  service: name=ntpd state=started enabled=yes
+  tags: [ 'cat2' , 'V-38620' , 'ntp' ]
 
 # --- BREAK --- #
 
