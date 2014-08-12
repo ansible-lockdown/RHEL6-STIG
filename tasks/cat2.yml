@@ -709,6 +709,9 @@
   lineinfile: "state=present backup=yes dest=/etc/sysconfig/init regexp='^PROMPT=' line='PROMPT=no'"
   tags: [ 'cat2' , 'V-38588' , 'interactive_boot' ]
 
+- name: V-38539 Medium  The system must be configured to use TCP syncookies
+  sysctl: name=net.ipv4.tcp_syncookies value=1 state=present reload=yes ignoreerrors=yes
+  tags: [ 'cat2' , 'V-38539' , 'tcp_syncookies' , 'kernel_parameters' , 'network' , 'test' ]
 
 # --- BREAK --- #
 
