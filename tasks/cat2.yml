@@ -343,9 +343,10 @@
   tags: [ 'cat2' , 'V-38498' , 'V-38445' , 'V-38495' , 'auditd' , 'file_perms' , 'audit_permissions' , 'test' ]
 
 
-- name: V-38555 Medium  The system must employ a local IPv4 firewall
+- name: "V-38555 Medium  The system must employ a local IPv4 firewall\n
+         V-38560 Medium  The operating system must connect to external networks or information systems only through managed IPv4 interfaces consisting of boundary protection devices arranged in accordance with an organizational security architecture"
   service: name=iptables enabled=yes state=started
-  tags: [ 'cat2' , 'V-38555' , 'firewall' ]
+  tags: [ 'cat2' , 'V-38555' , 'V-38560' , 'iptables' , 'firewall' ]
 
 - name: V-38492 Medium  The system must prevent the root account from logging in from virtual consoles
   lineinfile: state=absent dest=/etc/securetty regexp='^.*vc/\d' backup=yes
