@@ -294,7 +294,7 @@
     - /usr/lib64
   tags: [ 'cat2' , 'V-38465' , 'file_perms' ]
 
-- name: "V-38464 Medium  The audit system must take appropriate action when there are disk errors on the audit storage volume\n    V-38468 Medium  The audit system must take appropriate action when the audit storage volume is full\n    V-38678 Medium  The audit system must provide a warning when allocated audit record storage volume reaches a documented percentage of maximum audit record storage capacity\n    V-38470 Medium  The audit system must alert designated staff members when the audit storage volume approaches capacity"
+- name: "V-38464 Medium  The audit system must take appropriate action when there are disk errors on the audit storage volume\n    V-38468 Medium  The audit system must take appropriate action when the audit storage volume is full\n    V-38678 Medium  The audit system must provide a warning when allocated audit record storage volume reaches a documented percentage of maximum audit record storage capacity\n    V-38470 Medium  The audit system must alert designated staff members when the audit storage volume approaches capacity\n    V-38636  Medium  The system must retain enough rotated audit logs to cover the required log retention period"
   template: src=auditd.conf.j2 dest=/etc/audit/auditd.conf owner=root group=root mode=0640 backup=yes
   notify: restart auditd
   tags: [ 'cat2' , 'V-38464' , 'V-38468' , 'V-38678' , 'V-38470' , 'auditd' ]
