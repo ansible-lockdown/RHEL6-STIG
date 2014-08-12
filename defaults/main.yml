@@ -38,3 +38,16 @@ rhel6stig_system_is_router: false
 # If a password entry is found in grub.conf, the password will not be changed
 # unless this variable is set to 'true'
 rhel6stig_change_grub_password: false
+
+# NTP configuration used in ntp.conf
+rhel6stig_ntp_config_servers:
+  - 0.centos.pool.ntp.org
+  - 1.centos.pool.ntp.org
+  - 2.centos.pool.ntp.org
+  - 3.centos.pool.ntp.org
+
+rhel6stig_ntp_config_restrict:
+  - "-4 default kod nomodify notrap nopeer noquery"
+  - "-6 default kod nomodify notrap nopeer noquery"
+  - "127.0.0.1"
+  - "-6 ::1"

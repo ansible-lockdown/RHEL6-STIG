@@ -684,7 +684,10 @@
   when: users_uid_0.stdout and not rhel6stig_fullauto
   tags: [ 'cat2' , 'V-38500' , 'accounts' ]
 
-
+- name: V-38621 Medium  The system clock must be synchronized to an authoritative DoD time source
+  template: src=ntp.conf.j2 dest=/etc/ntp.conf backup=yes owner=root group=root mode=0644
+  tags: [ 'cat2' , 'V-38621' , 'ntp' , 'test' ]
+  notify: restart ntpd
 
 # --- BREAK --- #
 

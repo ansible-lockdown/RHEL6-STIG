@@ -53,6 +53,10 @@ Dependencies
 
 **rhel6stig_change_grub_password** Whether or not to update the grub password even if a hash already exists in `/boot/grub/grub.conf`. (Default: false)
 
+**rhel6stig_ntp_config_servers** List of servers used in ntp.conf (Default: list of NTP pool servers)
+
+**rhel6stig_ntp_config_restrict** List of restrict options used in ntp.conf
+
 Dependencies
 ------------
 
