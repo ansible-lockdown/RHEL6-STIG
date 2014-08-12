@@ -41,7 +41,7 @@
   service: name=ip6tables enabled=yes state=started
   when: rhel6stig_ipv6_in_use
   ignore_errors: yes
-  tags: [ 'cat2' , 'V-38551' , V-38549' 'ipv6' ]
+  tags: [ 'cat2' , 'V-38551' , V-38549' , 'ipv6' , 'firewall' ]
 
 
 # Look in /etc/password for hashes and print them out if any are found
@@ -333,14 +333,14 @@
   shell: 'grep "^log_file" /etc/audit/auditd.conf | sed "s/^[^\/]*//"'
   register: auditd_log_files
   changed_when: false
-  tags: [ 'cat2' , 'V-38498' , 'V-38445' , 'V-38495' , 'auditd' , 'file_perms' , 'audit_permissions' , 'test' ]
+  tags: [ 'cat2' , 'V-38498' , 'V-38445' , 'V-38495' , 'auditd' , 'file_perms' , 'audit_permissions' ]
 
 - name: "V-38498 Medium  Audit log files must have mode 0640 or less permissive\n
          V-38445 Medium  Audit log files must be group-owned by root\n
          V-38495 Medium  Audit log files must be owned by root."
   file: dest={{ item }} owner=root group=root mode=0600
   with_items: auditd_log_files.stdout_lines
-  tags: [ 'cat2' , 'V-38498' , 'V-38445' , 'V-38495' , 'auditd' , 'file_perms' , 'audit_permissions' , 'test' ]
+  tags: [ 'cat2' , 'V-38498' , 'V-38445' , 'V-38495' , 'auditd' , 'file_perms' , 'audit_permissions' ]
 
 
 - name: "V-38555 Medium  The system must employ a local IPv4 firewall\n
@@ -653,6 +653,10 @@
   when: grub_password_check.rc != 0 or rhel6stig_change_grub_password
   tags: [ 'cat2' , 'V-3858' , 'grub_password' ]
 
+- name: V-38444 Medium  The systems local IPv6 firewall must implement a deny-all, allow-by-exception policy for inbound packets
+  lineinfile: "state=present backup=yes dest=/etc/sysconfig/ip6tables regexp=':FORWARD' line=':FORWARD DROP [0:0]'"
+  when: rhel6stig_ipv6_in_use
+  tags: [ 'cat2' , 'V-38444' , 'firewall' , 'ipv6' ]
 
 # --- BREAK --- #
 
