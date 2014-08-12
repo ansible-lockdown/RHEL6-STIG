@@ -327,10 +327,21 @@
   when: rhel6stig_ipv6_in_use
   tags: [ 'cat2' , 'V-38553' , 'kernel_parameters' , 'network' , 'ipv6' ]
 
+
+# Get a list of all audit log files
+- name: List all audit log files
+  shell: 'grep "^log_file" /etc/audit/auditd.conf | sed "s/^[^\/]*//"'
+  register: auditd_log_files
+  changed_when: false
+  tags: [ 'cat2' , 'V-38498' , 'V-38445' , 'V-38495' , 'auditd' , 'file_perms' , 'audit_permissions' , 'test' ]
+
 - name: "V-38498 Medium  Audit log files must have mode 0640 or less permissive\n
-        V-38445 Medium  Audit log files must be group-owned by root"
-  file: dest=/var/log/audit/audit.log owner=root group=root mode=0600
-  tags: [ 'cat2' , 'V-38498' , 'V-38445' , 'auditd' , 'file_perms' ]
+         V-38445 Medium  Audit log files must be group-owned by root\n
+         V-38495 Medium  Audit log files must be owned by root."
+  file: dest={{ item }} owner=root group=root mode=0600
+  with_items: auditd_log_files.stdout_lines
+  tags: [ 'cat2' , 'V-38498' , 'V-38445' , 'V-38495' , 'auditd' , 'file_perms' , 'audit_permissions' , 'test' ]
+
 
 - name: V-38555 Medium  The system must employ a local IPv4 firewall
   service: name=iptables enabled=yes state=started
@@ -640,6 +651,7 @@
   lineinfile: "state=present backup=yes dest=/boot/grub/grub.conf regexp='password' line='password --encrypted {{ rhel6stig_bootloader_password }}' insertafter='^#\\s'"
   when: grub_password_check.rc != 0 or rhel6stig_change_grub_password
   tags: [ 'cat2' , 'V-3858' , 'grub_password' ]
+
 
 # --- BREAK --- #
 
