@@ -658,6 +658,10 @@
   when: rhel6stig_ipv6_in_use
   tags: [ 'cat2' , 'V-38444' , 'firewall' , 'ipv6' ]
 
+- name: V-38504 Medium  The /etc/shadow file must have mode 0000
+  file: dest=/etc/shadow owner=root group=root mode=0000
+  tags: [ 'cat2' , 'V-38504' , 'file_perms' ]
+
 # --- BREAK --- #
 
 
