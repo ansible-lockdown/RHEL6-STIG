@@ -562,16 +562,18 @@
   cron: name='Run AIDE integrity check once a month' day=7 hour=02 minute=10 job='/usr/sbin/aide --check'
   tags: [ 'cat2' , 'V-38698' , 'cron' , 'file_integrity' , 'aide' ]
 
-- name: "V-38519 Medium  All rsyslog-generated log files must be group-owned by root\n    V-38518 Medium  All rsyslog-generated log files must be owned by root"
-  file: dest={{ item }} owner=root group=root
-  with_items:
-    - /var/log/messages
-    - /var/log/secure
-    - /var/log/maillog
-    - /var/log/cron
-    - /var/log/spooler
-    - /var/log/boot.log
+
+- name: List all log files in /etc/rsyslog.conf
+  shell: "grep /var/log/ /etc/rsyslog.conf | awk '{print $2}' | sed 's/-//'"
+  register: rsyslog_log_files
+  changed_when: false
   tags: [ 'cat2' , 'V-38519' , 'file_perms' ]
+
+- name: "V-38519 Medium  All rsyslog-generated log files must be group-owned by root\n    V-38518 Medium  All rsyslog-generated log files must be owned by root\n    V-38623 Medium  All rsyslog-generated log files must have mode 0600 or less permissive"
+  file: dest={{ item }} owner=root group=root mode=0600
+  with_items: rsyslog_log_files.stdout_lines
+  tags: [ 'cat2' , 'V-38519' , 'file_perms' ]
+
 
 - name: "V-38517 Medium  The Transparent Inter-Process Communication (TIPC) protocol must be disabled unless required
          V-38515 Medium  The Stream Control Transmission Protocol (SCTP) must be disabled unless required\n
@@ -676,6 +678,7 @@
 - name: V-38620 Medium  The system clock must be synchronized continuously, or at least daily
   service: name=ntpd state=started enabled=yes
   tags: [ 'cat2' , 'V-38620' , 'ntp' ]
+
 
 # --- BREAK --- #
 
