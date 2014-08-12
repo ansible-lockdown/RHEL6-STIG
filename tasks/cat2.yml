@@ -333,7 +333,7 @@
   tags: [ 'cat2' , 'V-38498' , 'V-38445' , 'V-38495' , 'auditd' , 'file_perms' , 'audit_permissions' ]
 
 
-- name: "V-38555 Medium  The system must employ a local IPv4 firewall\n    V-38560 Medium  The operating system must connect to external networks or information systems only through managed IPv4 interfaces consisting of boundary protection devices arranged in accordance with an organizational security architecture"
+- name: "V-38555 Medium  The system must employ a local IPv4 firewall\n    V-38560 Medium  The operating system must connect to external networks or information systems only through managed IPv4 interfaces consisting of boundary protection devices arranged in accordance with an organizational security architecture\n    V-38512  Medium  The operating system must prevent public IPv4 access into an organizations internal networks, except as appropriately mediated by managed interfaces employing boundary protection devices"
   service: name=iptables enabled=yes state=started
   tags: [ 'cat2' , 'V-38555' , 'V-38560' , 'iptables' , 'firewall' ]
 
@@ -717,9 +717,6 @@
   lineinfile: "state=present backup=yes dest=/etc/sysconfig/iptables regexp=':INPUT' line=':INPUT DROP [0:0]'"
   tags: [ 'cat2' , 'V-38513' , 'firewall' ]
   notify: restart iptables
-
-# --- BREAK --- #
-
 
 - name: V-38532 Medium  The system must not accept ICMPv4 secure redirect packets by default.
   sysctl: name=net.ipv4.conf.default.secure_redirects value=0 state=present reload=yes ignoreerrors=yes
