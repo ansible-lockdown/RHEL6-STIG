@@ -208,7 +208,7 @@
   changed_when: false
   ignore_errors: yes
   register: audit_group_ownership
-  tags: [ 'cat2' , 'V-38665' , 'file_perms' ]
+  tags: [ 'cat2' , 'V-38665' , 'file_perms' , 'auditd' , 'rpm' ]
 
 - name: V-38665 Medium  The system package management tool must verify group-ownership on all files and directories associated with the audit package
   command: rpm --setugids audit
@@ -728,6 +728,20 @@
   command: gconftool-2 --direct --config-source xml:readwrite:/etc/gconf/gconf.xml.mandatory --type bool --set /apps/gnome-screensaver/lock_enabled true
   when: not rhel6stig_xwindows_required
   tags: [ 'cat2' , 'V-38638' , 'gui' , 'screen_lock' ]
+
+
+- name: Check for auditd files that have a different hash than rpm expects
+  shell: "rpm -V audit | grep '^..5'"
+  changed_when: false
+  register: audit_integrity_check
+  failed_when: audit_integrity_check.stderr
+  tags: [ 'cat2' , 'V-38637' , 'auditd' , 'rpm' , 'test' ]
+
+- name: V-38637 Medium  The system package management tool must verify contents of all files associated with the audit package
+  # yum: name=audit state=latest
+  command: yum -y reinstall audit
+  when: audit_integrity_check.stdout
+  tags: [ 'cat2' , 'V-38637' , 'auditd' , 'rpm' , 'test' ]
 
 # --- BREAK --- #
 
