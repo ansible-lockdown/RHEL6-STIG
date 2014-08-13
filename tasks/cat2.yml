@@ -208,8 +208,8 @@
 - name: Checking group group-ownership of audit files
   shell: rpm -V audit | grep '^......G'
   changed_when: false
-  ignore_errors: yes
   register: audit_group_ownership
+  failed_when: audit_group_ownership.stderr
   tags: [ 'cat2' , 'V-38665' , 'file_perms' , 'auditd' , 'rpm' ]
 
 - name: V-38665 Medium  The system package management tool must verify group-ownership on all files and directories associated with the audit package
@@ -222,8 +222,8 @@
 - name: Checking user ownership of audit files
   shell: rpm -V audit | grep '^......U'
   changed_when: false
-  ignore_errors: yes
   register: audit_user_ownership
+  failed_when: audit_user_ownership.stderr
   tags: [ 'cat2' , 'V-38664' , 'file_perms' , 'auditd' , 'rpm' ]
 
 - name: V-38664 Medium  The system package management tool must verify ownership on all files and directories associated with the audit package
@@ -242,8 +242,8 @@
 - name: Checking SNMP versions in use
   shell: "grep -E 'v1|v2c|com2sec' /etc/snmp/snmpd.conf | grep -v '^#'"
   changed_when: false
-  ignore_errors: yes
   register: snmp_version_check
+  failed_when: '"FAIL" in snmp_version_check.stdout'
   tags: [ 'cat2' , 'V-38660', 'snmp' ]
 
 - name: V-38660 Medium  The snmpd service must use only SNMP protocol version 3 or newer
@@ -261,8 +261,8 @@
 - name: Checking permissions of audit files
   shell: rpm -V audit | grep '^.M'
   changed_when: false
-  ignore_errors: yes
   register: audit_permissions
+  failed_when: audit_permissions.stderr
   tags: [ 'cat2' , 'V-38663' , 'file_perms' , 'auditd' , 'rpm' ]
 
 - name: V-38663 Medium  The system package management tool must verify permissions on all files and directories associated with the audit package
