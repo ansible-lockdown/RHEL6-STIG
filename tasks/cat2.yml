@@ -98,8 +98,8 @@
 - name: Checking for nfs mounts missing the 'nodev' option
   shell: mount | grep 'type nfs' | grep -v 'nodev'
   changed_when: false
-  ignore_errors: yes
   register: nfs_mounts_missing_nodev
+  failed_when: nfs_mounts_missing_nodev.stderr
   tags: [ 'cat2' , 'V-38652' , 'nfs' ]
 
 - name: V-38652 Medium  Remote file systems must be mounted with the 'nodev' option
@@ -118,7 +118,7 @@
 - name: Checking for nfs mounts missing the 'nosuid' option
   shell: mount | grep 'type nfs' | grep -v 'nosuid'
   changed_when: false
-  ignore_errors: yes
+  failed_when: nfs_mounts_missing_nosuid.stderr
   register: nfs_mounts_missing_nosuid
   tags: [ 'cat2' , 'V-38652' , 'nfs' ]
 
