@@ -155,8 +155,8 @@
 - name: Checking for remote log servers
   shell: grep -Er '(^[^#]?\*\.\*\s+@{1,2})|(\*\.\*\s+omrelp)' /etc/rsyslog.conf /etc/rsyslog.d/
   changed_when: false
-  ignore_errors: yes
   register: remote_logging_servers
+  failed_when: remote_logging_servers.stderr
   tags: [ 'cat2' , 'V-38520' , 'logging' ]
 
 - name: V-38520 Medium  The operating system must back up audit records on an organization defined frequency onto a different system or media than the system being audited
@@ -188,12 +188,16 @@
   command: yum check-update
   changed_when: false
   register: yum_update_status
-  ignore_errors: yes
+  failed_when: yum_update_status.rc == 1
+  tags: [ 'cat2' , 'V-38481' , 'yum' , 'updates' ]
+
+- name: "The following updates are available:"
+  debug: var=yum_update_status.stdout_lines
   tags: [ 'cat2' , 'V-38481' , 'yum' , 'updates' ]
 
 - name: V-38481 Medium  System security patches and updates must be installed and up-to-date
-  pause: prompt="All available updates not installed. This is a finding. Press Enter to continue"
-  when: yum_update_status.rc != 0 and not rhel6stig_fullauto
+  pause: prompt="Updates are available and not installed. This is a finding. Press Enter to continue"
+  when: yum_update_status.rc == 100 and not rhel6stig_fullauto
   tags: [ 'cat2' , 'V-38481' , 'yum' , 'updates' ]
 
 
