@@ -19,7 +19,7 @@
 
 
 # Search for world writable files and print them out if any are found
-- name: V-38643 Medium  There must be no world-writable files on the system
+- name: Looking for world-writable files on the system
   command: find / -xdev -type f -perm -002
   register: world_writable_files
   changed_when: false
