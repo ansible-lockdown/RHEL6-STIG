@@ -631,9 +631,17 @@
   with_items: users.stdout_lines
   tags: [ 'cat2' , 'V-38619' , 'netrc' ]
 
+
+- name: Checking if vsftpd is installed
+  command: rpm -q vsftpd
+  changed_when: false
+  register: vsftpd_package_status
+  failed_when: vsftpd_package_status.stderr
+  tags: [ 'cat2' , 'V-38599' , 'vsftp' , 'dod_logon_banner' , 'logon_settings' ]
+
 - name: V-38599 Medium  The FTPS/FTP service on the system must be configured with the Department of Defense (DoD) login banner
   lineinfile: "state=present backup=yes dest=/etc/vsftpd/vsftpd.conf regexp='^#?banner_file' line='banner_file=/etc/issue'"
-  ignore_errors: yes
+  when: vsftpd_package_status.rc == 0
   tags: [ 'cat2' , 'V-38599' , 'vsftp' , 'dod_logon_banner' , 'logon_settings' ]
   notify: restart vsftpd
 
