@@ -499,12 +499,21 @@
     - net-pf-31
   tags: [ 'cat2' , 'V-38682' , 'kernel_modules' , 'bluetooth' ]
 
-- name: V-38609 Medium  The TFTP service must not be running
-  lineinfile: "state=present backup=yes dest=/etc/xinetd.d/tftp regexp='disable.*=' line='\tdisable\t\t\t= yes'"
-  ignore_errors: yes
+
+- name: Checking if tftp-server is installed
+  command: rpm -q tftp-server
+  changed_when: false
+  register: tftpserver_package_status
+  failed_when: tftpserver_package_status.stderr
   when: not rhel6stig_tftp_required
   tags: [ 'cat2' , 'V-38609' , 'tftp-server' , 'unsecure_services' ]
+
+- name: V-38609 Medium  The TFTP service must not be running
+  command: chkconfig tftp off
+  when: "(not rhel6stig_tftp_required) and (tftpserver_package_status.rc == 0)"
+  tags: [ 'cat2' , 'V-38609' , 'tftp-server' , 'unsecure_services' ]
   notify: reload xinetd
+
 
 - name: V-38606 Medium  The tftp-server package must not be installed
   yum: name=tftp-server state=absent
