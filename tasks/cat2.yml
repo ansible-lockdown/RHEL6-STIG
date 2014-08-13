@@ -380,9 +380,8 @@
 - name: List interface config files
   shell: ls /etc/sysconfig/network-scripts/ifcfg-eth* | grep -v $(date +%Y)
   changed_when: false
-  ignore_errors: yes
   register: interface_config_files
-  tags: [ 'cat2' , 'V-38679' , 'network' , 'dhcp' ]
+  tags: [ 'cat2' , 'V-38679' , 'network' , 'dhcp'  ]
 
 - name: V-38679 Medium  The DHCP client must be disabled if not needed
   lineinfile: "state=present dest={{ item }} regexp='^BOOTPROTO=' line='BOOTPROTO=\"static\"' backup=yes"
@@ -435,8 +434,8 @@
   shell: ls /etc/yum.repos.d/*.repo
   changed_when: false
   register: yum_repos
-  ignore_errors: yes
-  tags: [ 'cat2' , 'V-38483' , 'rpm' , 'gpgcheck' , 'test' ]
+  failed_when: "'FAIL' in yum_repos.stdout"
+  tags: [ 'cat2' , 'V-38483' , 'rpm' , 'gpgcheck' ]
 
 - name: V-38483 Medium  The system package management tool must cryptographically verify the authenticity of system software packages during installation
   replace: backup=yes dest={{ item }} regexp='^gpgcheck=0' replace='gpgcheck=1'
