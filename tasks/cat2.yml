@@ -88,8 +88,7 @@
 
 - name: V-38582 Medium  The xinetd service must be disabled if no network services utilizing it are enabled
   service: name=xinetd enabled=no state=stopped
-  ignore_errors: yes
-  when: xinetd_services.stdout.find('\ton\n') == -1
+  when: xinetd_services.stdout and xinetd_services.stdout.find('\ton\n') == -1
   tags: [ 'cat2' , 'V-38582' , 'xinetd' , 'services' ]
 
 
