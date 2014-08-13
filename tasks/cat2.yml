@@ -670,11 +670,12 @@
   file: dest=/etc/shadow owner=root group=root mode=0000
   tags: [ 'cat2' , 'V-38504' , 'V-38502' , 'V-38503' , 'file_perms' ]
 
+
 - name: List accounst with UID 0
   shell: "awk -F: '($3 == \"0\") {print}' /etc/passwd | grep -v root"
   changed_when: false
-  ignore_errors: yes
   register: users_uid_0
+  failed_when: users_uid_0.stderr
   tags: [ 'cat2' , 'V-38500' , 'accounts' ]
 
 - name: The accounts have a UID of 0. This is a finding.
@@ -686,6 +687,7 @@
   pause: prompt="Accounts with UID 0 other than root were found. This is a finding. Press Enter to continue"
   when: users_uid_0.stdout and not rhel6stig_fullauto
   tags: [ 'cat2' , 'V-38500' , 'accounts' ]
+
 
 - name: V-38621 Medium  The system clock must be synchronized to an authoritative DoD time source
   template: src=ntp.conf.j2 dest=/etc/ntp.conf backup=yes owner=root group=root mode=0644
