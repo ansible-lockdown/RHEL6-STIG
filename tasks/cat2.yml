@@ -652,7 +652,7 @@
   command: grep password /boot/grub/grub.conf
   register: grub_password_check
   changed_when: false
-  ignore_errors: yes
+  failed_when: grub_password_check.stderr
   tags: [ 'cat2' , 'V-38585' , 'grub_password' ]
 
 - name: V-38585 Medium  The system boot loader must require authentication
