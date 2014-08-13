@@ -33,7 +33,7 @@ Role Variables
 
 **rhel6stig_root_email_address**          Address where system email is sent (Default: foo@baz.com)
 
-**rhel6stig_xwindows_required**           Whether or not X Windows is is use on taregt systems. Disables some changes if X Windows is not in use.
+**rhel6stig_xwindows_required**           Whether or not X Windows is is use on taregt systems. Disables some changes if X Windows is not in use. (Default: false)
 
 **rhel6stig_pass_min_length**             Minimum password length (Default: 14)
 

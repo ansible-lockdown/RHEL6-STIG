@@ -370,8 +370,7 @@
 
 - name: V-38630 Medium  The graphical desktop environment must automatically lock after 15 minutes of inactivity and the system must require user to re-authenticate to unlock the environment
   command: gconftool-2 --direct --config-source xml:readwrite:/etc/gconf/gconf.xml.mandatory --type bool --set /apps/gnome-screensaver/idle_activation_enabled true
-  ignore_errors: yes
-  when: not rhel6stig_xwindows_required
+  when: rhel6stig_xwindows_required
   tags: [ 'cat2' , 'V-38630' , 'gui' , 'screen_lock' ]
 
 
@@ -700,7 +699,7 @@
 - name: V-38629 Medium  The graphical desktop environment must set the idle timeout to no more than 15 minutes
   command: gconftool-2 --direct --config-source xml:readwrite:/etc/gconf/gconf.xml.mandatory --type int --set /apps/gnome-screensaver/idle_delay 15
   ignore_errors: yes
-  when: not rhel6stig_xwindows_required
+  when: rhel6stig_xwindows_required
   tags: [ 'cat2' , 'V-38629' , 'gui' , 'screen_lock' ]
 
 - name: V-38628 Medium  The operating system must produce audit records containing sufficient information to establish the identity of any user/subject associated with the event
@@ -728,7 +727,7 @@
 
 - name: V-38638 Medium  The graphical desktop environment must have automatic lock enabled
   command: gconftool-2 --direct --config-source xml:readwrite:/etc/gconf/gconf.xml.mandatory --type bool --set /apps/gnome-screensaver/lock_enabled true
-  when: not rhel6stig_xwindows_required
+  when: rhel6stig_xwindows_required
   tags: [ 'cat2' , 'V-38638' , 'gui' , 'screen_lock' ]
 
 
