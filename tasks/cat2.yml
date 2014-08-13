@@ -48,7 +48,6 @@
   shell: "awk -F: '($2 != \"x\") {print}' /etc/passwd"
   changed_when: false
   register: etc_password_hash_check
-  ignore_errors: yes
   tags: [ 'cat2' , 'V-38499' , 'passwords' ]
 
 - name: The following password hashes were found in /etc/passwd. This is a finding.
@@ -57,7 +56,7 @@
   tags: [ 'cat2' , 'V-38499' , 'passwords' ]
 
 - name: V-38499 Medium  The /etc/passwd file must not contain password hashes
-  pause: prompt="The following password hashes were found in /etc/passwd. This is a finding. Press Enter to continue"
+  pause: prompt="Password hashes were found in /etc/passwd. This is a finding. Press Enter to continue"
   when: etc_password_hash_check.stdout and not rhel6stig_fullauto
   tags: [ 'cat2' , 'V-38499' , 'passwords' ]
 
