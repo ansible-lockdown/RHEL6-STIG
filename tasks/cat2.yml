@@ -716,7 +716,6 @@
 
 - name: V-38629 Medium  The graphical desktop environment must set the idle timeout to no more than 15 minutes
   command: gconftool-2 --direct --config-source xml:readwrite:/etc/gconf/gconf.xml.mandatory --type int --set /apps/gnome-screensaver/idle_delay 15
-  ignore_errors: yes
   when: rhel6stig_xwindows_required
   tags: [ 'cat2' , 'V-38629' , 'gui' , 'screen_lock' ]
 
