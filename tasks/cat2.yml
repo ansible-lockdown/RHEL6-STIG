@@ -39,7 +39,6 @@
 - name: "V-38551 Medium  The operating system must connect to external networks or information systems only through managed IPv6 interfaces consisting of boundary protection devices arranged in accordance with an organizational security architecture\n    V-38549 Medium  The system must employ a local IPv6 firewall"
   service: name=ip6tables enabled=yes state=started
   when: rhel6stig_ipv6_in_use
-  ignore_errors: yes
   tags: [ 'cat2' , 'V-38551' , V-38549' , 'ipv6' , 'firewall' ]
 
 
@@ -244,17 +243,18 @@
   changed_when: false
   register: snmp_version_check
   failed_when: '"FAIL" in snmp_version_check.stdout'
+  when: snmpconf_test.stat.exists
   tags: [ 'cat2' , 'V-38660', 'snmp' ]
 
 - name: V-38660 Medium  The snmpd service must use only SNMP protocol version 3 or newer
   replace: dest=/etc/snmp/snmpd.conf regexp='(^.*)(v1|v2c|com2sec)(.*$)' replace='#\1\2\3' backup=yes
   notify: restart snmpd
-  when: snmp_version_check.stdout
+  when: snmp_version_check.stdout and snmpconf_test.stat.exists
   tags: [ 'cat2' , 'V-38660' , 'snmp' ]
 
 - name: Previous versions of SNMP disabled
   pause: prompt="Versions of SNMP prior to version 3 were found and disabled. More work must be done to fully convert to SNMPv3. Press Enter to continue"
-  when: snmp_version_check.stdout and not rhel6stig_fullauto
+  when: snmp_version_check.stdout and snmpconf_test.stat.exists and not rhel6stig_fullauto
   tags: [ 'cat2' , 'V-38660' , 'snmp' ]
 
 

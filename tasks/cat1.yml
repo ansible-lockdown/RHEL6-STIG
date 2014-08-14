@@ -1,8 +1,14 @@
 ---
 # CAT I Findings
+- name: Check for /etc/snmp/snmpd.conf
+  stat: path=/etc/snmp/snmpd.conf
+  register: snmpconf_test
+  tags: [ 'cat1' , 'V-38653' , 'snmp' ]
+
 - name: V-38653 High  The snmpd service must not use a default password
   replace: backup=yes dest=/etc/snmp/snmpd.conf regexp=(^com2sec.*default\s+)public replace=\1{{ rhel6stig_snmp_community }}
   ignore_errors: yes
+  when: snmpconf_test.stat.exists
   notify: restart snmpd
   tags: [ 'cat1' , 'V-38653' , 'snmp' ]
 
