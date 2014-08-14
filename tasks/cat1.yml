@@ -91,25 +91,50 @@
   failed_when: rshserver_package_status.stderr
   tags: [ 'cat1' , 'V-38602' , 'V-38594' , 'rsh' , 'rlogin', 'unsecure_services' ]
 
+
+- name: Check status of rsh
+  shell: chkconfig --list | grep rsh
+  register: rsh_status
+  failed_when: rsh_status.stderr
+  changed_when: false
+  when: rshserver_package_status.rc == 0
+  tags: [ 'cat1' , 'V-38602' , 'V-38594' , 'rsh' , 'rlogin', 'unsecure_services' ]
+
 - name: "V-38594 High  The rshd service must not be running"
   command: chkconfig rsh off
-  when: rshserver_package_status.rc == 0
+  when: rshserver_package_status.rc == 0 and rsh_status.stdout.find('\toff') == -1
   tags: [ 'cat1' , 'V-38594' , 'rsh' , 'unsecure_services' ]
+
+
+- name: Check status of rlogin
+  shell: chkconfig --list | grep rlogin
+  register: rlogin_status
+  failed_when: rlogin_status.stderr
+  changed_when: false
+  when: rshserver_package_status.rc == 0
+  tags: [ 'cat1' , 'V-38602' , 'rlogin', 'unsecure_services' ]
 
 - name: "V-38602 High  The rlogind service must not be running"
   command: chkconfig rlogin off
-  when: rshserver_package_status.rc == 0
+  when: rshserver_package_status.rc == 0 and rlogin_status.stdout.find('\toff') == -1
   tags: [ 'cat1' , 'V-38602' , 'rlogin', 'unsecure_services' ]
+
+- name: Check status of rexec
+  shell: chkconfig --list | grep rexec
+  register: rexec_status
+  failed_when: rexec_status.stderr
+  changed_when: false
+  when: rshserver_package_status.rc == 0
+  tags: [ 'cat1' , 'V-38598' , 'rexecd', 'unsecure_services' ]
+
+- name: V-38598 High  The rexecd service must not be running
+  service: name=rexec enabled=no state=stopped
+  when: rshserver_package_status.rc == 0 and rexec_status.stdout.find('\toff') == -1
+  tags: [ 'cat1' , 'V-38598' , 'rexec', 'unsecure_services' ]
 
 - name: V-38591 High  The rsh-server package must not be installed
   yum: name=rsh-server state=absent
   tags: [ 'cat1' , 'V-38591' , 'rsh', 'unsecure_services' ]
-
-
-- name: V-38598 High  The rexecd service must not be running
-  service: name=rexec enabled=no state=stopped
-  ignore_errors: yes
-  tags: [ 'cat1' , 'V-38598' , 'rexec', 'unsecure_services' ]
 
 - name: V-38587 High  The telnet-server package must not be installed
   yum: name=telnet-server state=absent
