@@ -19,7 +19,7 @@
 
 
 # Search for world writable files and print them out if any are found
-- name: V-38643 Medium  There must be no world-writable files on the system
+- name: Looking for world-writable files on the system
   command: find / -xdev -type f -perm -002
   register: world_writable_files
   changed_when: false
@@ -39,7 +39,6 @@
 - name: "V-38551 Medium  The operating system must connect to external networks or information systems only through managed IPv6 interfaces consisting of boundary protection devices arranged in accordance with an organizational security architecture\n    V-38549 Medium  The system must employ a local IPv6 firewall"
   service: name=ip6tables enabled=yes state=started
   when: rhel6stig_ipv6_in_use
-  ignore_errors: yes
   tags: [ 'cat2' , 'V-38551' , V-38549' , 'ipv6' , 'firewall' ]
 
 
@@ -48,7 +47,6 @@
   shell: "awk -F: '($2 != \"x\") {print}' /etc/passwd"
   changed_when: false
   register: etc_password_hash_check
-  ignore_errors: yes
   tags: [ 'cat2' , 'V-38499' , 'passwords' ]
 
 - name: The following password hashes were found in /etc/passwd. This is a finding.
@@ -57,7 +55,7 @@
   tags: [ 'cat2' , 'V-38499' , 'passwords' ]
 
 - name: V-38499 Medium  The /etc/passwd file must not contain password hashes
-  pause: prompt="The following password hashes were found in /etc/passwd. This is a finding. Press Enter to continue"
+  pause: prompt="Password hashes were found in /etc/passwd. This is a finding. Press Enter to continue"
   when: etc_password_hash_check.stdout and not rhel6stig_fullauto
   tags: [ 'cat2' , 'V-38499' , 'passwords' ]
 
@@ -89,8 +87,7 @@
 
 - name: V-38582 Medium  The xinetd service must be disabled if no network services utilizing it are enabled
   service: name=xinetd enabled=no state=stopped
-  ignore_errors: yes
-  when: xinetd_services.stdout.find('\ton\n') == -1
+  when: xinetd_services.stdout and xinetd_services.stdout.find('\ton\n') == -1
   tags: [ 'cat2' , 'V-38582' , 'xinetd' , 'services' ]
 
 
@@ -99,8 +96,8 @@
 - name: Checking for nfs mounts missing the 'nodev' option
   shell: mount | grep 'type nfs' | grep -v 'nodev'
   changed_when: false
-  ignore_errors: yes
   register: nfs_mounts_missing_nodev
+  failed_when: nfs_mounts_missing_nodev.stderr
   tags: [ 'cat2' , 'V-38652' , 'nfs' ]
 
 - name: V-38652 Medium  Remote file systems must be mounted with the 'nodev' option
@@ -119,7 +116,7 @@
 - name: Checking for nfs mounts missing the 'nosuid' option
   shell: mount | grep 'type nfs' | grep -v 'nosuid'
   changed_when: false
-  ignore_errors: yes
+  failed_when: nfs_mounts_missing_nosuid.stderr
   register: nfs_mounts_missing_nosuid
   tags: [ 'cat2' , 'V-38652' , 'nfs' ]
 
@@ -156,8 +153,8 @@
 - name: Checking for remote log servers
   shell: grep -Er '(^[^#]?\*\.\*\s+@{1,2})|(\*\.\*\s+omrelp)' /etc/rsyslog.conf /etc/rsyslog.d/
   changed_when: false
-  ignore_errors: yes
   register: remote_logging_servers
+  failed_when: remote_logging_servers.stderr
   tags: [ 'cat2' , 'V-38520' , 'logging' ]
 
 - name: V-38520 Medium  The operating system must back up audit records on an organization defined frequency onto a different system or media than the system being audited
@@ -189,12 +186,16 @@
   command: yum check-update
   changed_when: false
   register: yum_update_status
-  ignore_errors: yes
+  failed_when: yum_update_status.rc == 1
+  tags: [ 'cat2' , 'V-38481' , 'yum' , 'updates' ]
+
+- name: "The following updates are available:"
+  debug: var=yum_update_status.stdout_lines
   tags: [ 'cat2' , 'V-38481' , 'yum' , 'updates' ]
 
 - name: V-38481 Medium  System security patches and updates must be installed and up-to-date
-  pause: prompt="All available updates not installed. This is a finding. Press Enter to continue"
-  when: yum_update_status.rc != 0 and not rhel6stig_fullauto
+  pause: prompt="Updates are available and not installed. This is a finding. Press Enter to continue"
+  when: yum_update_status.rc == 100 and not rhel6stig_fullauto
   tags: [ 'cat2' , 'V-38481' , 'yum' , 'updates' ]
 
 
@@ -206,8 +207,8 @@
 - name: Checking group group-ownership of audit files
   shell: rpm -V audit | grep '^......G'
   changed_when: false
-  ignore_errors: yes
   register: audit_group_ownership
+  failed_when: audit_group_ownership.stderr
   tags: [ 'cat2' , 'V-38665' , 'file_perms' , 'auditd' , 'rpm' ]
 
 - name: V-38665 Medium  The system package management tool must verify group-ownership on all files and directories associated with the audit package
@@ -220,8 +221,8 @@
 - name: Checking user ownership of audit files
   shell: rpm -V audit | grep '^......U'
   changed_when: false
-  ignore_errors: yes
   register: audit_user_ownership
+  failed_when: audit_user_ownership.stderr
   tags: [ 'cat2' , 'V-38664' , 'file_perms' , 'auditd' , 'rpm' ]
 
 - name: V-38664 Medium  The system package management tool must verify ownership on all files and directories associated with the audit package
@@ -240,27 +241,28 @@
 - name: Checking SNMP versions in use
   shell: "grep -E 'v1|v2c|com2sec' /etc/snmp/snmpd.conf | grep -v '^#'"
   changed_when: false
-  ignore_errors: yes
   register: snmp_version_check
+  failed_when: '"FAIL" in snmp_version_check.stdout'
+  when: snmpconf_test.stat.exists
   tags: [ 'cat2' , 'V-38660', 'snmp' ]
 
 - name: V-38660 Medium  The snmpd service must use only SNMP protocol version 3 or newer
   replace: dest=/etc/snmp/snmpd.conf regexp='(^.*)(v1|v2c|com2sec)(.*$)' replace='#\1\2\3' backup=yes
   notify: restart snmpd
-  when: snmp_version_check.stdout
+  when: snmp_version_check.stdout and snmpconf_test.stat.exists
   tags: [ 'cat2' , 'V-38660' , 'snmp' ]
 
 - name: Previous versions of SNMP disabled
   pause: prompt="Versions of SNMP prior to version 3 were found and disabled. More work must be done to fully convert to SNMPv3. Press Enter to continue"
-  when: snmp_version_check.stdout and not rhel6stig_fullauto
+  when: snmp_version_check.stdout and snmpconf_test.stat.exists and not rhel6stig_fullauto
   tags: [ 'cat2' , 'V-38660' , 'snmp' ]
 
 
 - name: Checking permissions of audit files
   shell: rpm -V audit | grep '^.M'
   changed_when: false
-  ignore_errors: yes
   register: audit_permissions
+  failed_when: audit_permissions.stderr
   tags: [ 'cat2' , 'V-38663' , 'file_perms' , 'auditd' , 'rpm' ]
 
 - name: V-38663 Medium  The system package management tool must verify permissions on all files and directories associated with the audit package
@@ -368,8 +370,7 @@
 
 - name: V-38630 Medium  The graphical desktop environment must automatically lock after 15 minutes of inactivity and the system must require user to re-authenticate to unlock the environment
   command: gconftool-2 --direct --config-source xml:readwrite:/etc/gconf/gconf.xml.mandatory --type bool --set /apps/gnome-screensaver/idle_activation_enabled true
-  ignore_errors: yes
-  when: not rhel6stig_xwindows_required
+  when: rhel6stig_xwindows_required
   tags: [ 'cat2' , 'V-38630' , 'gui' , 'screen_lock' ]
 
 
@@ -379,9 +380,8 @@
 - name: List interface config files
   shell: ls /etc/sysconfig/network-scripts/ifcfg-eth* | grep -v $(date +%Y)
   changed_when: false
-  ignore_errors: yes
   register: interface_config_files
-  tags: [ 'cat2' , 'V-38679' , 'network' , 'dhcp' ]
+  tags: [ 'cat2' , 'V-38679' , 'network' , 'dhcp'  ]
 
 - name: V-38679 Medium  The DHCP client must be disabled if not needed
   lineinfile: "state=present dest={{ item }} regexp='^BOOTPROTO=' line='BOOTPROTO=\"static\"' backup=yes"
@@ -434,8 +434,8 @@
   shell: ls /etc/yum.repos.d/*.repo
   changed_when: false
   register: yum_repos
-  ignore_errors: yes
-  tags: [ 'cat2' , 'V-38483' , 'rpm' , 'gpgcheck' , 'test' ]
+  failed_when: "'FAIL' in yum_repos.stdout"
+  tags: [ 'cat2' , 'V-38483' , 'rpm' , 'gpgcheck' ]
 
 - name: V-38483 Medium  The system package management tool must cryptographically verify the authenticity of system software packages during installation
   replace: backup=yes dest={{ item }} regexp='^gpgcheck=0' replace='gpgcheck=1'
@@ -499,12 +499,21 @@
     - net-pf-31
   tags: [ 'cat2' , 'V-38682' , 'kernel_modules' , 'bluetooth' ]
 
-- name: V-38609 Medium  The TFTP service must not be running
-  lineinfile: "state=present backup=yes dest=/etc/xinetd.d/tftp regexp='disable.*=' line='\tdisable\t\t\t= yes'"
-  ignore_errors: yes
+
+- name: Checking if tftp-server is installed
+  command: rpm -q tftp-server
+  changed_when: false
+  register: tftpserver_package_status
+  failed_when: tftpserver_package_status.stderr
   when: not rhel6stig_tftp_required
   tags: [ 'cat2' , 'V-38609' , 'tftp-server' , 'unsecure_services' ]
+
+- name: V-38609 Medium  The TFTP service must not be running
+  command: chkconfig tftp off
+  when: "(not rhel6stig_tftp_required) and (tftpserver_package_status.rc == 0)"
+  tags: [ 'cat2' , 'V-38609' , 'tftp-server' , 'unsecure_services' ]
   notify: reload xinetd
+
 
 - name: V-38606 Medium  The tftp-server package must not be installed
   yum: name=tftp-server state=absent
@@ -622,9 +631,17 @@
   with_items: users.stdout_lines
   tags: [ 'cat2' , 'V-38619' , 'netrc' ]
 
+
+- name: Checking if vsftpd is installed
+  command: rpm -q vsftpd
+  changed_when: false
+  register: vsftpd_package_status
+  failed_when: vsftpd_package_status.stderr
+  tags: [ 'cat2' , 'V-38599' , 'vsftp' , 'dod_logon_banner' , 'logon_settings' ]
+
 - name: V-38599 Medium  The FTPS/FTP service on the system must be configured with the Department of Defense (DoD) login banner
   lineinfile: "state=present backup=yes dest=/etc/vsftpd/vsftpd.conf regexp='^#?banner_file' line='banner_file=/etc/issue'"
-  ignore_errors: yes
+  when: vsftpd_package_status.rc == 0
   tags: [ 'cat2' , 'V-38599' , 'vsftp' , 'dod_logon_banner' , 'logon_settings' ]
   notify: restart vsftpd
 
@@ -635,7 +652,7 @@
   command: grep password /boot/grub/grub.conf
   register: grub_password_check
   changed_when: false
-  ignore_errors: yes
+  failed_when: grub_password_check.stderr
   tags: [ 'cat2' , 'V-38585' , 'grub_password' ]
 
 - name: V-38585 Medium  The system boot loader must require authentication
@@ -653,11 +670,12 @@
   file: dest=/etc/shadow owner=root group=root mode=0000
   tags: [ 'cat2' , 'V-38504' , 'V-38502' , 'V-38503' , 'file_perms' ]
 
+
 - name: List accounst with UID 0
   shell: "awk -F: '($3 == \"0\") {print}' /etc/passwd | grep -v root"
   changed_when: false
-  ignore_errors: yes
   register: users_uid_0
+  failed_when: users_uid_0.stderr
   tags: [ 'cat2' , 'V-38500' , 'accounts' ]
 
 - name: The accounts have a UID of 0. This is a finding.
@@ -669,6 +687,7 @@
   pause: prompt="Accounts with UID 0 other than root were found. This is a finding. Press Enter to continue"
   when: users_uid_0.stdout and not rhel6stig_fullauto
   tags: [ 'cat2' , 'V-38500' , 'accounts' ]
+
 
 - name: V-38621 Medium  The system clock must be synchronized to an authoritative DoD time source
   template: src=ntp.conf.j2 dest=/etc/ntp.conf backup=yes owner=root group=root mode=0644
@@ -697,8 +716,7 @@
 
 - name: V-38629 Medium  The graphical desktop environment must set the idle timeout to no more than 15 minutes
   command: gconftool-2 --direct --config-source xml:readwrite:/etc/gconf/gconf.xml.mandatory --type int --set /apps/gnome-screensaver/idle_delay 15
-  ignore_errors: yes
-  when: not rhel6stig_xwindows_required
+  when: rhel6stig_xwindows_required
   tags: [ 'cat2' , 'V-38629' , 'gui' , 'screen_lock' ]
 
 - name: V-38628 Medium  The operating system must produce audit records containing sufficient information to establish the identity of any user/subject associated with the event
@@ -726,7 +744,7 @@
 
 - name: V-38638 Medium  The graphical desktop environment must have automatic lock enabled
   command: gconftool-2 --direct --config-source xml:readwrite:/etc/gconf/gconf.xml.mandatory --type bool --set /apps/gnome-screensaver/lock_enabled true
-  when: not rhel6stig_xwindows_required
+  when: rhel6stig_xwindows_required
   tags: [ 'cat2' , 'V-38638' , 'gui' , 'screen_lock' ]
 
 

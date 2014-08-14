@@ -1,8 +1,14 @@
 ---
 # CAT I Findings
+- name: Check for /etc/snmp/snmpd.conf
+  stat: path=/etc/snmp/snmpd.conf
+  register: snmpconf_test
+  tags: [ 'cat1' , 'V-38653' , 'snmp' ]
+
 - name: V-38653 High  The snmpd service must not use a default password
   replace: backup=yes dest=/etc/snmp/snmpd.conf regexp=(^com2sec.*default\s+)public replace=\1{{ rhel6stig_snmp_community }}
   ignore_errors: yes
+  when: snmpconf_test.stat.exists
   notify: restart snmpd
   tags: [ 'cat1' , 'V-38653' , 'snmp' ]
 
@@ -19,7 +25,8 @@
 - name: Looking for the presence of a DoD-approved virus scan program
   shell: grep uvscan /etc/cron* /var/spool/cron/*
   register: av_present
-  ignore_errors: yes
+  changed_when: false
+  failed_when: av_present.stderr
   tags: [ 'cat1' , 'V-38666', 'antivirus' ]
 
 - name: V-38666 High  The system must use and update a DoD-approved virus scan program
@@ -31,12 +38,18 @@
 - name: Looking for virus definitions older than seven days
   command: find /usr/local/uvscan -type f -mtime +7
   register: av_defs
-  ignore_errors: yes
+  changed_when: false
+  failed_when: '"FAIL" in av_defs.stderr'
   tags: [ 'cat1' , 'V-38666' , 'antivirus' ]
 
 - name: V-38666 High  The system must use and update a DoD-approved virus scan program
   pause: prompt="AV definitions are outdated. Press ENTER to continue"
   when: av_defs.stdout_lines and not rhel6stig_fullauto
+  tags: [ 'cat1' , 'V-38666' , 'antivirus' ]
+
+- name: V-38666 High  The system must use and update a DoD-approved virus scan program
+  pause: prompt="No AV definitions found in /usr/local/uvscan. Press ENTER to continue"
+  when: av_defs.stderr and not rhel6stig_fullauto
   tags: [ 'cat1' , 'V-38666' , 'antivirus' ]
 
 
