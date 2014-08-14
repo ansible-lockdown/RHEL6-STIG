@@ -83,15 +83,23 @@
   notify: restart ssh
   tags: [ 'ssh' , 'cat1' , 'V-38607' , 'ssh' ]
 
-- name: V-38602 High  The rlogind service must not be running
-  service: name=rlogin enabled=no state=stopped
-  ignore_errors: yes
-  tags: [ 'cat1' , 'V-38602' , 'rlogin', 'unsecure_services' ]
 
-- name: V-38594 High  The rshd service must not be running
-  service: name=rshd enabled=no state=stopped
-  ignore_errors: yes
-  tags: [ 'cat1' , 'V-38594' , 'rsh', 'unsecure_services' ]
+- name: Check status of rsh and rlogin
+  shell: chkconfig --list | grep -E {{ item }}
+  changed_when: false
+  register: rsh_rlogin_status
+  failed_when: rsh_rlogin_status.stderr
+  with_items:
+    - rlogin
+    - rsh
+  tags: [ 'cat1' , 'V-38602' , 'V-38594' , 'rsh' , 'rlogin', 'unsecure_services' , 'debug' ]
+
+- name: "V-38602 High  The rlogind service must not be running\n    V-38594 High  The rshd service must not be running"
+  command: chkconfig {{ item.item }} off
+  when: item.stdout.find('\toff') == -1
+  with_items: rsh_rlogin_status.results
+  tags: [ 'cat1' , 'V-38602' , 'V-38594' , 'rsh' , 'rlogin', 'unsecure_services' , 'debug' ]
+
 
 - name: V-38591 High  The rsh-server package must not be installed
   yum: name=rsh-server state=absent
