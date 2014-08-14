@@ -522,12 +522,13 @@
 
 - name: V-38605 Medium  The cron service must be running
   service: name=crond state=started enabled=yes
-  tags: [ 'cat2' , 'V-38605' , 'cron' , 'services' , 'mandatory_services' ]
+  tags: [ 'cat2' , 'V-38605' , 'cron' , 'mandatory_services' ]
 
 - name: V-38604 Medium  The ypbind service must not be running
   service: name=ypbind state=stopped enabled=no
-  ignore_errors: yes
-  tags: [ 'cat2' , 'V-38604' , 'service' , 'unsecure_services' , 'ypbind' ]
+  register: ypbind_test
+  when: ypbind_test.msg is defined and "'FAIL' not in ypbind_test.msg"
+  tags: [ 'cat2' , 'V-38604' , 'unsecure_services' , 'ypbind' ]
 
 - name: V-38603 Medium  The ypserv package must not be installed
   yum: name=ypserv state=absent
