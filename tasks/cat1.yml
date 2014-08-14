@@ -84,26 +84,27 @@
   tags: [ 'ssh' , 'cat1' , 'V-38607' , 'ssh' ]
 
 
-- name: Check status of rsh and rlogin
-  shell: chkconfig --list | grep -E {{ item }}
+- name: Check if rsh-server is installed
+  command: rpm -q rsh-server
   changed_when: false
-  register: rsh_rlogin_status
-  failed_when: rsh_rlogin_status.stderr
-  with_items:
-    - rlogin
-    - rsh
-  tags: [ 'cat1' , 'V-38602' , 'V-38594' , 'rsh' , 'rlogin', 'unsecure_services' , 'debug' ]
+  register: rshserver_package_status
+  failed_when: rshserver_package_status.stderr
+  tags: [ 'cat1' , 'V-38602' , 'V-38594' , 'rsh' , 'rlogin', 'unsecure_services' ]
 
-- name: "V-38602 High  The rlogind service must not be running\n    V-38594 High  The rshd service must not be running"
-  command: chkconfig {{ item.item }} off
-  when: item.stdout.find('\toff') == -1
-  with_items: rsh_rlogin_status.results
-  tags: [ 'cat1' , 'V-38602' , 'V-38594' , 'rsh' , 'rlogin', 'unsecure_services' , 'debug' ]
+- name: "V-38594 High  The rshd service must not be running"
+  command: chkconfig rsh off
+  when: rshserver_package_status.rc == 0
+  tags: [ 'cat1' , 'V-38594' , 'rsh' , 'unsecure_services' ]
 
+- name: "V-38602 High  The rlogind service must not be running"
+  command: chkconfig rlogin off
+  when: rshserver_package_status.rc == 0
+  tags: [ 'cat1' , 'V-38602' , 'rlogin', 'unsecure_services' ]
 
 - name: V-38591 High  The rsh-server package must not be installed
   yum: name=rsh-server state=absent
   tags: [ 'cat1' , 'V-38591' , 'rsh', 'unsecure_services' ]
+
 
 - name: V-38598 High  The rexecd service must not be running
   service: name=rexec enabled=no state=stopped
