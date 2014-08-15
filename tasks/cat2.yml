@@ -732,7 +732,7 @@
 
 
 - name: Check for auditd files that have a different hash than rpm expects
-  shell: "rpm -V audit | grep '^..5' | grep -Ev '(audit.rules|auditd.conf)'"
+  shell: "rpm -V audit | awk '$1 ~ /..5/ && $2 != \"c\"'"
   changed_when: false
   register: audit_integrity_check
   failed_when: audit_integrity_check.stderr
