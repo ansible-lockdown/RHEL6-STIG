@@ -21,7 +21,7 @@
   shell: grep uvscan /etc/cron* /var/spool/cron/*
   register: av_present
   changed_when: false
-  failed_when: av_present.stderr
+  failed_when: "'FAIL' in av_present.stderr"
   tags: [ 'cat1' , 'V-38666', 'antivirus' ]
 
 - name: V-38666 High  The system must use and update a DoD-approved virus scan program
