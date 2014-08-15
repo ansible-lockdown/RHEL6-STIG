@@ -340,7 +340,7 @@
   tags: [ 'cat2' , 'V-38555' , 'V-38560' , 'iptables' , 'firewall' ]
 
 - name: V-38492 Medium  The system must prevent the root account from logging in from virtual consoles
-  lineinfile: state=absent dest=/etc/securetty regexp='^.*vc/\d' backup=yes
+  lineinfile: state=absent dest=/etc/securetty regexp='^.*vc/?\d' backup=yes
   tags: [ 'cat2' , 'V-38492' , 'root_access' ]
 
 - name: V-38493 Medium  Audit log directories must have mode 0755 or less permissive
