@@ -275,7 +275,7 @@
   lineinfile: "state=present backup=yes dest=/etc/aliases regexp='^root:' line='root:        {{ rhel6stig_root_email_address }}'"
   when: rhel6stig_root_email_address is defined
   notify: update postfix aliases.db
-  tags: [ 'cat2' , 'V-38446' , 'mail' ]
+  tags: [ 'cat2' , 'V-38446' , 'mail' , 'postfix' ]
 
 - name: V-38466 Medium  Library files must be owned by root
   file: dest={{ item }} owner=root recurse=yes
@@ -746,3 +746,8 @@
   lineinfile: "state=present backup=yes dest=/etc/ssh/sshd_config regexp='^#?Banner' line='Banner /etc/issue'"
   tags: [ 'cat2' , 'V-38615' , 'ssh' , 'logon_settings' , 'dod_logon_banner' ]
   notify: restart ssh
+
+- name: V-38622 Medium  Mail relaying must be restricted
+  lineinfile: "state=present backup=yes dest=/etc/postfix/main.cf regexp='^inet_interfaces' line='inet_interfaces = localhost' insertafter='^#\\s?inet_interfaces'"
+  notify: restart postfix
+  tags: [ 'cat2' , 'V-38622' , 'postfix' ]
