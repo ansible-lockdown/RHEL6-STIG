@@ -499,26 +499,16 @@
     - net-pf-31
   tags: [ 'cat2' , 'V-38682' , 'kernel_modules' , 'bluetooth' ]
 
-
-- name: Checking if tftp-server is installed
-  command: rpm -q tftp-server
-  changed_when: false
-  register: tftpserver_package_status
-  failed_when: tftpserver_package_status.stderr
-  when: not rhel6stig_tftp_required
-  tags: [ 'cat2' , 'V-38609' , 'tftp-server' , 'unsecure_services' ]
-
 - name: V-38609 Medium  The TFTP service must not be running
   command: chkconfig tftp off
-  when: "(not rhel6stig_tftp_required) and (tftpserver_package_status.rc == 0)"
-  tags: [ 'cat2' , 'V-38609' , 'tftp-server' , 'unsecure_services' ]
+  when: "not rhel6stig_tftp_required and 'tftp' in xinetd_services.stdout_lines"
+  tags: [ 'cat2' , 'V-38609' , 'tftp' , 'tftp-server' , 'unsecure_services' ]
   notify: reload xinetd
-
 
 - name: V-38606 Medium  The tftp-server package must not be installed
   yum: name=tftp-server state=absent
   when: not rhel6stig_tftp_required
-  tags: [ 'cat2' , 'V-38606' , 'tftp-server' , 'unauthorized_packages' ]
+  tags: [ 'cat2' , 'V-38606' , 'tftp' , 'tftp-server' , 'unauthorized_packages' ]
 
 - name: V-38605 Medium  The cron service must be running
   service: name=crond state=started enabled=yes
@@ -632,17 +622,9 @@
   with_items: users.stdout_lines
   tags: [ 'cat2' , 'V-38619' , 'netrc' ]
 
-
-- name: Checking if vsftpd is installed
-  command: rpm -q vsftpd
-  changed_when: false
-  register: vsftpd_package_status
-  failed_when: vsftpd_package_status.stderr
-  tags: [ 'cat2' , 'V-38599' , 'vsftp' , 'dod_logon_banner' , 'logon_settings' ]
-
 - name: V-38599 Medium  The FTPS/FTP service on the system must be configured with the Department of Defense (DoD) login banner
   lineinfile: "state=present backup=yes dest=/etc/vsftpd/vsftpd.conf regexp='^#?banner_file' line='banner_file=/etc/issue'"
-  when: vsftpd_package_status.rc == 0
+  when: "'vsftpd' in sysv_services.stdout"
   tags: [ 'cat2' , 'V-38599' , 'vsftp' , 'dod_logon_banner' , 'logon_settings' ]
   notify: restart vsftpd
 
