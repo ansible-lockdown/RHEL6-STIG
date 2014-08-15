@@ -299,7 +299,7 @@
 - name: "V-38464 Medium  The audit system must take appropriate action when there are disk errors on the audit storage volume\n    V-38468 Medium  The audit system must take appropriate action when the audit storage volume is full\n    V-38678 Medium  The audit system must provide a warning when allocated audit record storage volume reaches a documented percentage of maximum audit record storage capacity\n    V-38470 Medium  The audit system must alert designated staff members when the audit storage volume approaches capacity\n    V-38636  Medium  The system must retain enough rotated audit logs to cover the required log retention period\n    V-38634  Medium  The system must rotate audit log files that reach the maximum file size\n    V-38633  Medium  The system must set a maximum audit log file size"
   template: src=auditd.conf.j2 dest=/etc/audit/auditd.conf owner=root group=root mode=0640 backup=yes
   notify: restart auditd
-  tags: [ 'cat2' , 'V-38464' , 'V-38468' , 'V-38678' , 'V-38470' , 'V-38634' , 'V-38633' , 'auditd' , 'test' ]
+  tags: [ 'cat2' , 'V-38464' , 'V-38468' , 'V-38678' , 'V-38470' , 'V-38634' , 'V-38633' , 'auditd' ]
 
 - name: V-38461 Medium  The /etc/group file must have mode 0644 or less permissive
   file: dest=/etc/group owner=root group=root mode=0644
@@ -612,11 +612,6 @@
     - issue.net
   tags: [ 'cat2' , 'V-38593' , 'logon_settings' , 'dod_logon_banner' ]
 
-- name: Use /etc/issue for SSH logon banner
-  lineinfile: "state=present backup=yes dest=/etc/ssh/sshd_config regexp='^#?Banner' line='Banner /etc/issue'"
-  tags: [ 'cat2' , 'V-38593' , 'ssh' , 'logon_settings' , 'dod_logon_banner' ]
-  notify: restart ssh
-
 - name: V-38619 Medium  There must be no .netrc files on the system
   file: state=absent dest=~{{ item }}/.netrc
   with_items: users.stdout_lines
@@ -747,3 +742,7 @@
   lineinfile: state=present backup=yes dest=/etc/sysconfig/init regexp='^(#)?SINGLE' line='SINGLE=/sbin/sulogin'
   tags: [ 'cat2' , 'V-38586' , 'root_access' ]
 
+- name: V-38615 Medium  The SSH daemon must be configured with the Department of Defense (DoD) login banner.
+  lineinfile: "state=present backup=yes dest=/etc/ssh/sshd_config regexp='^#?Banner' line='Banner /etc/issue'"
+  tags: [ 'cat2' , 'V-38615' , 'ssh' , 'logon_settings' , 'dod_logon_banner' ]
+  notify: restart ssh
