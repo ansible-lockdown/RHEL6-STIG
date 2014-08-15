@@ -273,7 +273,7 @@
 
 - name: V-38446 Medium  The mail system must forward all mail for root to one or more system administrators
   lineinfile: "state=present backup=yes dest=/etc/aliases regexp='^root:' line='root:        {{ rhel6stig_root_email_address }}'"
-  when: rhel6stig_root_email_address
+  when: rhel6stig_root_email_address is defined
   notify: update postfix aliases.db
   tags: [ 'cat2' , 'V-38446' , 'mail' ]
 
@@ -597,7 +597,7 @@
 
 - name: V-38691 Medium  The Bluetooth service must be disabled
   service: name=bluetooth state=stopped enabled=no
-  ignore_errors: yes
+  when: "'bluetooth' in sysv_services.stdout_lines"
   tags: [ 'cat2' , 'V-38691' , 'bluetooth' ]
 
 - name: V-38511 Medium  IP forwarding for IPv4 must not be enabled, unless the system is a router
@@ -754,13 +754,13 @@
   changed_when: false
   register: audit_integrity_check
   failed_when: audit_integrity_check.stderr
-  tags: [ 'cat2' , 'V-38637' , 'auditd' , 'rpm' , 'test' ]
+  tags: [ 'cat2' , 'V-38637' , 'auditd' , 'rpm' ]
 
 - name: V-38637 Medium  The system package management tool must verify contents of all files associated with the audit package
-  # yum: name=audit state=latest
   command: yum -y reinstall audit
   when: audit_integrity_check.stdout
-  tags: [ 'cat2' , 'V-38637' , 'auditd' , 'rpm' , 'test' ]
+  tags: [ 'cat2' , 'V-38637' , 'auditd' , 'rpm' ]
+
 
 # --- BREAK --- #
 
