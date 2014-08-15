@@ -82,6 +82,98 @@ Make sure to include the vars_prompt section in your playbook. It is needed for 
           confirm: yes
           salt_size: 8
 
+Tags
+----
+Many tags are available for precise control of what is and is not changed. When running this playbook with tags, always include the `prelim_tasks` tag. This will run all the setup tasks that gather information and set variables used by subsequest tasks. If run without `prelim_tasks`, certain tasks will fail.
+
+Here is the list of all available tags, not including finding IDs:
+
+    accounts
+    aide
+    antivirus
+    audit_permissions
+    auditd
+    bluetooth
+    cat1
+    cat2
+    cat3
+    config
+    cron
+    ctrl_alt_delete
+    dccp
+    dhcp
+    dod_logon_banner
+    file_integrity
+    file_perms
+    firewall
+    gpgcheck
+    grub
+    grub_password
+    gui
+    hosts_equiv
+    icmp_redirects
+    interactive_boot
+    intrusion_detection
+    iptables
+    ipv6
+    kernel_modules
+    kernel_parameters
+    kerner_parameters
+    ldap
+    logging
+    logon_settings
+    mail
+    mandatory_services
+    mobile_devices
+    netrc
+    network
+    nfs
+    ntp
+    packages
+    passwords
+    postfix
+    prelim_tasks
+    reverse_path_filter
+    rexec
+    rhosts
+    rlogin
+    root_access
+    rpm
+    rsh
+    screen_lock
+    sctp
+    sendmail
+    services
+    snmp
+    source_routed_packets
+    ssh
+    tcp_syncookies
+    tcp_timestamps
+    telnet
+    test
+    tftp
+    tftp-server
+    tipc
+    unauthorized_packages
+    unsecure_services
+    updates
+    usb_devices
+    vsftp
+    xinetd
+    xwindows
+    ypbind
+    ypserv
+    yum
+
+Some examples of using tags:
+
+    # Only remediate ssh
+    ansible-playbook site.yml --tags="prelim_tasks,ssh"
+
+    # Don't change SNMP or postfix
+    ansible-playbook site.yml --skip-tags="postfix,mail,snmp"
+
+
 License
 -------
 
