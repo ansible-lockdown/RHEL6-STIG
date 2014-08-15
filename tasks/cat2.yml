@@ -155,7 +155,7 @@
   changed_when: false
   register: remote_logging_servers
   failed_when: remote_logging_servers.stderr
-  tags: [ 'cat2' , 'V-38520' , 'logging' ]
+  tags: [ 'cat2' , 'V-38520' ,  'auditd' , 'logging' ]
 
 - name: V-38520 Medium  The operating system must back up audit records on an organization defined frequency onto a different system or media than the system being audited
   pause: prompt="No remote logging server is configured. Press Enter to continue"
@@ -732,7 +732,7 @@
 
 
 - name: Check for auditd files that have a different hash than rpm expects
-  shell: "rpm -V audit | grep '^..5'"
+  shell: "rpm -V audit | grep '^..5' | grep -Ev '(audit.rules|auditd.conf)'"
   changed_when: false
   register: audit_integrity_check
   failed_when: audit_integrity_check.stderr
