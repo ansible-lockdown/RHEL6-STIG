@@ -751,3 +751,13 @@
   lineinfile: "state=present backup=yes dest=/etc/postfix/main.cf regexp='^inet_interfaces' line='inet_interfaces = localhost' insertafter='^#\\s?inet_interfaces'"
   notify: restart postfix
   tags: [ 'cat2' , 'V-38622' , 'postfix' ]
+
+- name: V-38617 Medium  The SSH daemon must be configured to use only FIPS 140-2 approved ciphers
+  lineinfile: "state=present backup=yes dest=/etc/ssh/sshd_config line='Ciphers aes128-ctr,aes192-ctr,aes256-ctr,aes128-cbc,3des-cbc,aes192-cbc,aes256-cbc'"
+  tags: [ 'cat2' , 'V-38614' , 'ssh' ]
+  notify: restart ssh
+
+- name: V-38611 Medium  The SSH daemon must ignore .rhosts files
+  lineinfile: "state=present backup=yes dest=/etc/ssh/sshd_config regexp='^#?IgnoreRhosts' line='IgnoreRhosts yes'"
+  tags: [ 'cat2' , 'V-38611' , 'ssh' ]
+  notify: restart ssh
