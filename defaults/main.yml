@@ -51,3 +51,19 @@ rhel6stig_ntp_config_restrict:
   - "-6 default kod nomodify notrap nopeer noquery"
   - "127.0.0.1"
   - "-6 ::1"
+
+# Services listed in CAT III findings and their configuration
+# state should be  started or stopped
+# enabled can be yes or no
+rhel6stig_cat3_disabled_services:
+  - name: abrtd
+    state: stopped
+    enabled: no
+
+  - name: atd
+    state: stopped
+    enabled: no
+
+  - name: qpidd
+    state: stopped
+    enabled: no
