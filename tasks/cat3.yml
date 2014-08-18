@@ -34,6 +34,9 @@
   when: '"fish" in shells.stdout_lines'
   tags: [ 'cat2' , 'V-38647' , 'umask' , 'bash' ]
 
+- name: V-38645 Low  The system default umask in /etc/login.defs must be 077
+  lineinfile: "state=present backup=yes dest=/etc/login.defs regexp='^UMASK' line='UMASK           077'"
+  tags: [ 'cat2' , 'V-38645' , 'umask' , 'test' ]
 
 # --- BREAK --- #
 
