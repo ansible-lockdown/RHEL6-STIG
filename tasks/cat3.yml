@@ -8,6 +8,10 @@
   when: "'qpidd' in sysv_services.stdout_lines"
   tags: [ 'cat2' , 'V-38648' , 'qpidd' ]
 
+- name: V-38642 Low  The system default umask for daemons must be 027 or 022
+  lineinfile: state=present backup=yes dest=/etc/init.d/functions regexp="umask \d\d\d" line="umask 022"
+  tags: [ 'cat2' , 'V-38642' , 'umask' ]
+
 # --- BREAK --- #
 
 - name: V-38647 Low  The system default umask in /etc/profile must be 077
