@@ -57,3 +57,10 @@
   set_fact: ipv6_in_use=true
   when: rhel6stig_ipv6test.stdout
   tags: [ 'ipv6' ]
+
+# Get list of shells
+- name: PRELIM | Get list of shells on system
+  shell: grep -Pv "/(sh|nologin|dash)" /etc/shells | sed -r 's#/((bin|sbin|usr)/)+##'
+  register: shells
+  changed_when: false
+  tags: [ 'umask' ]

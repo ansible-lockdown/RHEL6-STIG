@@ -1,9 +1,35 @@
 ---
-- name: V-38649 Low The system default umask for the csh shell must be 077
-  lineinfile: "state=present backup=yes dest=/etc/csh.cshrc regexp='umask' line='    umask 077' insertafter='else'"
+- name: V-38649 Low  The system default umask for the csh shell must be 077
+  replace: backup=yes dest=/etc/csh.cshrc regexp="umask \d\d\d" replace="umask 077"
   tags: [ 'cat2' , 'V-38649' , 'csh' , 'umask' ]
 
-- name: V-38533 Low The system must ignore IPv4 ICMP redirect messages.
+# --- BREAK --- #
+
+- name: V-38647 Low  The system default umask in /etc/profile must be 077
+  replace: backup=yes dest={{ item }} regexp="umask \d\d\d" replace="umask 077"
+  with_items:
+    - /etc/profile
+    - /etc/bashrc
+  tags: [ 'cat2' , 'V-38647' , 'umask' , 'bash' ]
+
+# Set default umask for fish shell if it is installed
+# This required two tasks in order to add multiple lines cleanly
+# Adding '\n' to the 'line' field causes this module to reinsert the same
+# line every time the task is run which is very undesirable.
+- name: Set default umask for fish shell to 077
+  lineinfile: backup=yes dest=/etc/fish/config.fish line="# Set default umask" insertafter=EOF
+  when: '"fish" in shells.stdout_lines'
+  tags: [ 'cat2' , 'V-38647' , 'umask' , 'bash' ]
+
+- name: Set default umask for fish shell to 077
+  lineinfile: backup=yes dest=/etc/fish/config.fish line="umask 077" insertafter="# Set default umask"
+  when: '"fish" in shells.stdout_lines'
+  tags: [ 'cat2' , 'V-38647' , 'umask' , 'bash' ]
+
+
+# --- BREAK --- #
+
+- name: V-38533 Low  The system must ignore IPv4 ICMP redirect messages.
   sysctl: name=net.ipv4.conf.default.accept_redirects value=0 state=present reload=yes ignoreerrors=yes
   tags: [ 'cat3' , 'V-38533' , 'icmp_redirects' , 'kerner_parameters' , 'network' ]
 
