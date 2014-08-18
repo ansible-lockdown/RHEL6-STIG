@@ -3,6 +3,11 @@
   replace: backup=yes dest=/etc/csh.cshrc regexp="umask \d\d\d" replace="umask 077"
   tags: [ 'cat2' , 'V-38649' , 'csh' , 'umask' ]
 
+- name: V-38648 Low  The qpidd service must not be running
+  service: name=qpidd state=stopped enabled=no
+  when: "'qpidd' in sysv_services.stdout_lines"
+  tags: [ 'cat2' , 'V-38648' , 'qpidd' ]
+
 # --- BREAK --- #
 
 - name: V-38647 Low  The system default umask in /etc/profile must be 077
