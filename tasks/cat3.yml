@@ -38,6 +38,10 @@
   lineinfile: "state=present backup=yes dest=/etc/login.defs regexp='^UMASK' line='UMASK           077'"
   tags: [ 'cat2' , 'V-38645' , 'umask' ]
 
+- name: V-51369 Low  The system must use a Linux Security Module configured to limit the privileges of system services
+  selinux: policy=targeted state=enforcing
+  tags: [ 'cat2' , 'V-51369' , 'selinux' ]
+
 # --- BREAK --- #
 
 - name: V-38533 Low  The system must ignore IPv4 ICMP redirect messages.
