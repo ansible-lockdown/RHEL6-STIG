@@ -1,24 +1,24 @@
 ---
 - name: V-38649 Low  The system default umask for the csh shell must be 077
   replace: backup=yes dest=/etc/csh.cshrc regexp="umask \d\d\d" replace="umask 077"
-  tags: [ 'cat2' , 'V-38649' , 'csh' , 'umask' ]
+  tags: [ 'cat3' , 'V-38649' , 'csh' , 'umask' ]
 
 - name: V-38642 Low  The system default umask for daemons must be 027 or 022
   lineinfile: state=present backup=yes dest=/etc/init.d/functions regexp="umask \d\d\d" line="umask 022"
-  tags: [ 'cat2' , 'V-38642' , 'umask' ]
+  tags: [ 'cat3' , 'V-38642' , 'umask' ]
 
 - name: "V-38648 Low  The qpidd service must not be running\n    V-38641 Low  The atd service must be disabled\n    V-38640 Low  The Automatic Bug Reporting Tool (abrtd) service must not be running\n    V-38646 Low  The oddjobd service must not be running\n    V-38644 Low  The ntpdate service must not be running"
   service: name={{ item.name }} state={{ item.state }} enabled={{ item.enabled }}
   when: "'{{ item.name }}' in sysv_services.stdout_lines"
   with_items: rhel6stig_cat3_disabled_services
-  tags: [ 'cat2' , 'V-38640' , 'abrtd', 'V-38648' , 'qpidd' , 'V-38641' , 'atd' , 'V-38646' , 'oddjobd' , 'V-38644' , 'ntpdate' , 'test' ]
+  tags: [ 'cat3' , 'V-38640' , 'abrtd', 'V-38648' , 'qpidd' , 'V-38641' , 'atd' , 'V-38646' , 'oddjobd' , 'V-38644' , 'ntpdate' , 'test' ]
 
 - name: V-38647 Low  The system default umask in /etc/profile must be 077
   replace: backup=yes dest={{ item }} regexp="umask \d\d\d" replace="umask 077"
   with_items:
     - /etc/profile
     - /etc/bashrc
-  tags: [ 'cat2' , 'V-38647' , 'umask' , 'bash' ]
+  tags: [ 'cat3' , 'V-38647' , 'umask' , 'bash' ]
 
 # Set default umask for fish shell if it is installed
 # This required two tasks in order to add multiple lines cleanly
@@ -27,20 +27,20 @@
 - name: Set default umask for fish shell to 077
   lineinfile: backup=yes dest=/etc/fish/config.fish line="# Set default umask" insertafter=EOF
   when: '"fish" in shells.stdout_lines'
-  tags: [ 'cat2' , 'V-38647' , 'umask' , 'bash' ]
+  tags: [ 'cat3' , 'V-38647' , 'umask' , 'bash' ]
 
 - name: Set default umask for fish shell to 077
   lineinfile: backup=yes dest=/etc/fish/config.fish line="umask 077" insertafter="# Set default umask"
   when: '"fish" in shells.stdout_lines'
-  tags: [ 'cat2' , 'V-38647' , 'umask' , 'bash' ]
+  tags: [ 'cat3' , 'V-38647' , 'umask' , 'bash' ]
 
 - name: V-38645 Low  The system default umask in /etc/login.defs must be 077
   lineinfile: "state=present backup=yes dest=/etc/login.defs regexp='^UMASK' line='UMASK           077'"
-  tags: [ 'cat2' , 'V-38645' , 'umask' ]
+  tags: [ 'cat3' , 'V-38645' , 'umask' ]
 
 - name: V-51369 Low  The system must use a Linux Security Module configured to limit the privileges of system services
   selinux: policy=targeted state=enforcing
-  tags: [ 'cat2' , 'V-51369' , 'selinux' ]
+  tags: [ 'cat3' , 'V-51369' , 'selinux' ]
 
 # --- BREAK --- #
 
