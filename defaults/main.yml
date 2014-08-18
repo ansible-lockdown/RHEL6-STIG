@@ -67,3 +67,7 @@ rhel6stig_cat3_disabled_services:
   - name: qpidd
     state: stopped
     enabled: no
+
+  - name: oddjobd
+    state: stopped
+    enabled: no

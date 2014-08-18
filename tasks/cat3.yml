@@ -7,11 +7,11 @@
   lineinfile: state=present backup=yes dest=/etc/init.d/functions regexp="umask \d\d\d" line="umask 022"
   tags: [ 'cat2' , 'V-38642' , 'umask' ]
 
-- name: "V-38648 Low  The qpidd service must not be running\n    V-38641 Low  The atd service must be disabled\n    V-38640 Low  The Automatic Bug Reporting Tool (abrtd) service must not be running\n    "
+- name: "V-38648 Low  The qpidd service must not be running\n    V-38641 Low  The atd service must be disabled\n    V-38640 Low  The Automatic Bug Reporting Tool (abrtd) service must not be running\n    V-38646 Low  The oddjobd service must not be running"
   service: name={{ item.name }} state={{ item.state }} enabled={{ item.enabled }}
   when: "'{{ item.name }}' in sysv_services.stdout_lines"
   with_items: rhel6stig_cat3_disabled_services
-  tags: [ 'cat2' , 'V-38640' , 'abrtd', 'V-38648' , 'qpidd' , 'V-38641' , 'atd' , 'test' ]
+  tags: [ 'cat2' , 'V-38640' , 'abrtd', 'V-38648' , 'qpidd' , 'V-38641' , 'atd' , 'V-38646' , 'oddjobd' , 'test' ]
 
 - name: V-38647 Low  The system default umask in /etc/profile must be 077
   replace: backup=yes dest={{ item }} regexp="umask \d\d\d" replace="umask 077"
