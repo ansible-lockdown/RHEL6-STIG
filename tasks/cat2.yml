@@ -191,6 +191,7 @@
 
 - name: "The following updates are available:"
   debug: var=yum_update_status.stdout_lines
+  when: yum_update_status.rc == 100 and not rhel6stig_fullauto
   tags: [ 'cat2' , 'V-38481' , 'yum' , 'updates' ]
 
 - name: V-38481 Medium  System security patches and updates must be installed and up-to-date
