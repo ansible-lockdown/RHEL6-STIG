@@ -248,14 +248,14 @@
   tags: [ 'cat2' , 'V-38660', 'snmp' ]
 
 - name: V-38660 Medium  The snmpd service must use only SNMP protocol version 3 or newer
-  replace: dest=/etc/snmp/snmpd.conf regexp='(^.*)(v1|v2c|com2sec)(.*$)' replace='#\1\2\3' backup=yes
+  replace: dest=/etc/snmp/snmpd.conf regexp='^(#+)?(.*)(v1|v2c|com2sec)(.*$)' replace='#\2\3\4' backup=yes
   notify: restart snmpd
-  when: snmp_version_check.stdout and snmpconf_test.stat.exists
+  when: snmp_version_check.stdout is defined and snmpconf_test.stat.exists
   tags: [ 'cat2' , 'V-38660' , 'snmp' ]
 
 - name: Previous versions of SNMP disabled
   pause: prompt="Versions of SNMP prior to version 3 were found and disabled. More work must be done to fully convert to SNMPv3. Press Enter to continue"
-  when: snmp_version_check.stdout and snmpconf_test.stat.exists and not rhel6stig_fullauto
+  when: snmp_version_check.stdout is defined and snmpconf_test.stat.exists and not rhel6stig_fullauto
   tags: [ 'cat2' , 'V-38660' , 'snmp' ]
 
 
