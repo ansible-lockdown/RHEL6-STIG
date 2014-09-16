@@ -11,7 +11,7 @@
   service: name={{ item.name }} state={{ item.state }} enabled={{ item.enabled }}
   when: "'{{ item.name }}' in sysv_services.stdout_lines"
   with_items: rhel6stig_cat3_disabled_services
-  tags: [ 'cat3' , 'V-38640' , 'abrtd', 'V-38648' , 'qpidd' , 'V-38641' , 'atd' , 'V-38646' , 'oddjobd' , 'V-38644' , 'ntpdate' , 'test' ]
+  tags: [ 'cat3' , 'V-38640' , 'abrtd', 'V-38648' , 'qpidd' , 'V-38641' , 'atd' , 'V-38646' , 'oddjobd' , 'V-38644' , 'ntpdate' ]
 
 - name: V-38647 Low  The system default umask in /etc/profile must be 077
   replace: backup=yes dest={{ item }} regexp="umask \d\d\d" replace="umask 077"
@@ -44,7 +44,21 @@
   selinux: policy=targeted state=enforcing
   tags: [ 'cat3' , 'V-51369' , 'selinux' ]
 
-# - name: V-38452 Low  The system package management tool must verify permissions on all files and directories associated with packages
+
+- name: Check permissions on all files and directories associated with packages
+  shell: "grep '^.M' /tmp/rhel6stig_rpm_verify | awk '{print $3}' "
+  changed_when: false
+  register: rpm_file_permissions_check
+  failed_when: rpm_file_permissions_check.stderr
+  tags: [ 'cat3' , 'V-38452' , 'rpm' , 'test' ]
+
+- name: V-38452 Low  The system package management tool must verify permissions on all files and directories associated with packages
+  shell: rpm --setperms $(rpm -qf {{ item }})
+  when: rpm_file_permissions_check.stdout
+  with_items: rpm_file_permissions_check.stdout_lines
+  tags: [ 'cat3' , 'V-38452' , 'rpm' , 'test' ]
+
+
 # - name: V-38453 Low  The system package management tool must verify group-ownership on all files and directories associated with packages
 
 - name: V-38608 Low  The SSH daemon must set a timeout interval on idle sessions
@@ -56,17 +70,17 @@
 # Print list of files whose integrity does not match rpm database that are not
 # config files. If any are found, reinstall the package.
 - name: Checking integrity of installed files associated with packages
-  shell: "rpm -Va | awk '$1 ~ /..5/ && $2 != \"c\" ' | awk '{print $2}' "
+  shell: "awk '$1 ~ /..5/ && $2 != \"c\" ' /tmp/rhel6stig_rpm_verify | awk '{print $2}' "
   changed_when: false
   register: rpm_integrity_check
   failed_when: rpm_integrity_check.stderr
-  tags: [ 'cat3' , 'V-38447' , 'rpm' , 'test' ]
+  tags: [ 'cat3' , 'V-38447' , 'rpm' ]
 
 - name: V-38447 Low The system package management tool must verify contents of all files associated with packages
   shell: yum reinstall -y $(rpm -qf {{ item }})
   when: rpm_integrity_check.stdout
   with_items: rpm_integrity_check.stdout_lines
-  tags: [ 'cat3' , 'V-38447' , 'rpm' , 'test' ]
+  tags: [ 'cat3' , 'V-38447' , 'rpm' ]
 
 # --- BREAK --- #
 
