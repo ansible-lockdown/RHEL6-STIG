@@ -42,6 +42,14 @@
   selinux: policy=targeted state=enforcing
   tags: [ 'cat3' , 'V-51369' , 'selinux' ]
 
+# - name: V-38452 Low  The system package management tool must verify permissions on all files and directories associated with packages
+# - name: V-38453 Low  The system package management tool must verify group-ownership on all files and directories associated with packages
+
+- name: V-38608 Low  The SSH daemon must set a timeout interval on idle sessions
+  lineinfile: "state=present backup=yes dest=/etc/ssh/sshd_config regexp='^(#)?ClientAliveInterval' line='ClientAliveInterval 900'"
+  tags: [ 'cat3' , 'V-38608' , 'ssh' ]
+  notify: restart ssh
+
 # --- BREAK --- #
 
 - name: V-38533 Low  The system must ignore IPv4 ICMP redirect messages.
