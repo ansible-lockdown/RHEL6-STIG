@@ -75,3 +75,7 @@ rhel6stig_cat3_disabled_services:
   - name: ntpdate
     state: stopped
     enabled: no
+
+  - name: rdisc
+    state: stopped
+    enabled: no
