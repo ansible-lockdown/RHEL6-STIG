@@ -20,6 +20,7 @@
     - /etc/bashrc
   tags: [ 'cat3' , 'V-38647' , 'umask' , 'bash' ]
 
+
 # Set default umask for fish shell if it is installed
 # This required two tasks in order to add multiple lines cleanly
 # Adding '\n' to the 'line' field causes this module to reinsert the same
@@ -33,6 +34,7 @@
   lineinfile: backup=yes dest=/etc/fish/config.fish line="umask 077" insertafter="# Set default umask"
   when: '"fish" in shells.stdout_lines'
   tags: [ 'cat3' , 'V-38647' , 'umask' , 'bash' ]
+
 
 - name: V-38645 Low  The system default umask in /etc/login.defs must be 077
   lineinfile: "state=present backup=yes dest=/etc/login.defs regexp='^UMASK' line='UMASK           077'"
@@ -49,6 +51,22 @@
   lineinfile: "state=present backup=yes dest=/etc/ssh/sshd_config regexp='^(#)?ClientAliveInterval' line='ClientAliveInterval 900'"
   tags: [ 'cat3' , 'V-38608' , 'ssh' ]
   notify: restart ssh
+
+
+# Print list of files whose integrity does not match rpm database that are not
+# config files. If any are found, reinstall the package.
+- name: Checking integrity of installed files associated with packages
+  shell: "rpm -Va | awk '$1 ~ /..5/ && $2 != \"c\" ' | awk '{print $2}' "
+  changed_when: false
+  register: rpm_integrity_check
+  failed_when: rpm_integrity_check.stderr
+  tags: [ 'cat3' , 'V-38447' , 'rpm' , 'test' ]
+
+- name: V-38447 Low The system package management tool must verify contents of all files associated with packages
+  shell: yum reinstall -y $(rpm -qf {{ item }})
+  when: rpm_integrity_check.stdout
+  with_items: rpm_integrity_check.stdout_lines
+  tags: [ 'cat3' , 'V-38447' , 'rpm' , 'test' ]
 
 # --- BREAK --- #
 
