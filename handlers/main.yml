@@ -34,3 +34,6 @@
 
 - name: restart vsftpd
   service: name=vsftpd state=restarted
+
+- name: restart samba
+  service: name=smb state=restarted

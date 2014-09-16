@@ -99,6 +99,11 @@
   replace: backup=yes dest=/etc/bashrc regexp="umask \d\d\d" replace="umask 077"
   tags: [ 'cat3' , 'V-38651' , 'umask' , 'test' ]
 
+- name: V-38656 Low The system must use SMB client signing for connecting to samba servers using smbclient
+  lineinfile: "state=present backup=yes dest=/etc/samba/smb.conf regexp='client signing' line='client signing = mandatory' insertafter='\\[global\\]'"
+  tags: [ 'cat3' , 'V-38656' , 'smb' ]
+  notify: restart samba
+
 # --- BREAK --- #
 
 - name: V-38533 Low  The system must ignore IPv4 ICMP redirect messages.
