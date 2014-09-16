@@ -50,16 +50,28 @@
   changed_when: false
   register: rpm_file_permissions_check
   failed_when: rpm_file_permissions_check.stderr
-  tags: [ 'cat3' , 'V-38452' , 'rpm' , 'test' ]
+  tags: [ 'cat3' , 'V-38452' , 'rpm' ]
 
 - name: V-38452 Low  The system package management tool must verify permissions on all files and directories associated with packages
   shell: rpm --setperms $(rpm -qf {{ item }})
   when: rpm_file_permissions_check.stdout
   with_items: rpm_file_permissions_check.stdout_lines
-  tags: [ 'cat3' , 'V-38452' , 'rpm' , 'test' ]
+  tags: [ 'cat3' , 'V-38452' , 'rpm' ]
 
 
-# - name: V-38453 Low  The system package management tool must verify group-ownership on all files and directories associated with packages
+- name: Check group-ownership on all files and directories associated with packages
+  shell: "grep '^......G' /tmp/rhel6stig_rpm_verify | awk '{print $3}' "
+  changed_when: false
+  register: rpm_group_ownership_check
+  failed_when: rpm_group_ownership_check.stderr
+  tags: [ 'cat3' , 'V-38453' , 'rpm' ]
+
+- name: V-38453 Low  The system package management tool must verify group-ownership on all files and directories associated with packages
+  shell: rpm --setugids $(rpm -qf {{ item }})
+  when: rpm_group_ownership_check.stdout
+  with_items: rpm_group_ownership_check.stdout_lines
+  tags: [ 'cat3' , 'V-38453' , 'rpm' ]
+
 
 - name: V-38608 Low  The SSH daemon must set a timeout interval on idle sessions
   lineinfile: "state=present backup=yes dest=/etc/ssh/sshd_config regexp='^(#)?ClientAliveInterval' line='ClientAliveInterval 900'"
@@ -67,8 +79,6 @@
   notify: restart ssh
 
 
-# Print list of files whose integrity does not match rpm database that are not
-# config files. If any are found, reinstall the package.
 - name: Checking integrity of installed files associated with packages
   shell: "awk '$1 ~ /..5/ && $2 != \"c\" ' /tmp/rhel6stig_rpm_verify | awk '{print $2}' "
   changed_when: false
