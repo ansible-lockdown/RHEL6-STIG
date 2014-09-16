@@ -95,7 +95,9 @@
 
 # - name: V-38659 Low The operating system must employ cryptographic mechanisms to protect information in storage
 
-
+- name: V-38651 Low The system default umask for the bash shell must be 077
+  replace: backup=yes dest=/etc/bashrc regexp="umask \d\d\d" replace="umask 077"
+  tags: [ 'cat3' , 'V-38651' , 'umask' , 'test' ]
 
 # --- BREAK --- #
 
