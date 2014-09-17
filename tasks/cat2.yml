@@ -6,9 +6,9 @@
 
 
 # This audit.rules file is from https://github.com/RedHatGov/stig-fix-el6/tree/master/config
-- name: "Medium  Copy STIG compliant audit.rules\n    V-38580 Medium  The audit system must be configured to audit the loading and unloading of dynamic kernel modules\n    V-38680 Medium  The audit system must identify staff members to receive notifications of audit log storage volume capacity issues\n    V-38527 Low     The audit system must be configured to audit all attempts to alter system time through clock_settime\n    V-38525 Low     The audit system must be configured to audit all attempts to alter system time through stime"
+- name: "Medium  Copy STIG compliant audit.rules\n    V-38580 Medium  The audit system must be configured to audit the loading and unloading of dynamic kernel modules\n    V-38680 Medium  The audit system must identify staff members to receive notifications of audit log storage volume capacity issues\n    V-38527 Low     The audit system must be configured to audit all attempts to alter system time through clock_settime\n    V-38525 Low     The audit system must be configured to audit all attempts to alter system time through stime\n    V-38522 Low     The audit system must be configured to audit all attempts to alter system time through settimeofday"
   template: src=audit.rules.j2 dest=/etc/audit/audit.rules owner=root group=root mode=0640 backup=yes
-  tags: [ 'cat2' , 'V-38580' , 'V-38680' , 'V-38527' , 'V-38525' , 'auditd' ]
+  tags: [ 'cat2' , 'V-38580' , 'V-38680' , 'V-38527' , 'V-38525' , 'V-38522' , 'auditd' ]
   notify: restart auditd
 
 
@@ -435,11 +435,11 @@
   changed_when: false
   register: yum_repos
   failed_when: "'FAIL' in yum_repos.stdout"
-  tags: [ 'cat2' , 'V-38483' , 'rpm' , 'gpgcheck' ]
+  tags: [ 'cat2' , 'V-38483' , 'V-38487' , 'rpm' , 'gpgcheck' ]
 
-- name: V-38483 Medium  The system package management tool must cryptographically verify the authenticity of system software packages during installation
+- name: "V-38483 Medium  The system package management tool must cryptographically verify the authenticity of system software packages during installation\n     V-38487  Low     The system package management tool must cryptographically verify the authenticity of all software packages during installation"
   replace: backup=yes dest={{ item }} regexp='^gpgcheck=0' replace='gpgcheck=1'
-  tags: [ 'cat2' , 'V-38483' , 'rpm' , 'gpgcheck' ]
+  tags: [ 'cat2' , 'V-38483' , 'V-38487' , 'rpm' , 'gpgcheck' ]
   with_flattened:
     - /etc/yum.conf
     - yum_repos.stdout_lines
