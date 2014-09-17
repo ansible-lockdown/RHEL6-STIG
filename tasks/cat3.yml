@@ -111,6 +111,10 @@
   when: rhel6stig_dev_unlabeled_context.stdout
   tags: [ 'cat3' , 'V-51379' , 'secontext' ]
 
+- name: V-38480  Low Users must be warned 7 days in advance of password expiration
+  lineinfile: "state=present backup=yes dest=/etc/login.defs regexp='^#?PASS_WARN_AGE' line='PASS_WARN_AGE\t7'"
+  tags: [ 'cat3' , 'V-38480' , 'passwords' ]
+
 # --- BREAK --- #
 
 - name: V-38533 Low  The system must ignore IPv4 ICMP redirect messages.
