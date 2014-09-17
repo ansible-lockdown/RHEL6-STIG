@@ -86,27 +86,27 @@
   failed_when: rpm_integrity_check.stderr
   tags: [ 'cat3' , 'V-38447' , 'rpm' ]
 
-- name: V-38447 Low The system package management tool must verify contents of all files associated with packages
+- name: V-38447 Low  The system package management tool must verify contents of all files associated with packages
   shell: yum reinstall -y $(rpm -qf {{ item }})
   when: rpm_integrity_check.stdout
   with_items: rpm_integrity_check.stdout_lines
   tags: [ 'cat3' , 'V-38447' , 'rpm' ]
 
 
-# - name: V-38659 Low The operating system must employ cryptographic mechanisms to protect information in storage
+# - name: V-38659 Low  The operating system must employ cryptographic mechanisms to protect information in storage
 
-- name: V-38651 Low The system default umask for the bash shell must be 077
+- name: V-38651 Low  The system default umask for the bash shell must be 077
   replace: backup=yes dest=/etc/bashrc regexp="umask \d\d\d" replace="umask 077"
   tags: [ 'cat3' , 'V-38651' , 'umask' ]
 
-- name: V-38656 Low The system must use SMB client signing for connecting to samba servers using smbclient
+- name: V-38656 Low  The system must use SMB client signing for connecting to samba servers using smbclient
   lineinfile: "state=present backup=yes dest=/etc/samba/smb.conf regexp='client signing' line='client signing = mandatory' insertafter='\\[global\\]'"
   tags: [ 'cat3' , 'V-38656' , 'smb' ]
   notify: restart samba
 
-# - name: V-38657 Low The system must use SMB client signing for connecting to samba servers using mount.cifs
+# - name: V-38657 Low  The system must use SMB client signing for connecting to samba servers using mount.cifs
 
-- name: V-51379 Low All device files must be monitored by the system Linux Security Module
+- name: V-51379 Low  All device files must be monitored by the system Linux Security Module
   command: restorecon -r /dev/
   when: rhel6stig_dev_unlabeled_context.stdout
   tags: [ 'cat3' , 'V-51379' , 'secontext' ]
@@ -114,6 +114,10 @@
 - name: V-38480  Low Users must be warned 7 days in advance of password expiration
   lineinfile: "state=present backup=yes dest=/etc/login.defs regexp='^#?PASS_WARN_AGE' line='PASS_WARN_AGE\t7'"
   tags: [ 'cat3' , 'V-38480' , 'passwords' ]
+
+- name: V-38528 Low  The system must log Martian packets
+  sysctl: name=net.ipv4.conf.all.log_martians value=1 state=present reload=yes ignoreerrors=yes
+  tags: [ 'cat3' , 'V-38528' , 'martian_packets' , 'kernel_parameters' ]
 
 # --- BREAK --- #
 
