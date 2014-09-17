@@ -79,3 +79,7 @@ rhel6stig_cat3_disabled_services:
   - name: rdisc
     state: stopped
     enabled: no
+
+  - name: autofs
+    state: started
+    enabled: yes
