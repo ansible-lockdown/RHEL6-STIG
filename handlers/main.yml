@@ -37,3 +37,6 @@
 
 - name: restart samba
   service: name=smb state=restarted
+
+- name: restart nfs
+  service: name=nfs state=restarted

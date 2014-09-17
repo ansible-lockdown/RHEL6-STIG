@@ -121,6 +121,13 @@
 
 # - name: V-38661 Low  The operating system must protect the confidentiality and integrity of data at rest
 # - name: V-38662 Low  The operating system must employ cryptographic mechanisms to prevent unauthorized disclosure of data at rest unless otherwise protected by alternative physical measures
+# - name: V-38467 Low The system must use a separate file system for the system audit data path
+# - name: V-38463 Low The system must use a separate file system for /var/log
+
+- name: V-38460 Low The NFS server must not have the all_squash option enabled
+  replace: backup=yes dest=/etc/exports regexp=',?all_squash'
+  tags: [ 'cat3' , 'V-38469' , 'nfs' ]
+  notify: restart nfs
 
 
 
