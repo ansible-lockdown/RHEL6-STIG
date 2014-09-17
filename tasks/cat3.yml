@@ -97,7 +97,7 @@
 
 - name: V-38651 Low The system default umask for the bash shell must be 077
   replace: backup=yes dest=/etc/bashrc regexp="umask \d\d\d" replace="umask 077"
-  tags: [ 'cat3' , 'V-38651' , 'umask' , 'test' ]
+  tags: [ 'cat3' , 'V-38651' , 'umask' ]
 
 - name: V-38656 Low The system must use SMB client signing for connecting to samba servers using smbclient
   lineinfile: "state=present backup=yes dest=/etc/samba/smb.conf regexp='client signing' line='client signing = mandatory' insertafter='\\[global\\]'"
@@ -106,7 +106,10 @@
 
 # - name: V-38657 Low The system must use SMB client signing for connecting to samba servers using mount.cifs
 
-
+- name: V-51379 Low All device files must be monitored by the system Linux Security Module
+  command: restorecon -r /dev/
+  when: rhel6stig_dev_unlabeled_context.stdout
+  tags: [ 'cat3' , 'V-51379' , 'secontext' ]
 
 # --- BREAK --- #
 

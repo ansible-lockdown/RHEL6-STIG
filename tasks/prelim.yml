@@ -81,3 +81,11 @@
   failed_when: false
   when: rhel6stig_cat3
   tags: [ 'rpm' ]
+
+- name: PRELIM | Check for device files with unlabeled_t context
+  shell: ls -RZ /dev | grep unlabeled_t
+  register: rhel6stig_dev_unlabeled_context
+  changed_when: false
+  failed_when: false
+  when: rhel6stig_cat3
+  tags: [ 'selinux' ]
