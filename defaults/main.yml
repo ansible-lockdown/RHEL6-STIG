@@ -55,7 +55,7 @@ rhel6stig_ntp_config_restrict:
 # Services listed in CAT III findings and their configuration
 # state should be  started or stopped
 # enabled can be yes or no
-rhel6stig_cat3_disabled_services:
+rhel6stig_cat3_services:
   - name: abrtd
     state: stopped
     enabled: no
@@ -81,5 +81,9 @@ rhel6stig_cat3_disabled_services:
     enabled: no
 
   - name: autofs
+    state: stopped
+    enabled: no
+
+  - name: postfix
     state: started
     enabled: yes
