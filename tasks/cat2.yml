@@ -6,10 +6,9 @@
 
 
 # This audit.rules file is from https://github.com/RedHatGov/stig-fix-el6/tree/master/config
-# I modified it slightly by turning it into a template
-- name: V-38580 V-38680 Medium  Copy STIG compliant audit.rules
+- name: "Medium  Copy STIG compliant audit.rules\n    V-38580 Medium  The audit system must be configured to audit the loading and unloading of dynamic kernel modules\n    V-38680 Medium  The audit system must identify staff members to receive notifications of audit log storage volume capacity issues\n    V-38527 Low     The audit system must be configured to audit all attempts to alter system time through clock_settime\n    V-38525 Low     The audit system must be configured to audit all attempts to alter system time through stime"
   template: src=audit.rules.j2 dest=/etc/audit/audit.rules owner=root group=root mode=0640 backup=yes
-  tags: [ 'cat2' , 'V-38580' , 'V-38680' , 'auditd' ]
+  tags: [ 'cat2' , 'V-38580' , 'V-38680' , 'V-38527' , 'V-38525' , 'auditd' ]
   notify: restart auditd
 
 
@@ -297,7 +296,7 @@
     - /usr/lib64
   tags: [ 'cat2' , 'V-38465' , 'file_perms' ]
 
-- name: "V-38464 Medium  The audit system must take appropriate action when there are disk errors on the audit storage volume\n    V-38468 Medium  The audit system must take appropriate action when the audit storage volume is full\n    V-38678 Medium  The audit system must provide a warning when allocated audit record storage volume reaches a documented percentage of maximum audit record storage capacity\n    V-38470 Medium  The audit system must alert designated staff members when the audit storage volume approaches capacity\n    V-38636  Medium  The system must retain enough rotated audit logs to cover the required log retention period\n    V-38634  Medium  The system must rotate audit log files that reach the maximum file size\n    V-38633  Medium  The system must set a maximum audit log file size"
+- name: "Copy STIG compliant audit.conf\n    V-38464 Medium  The audit system must take appropriate action when there are disk errors on the audit storage volume\n    V-38468 Medium  The audit system must take appropriate action when the audit storage volume is full\n    V-38678 Medium  The audit system must provide a warning when allocated audit record storage volume reaches a documented percentage of maximum audit record storage capacity\n    V-38470 Medium  The audit system must alert designated staff members when the audit storage volume approaches capacity\n    V-38636 Medium  The system must retain enough rotated audit logs to cover the required log retention period\n    V-38634 Medium  The system must rotate audit log files that reach the maximum file size\n    V-38633 Medium  The system must set a maximum audit log file size"
   template: src=auditd.conf.j2 dest=/etc/audit/auditd.conf owner=root group=root mode=0640 backup=yes
   notify: restart auditd
   tags: [ 'cat2' , 'V-38464' , 'V-38468' , 'V-38678' , 'V-38470' , 'V-38634' , 'V-38633' , 'auditd' ]
