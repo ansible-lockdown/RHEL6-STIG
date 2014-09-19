@@ -9,7 +9,8 @@ rhel6stig_snmp_community: B0re4lis
 rhel6stig_pass_min_length: 14
 rhel6stig_pass_min_days: 1
 rhel6stig_pass_max_days: 60
-rhel6stig_system_auth_ac_parameters: sha512 shadow nullok try_first_pass use_authtok remember=24
+rhel6stig_system_auth_ac_pam_unix_parameters: sha512 shadow nullok try_first_pass use_authtok remember=24
+rhel6stig_system_auth_ac_pam_cracklib_parameters: try_first_pass retry=3 type= dcredit=-1
 
 # Set this to true to omit all the pauses in the role
 rhel6stig_fullauto: false

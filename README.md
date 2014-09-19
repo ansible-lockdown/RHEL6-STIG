@@ -41,7 +41,9 @@ Role Variables
 
 **rhel6stig_pass_max_days**               Maximum password age in days (Default: 60)
 
-**rhel6stig_system_auth_ac_parameters** Settings placed in /etc/pam.d/system-auth-ac that control password behaviour (Default: sha512 shadow nullok try_first_pass use_authtok remember=24)
+**rhel6stig_system_auth_ac_pam_unix_parameters** Settings placed in /etc/pam.d/system-auth-ac that control password behaviour (Default: sha512 shadow nullok try_first_pass use_authtok remember=24)
+
+**rhel6stig_system_auth_ac_pam_cracklib_parameters** Settings placed in /etc/pam.d/system-auth-ac that control password makeup (Default: try_first_pass retry=3 type= dcredit=-1)
 
 
 **rhel6stig_ipv6_in_use**       Whether or not ipv6 is in use of the target system. This is set automatically to 'true' if ipv6 is found to be in use. (Default: false)

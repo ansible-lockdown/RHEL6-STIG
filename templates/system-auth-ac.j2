@@ -14,8 +14,8 @@ account     sufficient    pam_localuser.so
 account     sufficient    pam_succeed_if.so uid < 500 quiet
 account     required      pam_permit.so
 
-password    requisite     pam_cracklib.so try_first_pass retry=3 type=
-password    sufficient    pam_unix.so {{ rhel6stig_system_auth_ac_parameters }}
+password    requisite     pam_cracklib.so {{ rhel6stig_system_auth_ac_pam_cracklib_parameters }}
+password    sufficient    pam_unix.so {{ rhel6stig_system_auth_ac_pam_unix_parameters }}
 password    required      pam_deny.so
 
 session     optional      pam_keyinit.so revoke

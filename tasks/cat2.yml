@@ -71,9 +71,9 @@
   file: path=/etc/group owner=root group=root mode=0644
   tags: [ 'cat2' , 'V-38458' , 'file_perms' ]
 
-- name: "V-38658 Medium  The system must prohibit the reuse of passwords within twenty-four iterations\n    V-38574 Medium  The system must use a FIPS 140-2 approved cryptographic hashing algorithm for generating account password hashes (system-auth)\n    V-38573 Medium  The system must disable accounts after three consecutive unsuccessful login attempts\n    V-38592 Medium  The system must require administrator action to unlock an account locked by excessive failed login attempts\n    V-38501 Medium  The system must disable accounts after excessive login failures within a 15-minute interval"
+- name: "V-38658 Medium  The system must prohibit the reuse of passwords within twenty-four iterations\n    V-38574 Medium  The system must use a FIPS 140-2 approved cryptographic hashing algorithm for generating account password hashes (system-auth)\n    V-38573 Medium  The system must disable accounts after three consecutive unsuccessful login attempts\n    V-38592 Medium  The system must require administrator action to unlock an account locked by excessive failed login attempts\n    V-38501 Medium  The system must disable accounts after excessive login failures within a 15-minute interval\n    V-38482 Low     The system must require passwords to contain at least one numeric character"
   template: src=system-auth-ac.j2 dest=/etc/pam.d/system-auth-ac owner=root group=root mode=0640 backup=yes
-  tags: [ 'cat2' , 'V-38658' , 'V-38574' , 'V-38573' , 'passwords' , 'accounts' ]
+  tags: [ 'cat2' , 'V-38658' , 'V-38574' , 'V-38573' , 'V-38482' , 'passwords' , 'accounts' ]
 
 
 # List all xinetd services then look for 'on' in the output
