@@ -153,6 +153,11 @@
   when: rhel6stig_xwindows_required
   tags: [ 'cat2' , 'V-38474' , 'gui' , 'screen_lock' ]
 
+- name: V-38471 Low The system must forward audit records to the syslog service
+  lineinfile: "state=present backup=yes dest=/etc/audisp/plugins.d/syslog.conf regexp='^active' line='active = yes'"
+  tags: [ 'cat3' , 'V-38471' , 'auditd' ]
+  notify: restart auditd
+
 # --- BREAK --- #
 
 - name: V-38533 Low  The system must ignore IPv4 ICMP redirect messages.
