@@ -129,7 +129,11 @@
   tags: [ 'cat3' , 'V-38469' , 'nfs' ]
   notify: restart nfs
 
-
+- name: V-38702 Low The FTP daemon must be configured for logging or verbose mode
+  lineinfile: "state=present backup=yes dest=/etc/vsftpd/vsftpd.conf regexp='^#?xferlog_enable=' line='xferlog_enable=YES'"
+  when: "'vsftpd' in sysv_services.stdout"
+  tags: [ 'cat3' , 'V-38702' , 'vsftp' ]
+  notify: restart vsftpd
 
 # --- BREAK --- #
 

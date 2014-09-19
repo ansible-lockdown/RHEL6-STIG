@@ -57,7 +57,7 @@ Dependencies
 
 **rhel6stig_ntp_config_restrict** List of restrict options used in ntp.conf
 
-**rhel6stig_cat3_disabled_services** List of services that are stopped and disabled to correct CAT III findings. This should be customized to suite your environment.
+**rhel6stig_cat3_services** List of services that are stopped and disabled to correct CAT III findings. This should be customized to suit your environment.
 
 Dependencies
 ------------
