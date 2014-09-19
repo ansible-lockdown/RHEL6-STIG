@@ -144,10 +144,14 @@
   when: not rhel6stig_xwindows_required
   tags: [ 'cat3' , 'V-38676' , 'xwindows' ]
 
-- name: V-38675 Low Process core dumps must be disabled unless needed
+- name: V-38675 Low  Process core dumps must be disabled unless needed
   lineinfile: "state=present backup=yes dest=/etc/security/limits.conf regexp='^#?\\*.*(hard|soft).*core' line='*               hard    core            0'"
   tags: [ 'cat3' , 'V-38675' , 'core_dump' ]
 
+- name: V-38474 Low  The system must allow locking of graphical desktop sessions
+  command: gconftool-2 --direct --config-source xml:readwrite:/etc/gconf/gconf.xml.mandatory --type string --set /apps/gnome_settings_daemon/keybindings/screensaver "<Ctrl><Alt>l"
+  when: rhel6stig_xwindows_required
+  tags: [ 'cat2' , 'V-38474' , 'gui' , 'screen_lock' ]
 
 # --- BREAK --- #
 
