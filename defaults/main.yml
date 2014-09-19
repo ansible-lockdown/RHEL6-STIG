@@ -91,3 +91,7 @@ rhel6stig_cat3_services:
   - name: netconsole
     state: stopped
     enabled: no
+
+  - name: rhnsd
+    state: stopped
+    enabled: no
