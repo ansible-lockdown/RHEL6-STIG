@@ -124,16 +124,21 @@
 # - name: V-38467 Low The system must use a separate file system for the system audit data path
 # - name: V-38463 Low The system must use a separate file system for /var/log
 
-- name: V-38460 Low The NFS server must not have the all_squash option enabled
+- name: V-38460 Low  The NFS server must not have the all_squash option enabled
   replace: backup=yes dest=/etc/exports regexp=',?all_squash'
   tags: [ 'cat3' , 'V-38469' , 'nfs' ]
   notify: restart nfs
 
-- name: V-38702 Low The FTP daemon must be configured for logging or verbose mode
+- name: V-38702 Low  The FTP daemon must be configured for logging or verbose mode
   lineinfile: "state=present backup=yes dest=/etc/vsftpd/vsftpd.conf regexp='^#?xferlog_enable=' line='xferlog_enable=YES'"
   when: "'vsftpd' in sysv_services.stdout"
   tags: [ 'cat3' , 'V-38702' , 'vsftp' ]
   notify: restart vsftpd
+
+- name: V-38494 Low The system must prevent the root account from logging in from serial consoles
+  lineinfile: state=absent dest=/etc/securetty regexp='^ttyS[0-9]' backup=yes
+  tags: [ 'cat3' , 'V-38494' , 'root_access' , 'tty' ]
+
 
 # --- BREAK --- #
 
