@@ -4,7 +4,7 @@
   stat: path=/etc/snmp/snmpd.conf
   register: snmpconf_test
   always_run: yes
-  tags: [ 'cat1' , 'cat2' , 'cat3' , V-38653' , 'snmp' ]
+  tags: [ 'cat1' , 'cat2' , 'cat3' , 'V-38653' , 'snmp' ]
 
 # Setup variables based on operating system
 - name: PRELIM | Set gpg_key_url for CentOS
@@ -76,7 +76,7 @@
   tags: [ 'umask' ]
 
 - name: PRELIM | Verify all rpm packages and store output in /tmp/rhel6stig_rpm_verify
-  shell: rm /tmp/rhel6stig_rpm_verify; rpm -Va >> /tmp/rhel6stig_rpm_verify
+  shell: rpm -Va > /tmp/rhel6stig_rpm_verify
   changed_when: false
   failed_when: false
   when: rhel6stig_cat3

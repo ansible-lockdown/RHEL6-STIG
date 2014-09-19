@@ -46,7 +46,7 @@
 
 
 - name: Check permissions on all files and directories associated with packages
-  shell: "grep '^.M' /tmp/rhel6stig_rpm_verify | awk '{print $3}' "
+  shell: "grep '^.M' /tmp/rhel6stig_rpm_verify | awk '{print $2}' "
   changed_when: false
   register: rpm_file_permissions_check
   failed_when: rpm_file_permissions_check.stderr
@@ -160,6 +160,19 @@
 
 # - name: V-38473 Low  The system must use a separate file system for user home directories
 
+
+- name: Check ownership on all files and directories associated with packages
+  shell: "grep '^.....U' /tmp/rhel6stig_rpm_verify | awk '{print $2}' "
+  changed_when: false
+  register: rpm_file_ownership_check
+  failed_when: rpm_file_ownership_check.stderr
+  tags: [ 'cat3' , 'V-38454' , 'rpm' ]
+
+- name: V-38454 Low  The system package management tool must verify ownership on all files and directories associated with packages
+  shell: rpm --setugids $(rpm -qf {{ item }})
+  when: rpm_file_ownership_check.stdout
+  with_items: rpm_file_ownership_check.stdout_lines
+  tags: [ 'cat3' , 'V-38454' , 'rpm' ]
 
 # --- BREAK --- #
 
