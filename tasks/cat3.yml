@@ -142,7 +142,11 @@
 - name: V-38676 Low  The xorg-x11-server-common (X Windows) package must not be installed, unless required
   yum: name="@X Window System" state=absent
   when: not rhel6stig_xwindows_required
-  tags: [ 'cat3' , 'V-38676' , 'xwindows' , 'test' ]
+  tags: [ 'cat3' , 'V-38676' , 'xwindows' ]
+
+- name: V-38675 Low Process core dumps must be disabled unless needed
+  lineinfile: "state=present backup=yes dest=/etc/security/limits.conf regexp='^#?\\*.*(hard|soft).*core' line='*               hard    core            0'"
+  tags: [ 'cat3' , 'V-38675' , 'core_dump' ]
 
 
 # --- BREAK --- #
