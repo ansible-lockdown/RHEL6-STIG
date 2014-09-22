@@ -184,6 +184,10 @@
   with_items: rhel6stig_temporary_users
   tags: [ 'cat3' , 'V-38685' , 'accounts' ]
 
+- name: V-38684 Low  The system must limit users to 10 simultaneous system logins, or a site-defined number, in accordance with operational requirements
+  lineinfile: "state=present backup=yes dest=/etc/security/limits.conf insertbefore='^# End of file' regexp='^#?\\*.*maxlogins' line='*               hard    maxlogins       {{ rhel6stig_maxlogins }}'"
+  tags: [ 'cat3' , 'V-38684' , 'logon_settings' ]
+
 # --- BREAK --- #
 
 - name: V-38533 Low  The system must ignore IPv4 ICMP redirect messages.

@@ -61,6 +61,8 @@ Dependencies
 
 **rhel6stig_temporary_users** List of user accounts and the expiration date to set. This variable is used by CAT III finding V-38685. (Default: undefined)
 
+**rhel6stig_maxlogins** Number of maximum simultanous system logins. (Default: 10)
+
 Dependencies
 ------------
 
