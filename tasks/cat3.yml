@@ -195,17 +195,39 @@
   changed_when: false
   failed_when: dup_account_check.stderr
   register: dup_account_check
-  tags: [ 'cat3' , 'V-38683' , 'accounts' , 'test' ]
+  tags: [ 'cat3' , 'V-38683' , 'accounts' ]
 
 - name: The following duplicate entries were found in /etc/passwd. This is a finding.
   debug: var=dup_account_check.stdout_lines
   when: dup_account_check.stdout_lines
-  tags: [ 'cat3' , 'V-38683' , 'accounts' , 'test' ]
+  tags: [ 'cat3' , 'V-38683' , 'accounts' ]
 
 - name: V-38683 Low  All accounts on the system must have unique user or account names
   pause: prompt="Duplicate account names were found in /etc/passwd. This is a finding. Press Enter to continue"
   when: dup_account_check.stdout_lines and not rhel6stig_fullauto
-  tags: [ 'cat3' , 'V-38683' , 'accounts' , 'test' ]
+  tags: [ 'cat3' , 'V-38683' , 'accounts' ]
+
+
+# Check for missing groups and show the output if any are found
+- name: Checking for missing groups
+  shell: pwck -r | grep 'no group'
+  changed_when: false
+  failed_when: missing_group_check.stderr
+  register: missing_group_check
+  tags: [ 'cat3' , 'V-38681' , 'accounts' ]
+
+- name: The following groups in /etc/passwd are missing from /etc/group. This is a finding.
+  debug: var=missing_group_check.stdout_lines
+  when: missing_group_check.stdout_lines
+  tags: [ 'cat3' , 'V-38681' , 'accounts' ]
+
+- name: V-38681 Low  All GIDs referenced in /etc/passwd must be defined in /etc/group
+  pause: prompt="Groups defiend in /etc/passwd are missing from /etc/group. This is a finding. Press Enter to continue"
+  when: missing_group_check.stdout_lines and not rhel6stig_fullauto
+  tags: [ 'cat3' , 'V-38681' , 'accounts' ]
+
+
+
 
 # --- BREAK --- #
 
