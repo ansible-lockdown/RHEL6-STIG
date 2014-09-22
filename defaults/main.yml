@@ -54,7 +54,7 @@ rhel6stig_ntp_config_restrict:
   - "-6 ::1"
 
 # Services listed in CAT III findings and their configuration
-# state should be  started or stopped
+# state should be started or stopped
 # enabled can be yes or no
 rhel6stig_cat3_services:
   - name: abrtd
@@ -100,3 +100,11 @@ rhel6stig_cat3_services:
   - name: ipsec
     state: stopped
     enabled: no
+
+
+# List of temporary accounts and their expiration dates
+# Format of expiration date is YYYY-MM-DD
+#
+# rhel6stig_temporary_users:
+  # - user: foo
+  #   expiration: "2021-09-24"

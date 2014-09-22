@@ -176,8 +176,13 @@
 
 - name: V-38687 Low  The system must provide VPN connectivity for communications over untrusted networks
   yum: name=openswan state=present
-  tags: [ 'cat3' , 'V-38687' , 'openswan' , 'vpn' , 'test' ]
+  tags: [ 'cat3' , 'V-38687' , 'openswan' , 'vpn' ]
 
+- name: V-38685 Low  Temporary accounts must be provisioned with an expiration date
+  command: chage -E {{ item.expiration }}  {{ item.user }}
+  when: rhel6stig_temporary_users is defined
+  with_items: rhel6stig_temporary_users
+  tags: [ 'cat3' , 'V-38685' , 'accounts' ]
 
 # --- BREAK --- #
 

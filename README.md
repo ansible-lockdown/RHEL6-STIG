@@ -59,6 +59,8 @@ Dependencies
 
 **rhel6stig_cat3_services** List of services that are stopped and disabled to correct CAT III findings. This should be customized to suit your environment.
 
+**rhel6stig_temporary_users** List of user accounts and the expiration date to set. This variable is used by CAT III finding V-38685. (Default: undefined)
+
 Dependencies
 ------------
 
