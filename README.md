@@ -5,8 +5,6 @@ Configure RHEL 6 machine to be DISA STIG compliant. CAT I findings will be corre
 
 This role **will make changes to the system** that could break things. This is not an auditing tool but rather a remediation tool to be used after an audit has been conducted.
 
-When the role is running, you will most likely see a good number of failures. This is caused by using the `shell` module to run `grep` and look for output. If not output is returned, the `shell` module will fail. However, this is usally a good sign because no output means no finding.
-
 The role tries to be helpful and pause to let you know it found something. You can disable this behaviour if you want to run it unattended by setting `rhel6stig_fullauto` to `true`.
 
 Based on [Red Hat Enterprise Linux 6 Security Technical Implementation Guide 2013-06-03](http://www.stigviewer.com/stig/red_hat_enterprise_linux_6/).
