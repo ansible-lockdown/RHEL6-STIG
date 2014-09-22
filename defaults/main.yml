@@ -96,3 +96,7 @@ rhel6stig_cat3_services:
   - name: rhnsd
     state: stopped
     enabled: no
+
+  - name: ipsec
+    state: stopped
+    enabled: no
