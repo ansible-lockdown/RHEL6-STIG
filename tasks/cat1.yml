@@ -118,6 +118,19 @@
   tags: [ 'cat1' , 'V-38598' , 'rexec', 'unsecure_services' ]
 
 
+- name: Check status of telnet
+  shell: chkconfig --list | grep telnet
+  register: telnet_status
+  changed_when: false
+  when: "'telnet' in xinetd_services.stdout_lines"
+  tags: [ 'cat1' , 'V-38589' , 'telnet' , 'unsecure_services' ]
+
+- name: "V-38589 High  The telnet daemon must not be running"
+  command: chkconfig telnet off
+  when: "'telnet' in xinetd_services.stdout_lines and telnet_status.stdout.find('\toff') == -1"
+  tags: [ 'cat1' , 'V-38589' , 'telnet' , 'unsecure_services' ]
+
+
 - name: V-38591 High  The rsh-server package must not be installed
   yum: name=rsh-server state=absent
   tags: [ 'cat1' , 'V-38591' , 'rsh', 'unsecure_services' ]
