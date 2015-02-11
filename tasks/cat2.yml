@@ -135,9 +135,10 @@
   notify: unload usb-storage
   tags: [ 'cat2' , 'V-38490' , 'mobile_devices' , 'usb_devices' , 'kernel_modules' ]
 
-- name: V-38443 Medium  The /etc/gshadow file must be owned by root
+- name: V-38443 V-38448 V-38449 Medium  The /etc/gshadow file must be owned by root
+        be group-owned by root and must have mode 0000
   file: path=/etc/gshadow owner=root group=root mode=0000
-  tags: [ 'cat2' , 'V-38443' , 'file_perms' ]
+  tags: [ 'cat2' , 'V-38443' , 'V-38448' , 'V-38449' , 'file_perms' ]
 
 - name: V-38526 Medium  The system must not accept ICMPv4 secure redirect packets on any interface
   sysctl: name=net.ipv4.conf.all.secure_redirects value=0 state=present reload=yes ignoreerrors=yes
@@ -531,11 +532,6 @@
 - name: V-38600 Medium  The system must not send ICMPv4 redirects by default
   sysctl: name=net.ipv4.conf.default.send_redirects value=0 state=present reload=yes ignoreerrors=yes
   tags: [ 'cat2' , 'V-38600' , 'icmp_redirects' , 'kernel_parameters' , 'network' ]
-
-- name: V-38449 Medium  The /etc/gshadow file must have mode 0000
-        V-38448 Medium  The /etc/gshadow file must be group-owned by root
-  file: path=/etc/gshadow owner=root group=root mode=0000
-  tags: [ 'cat2' , 'V-38449' , 'V-38448' , 'file_perms' ]
 
 - name: V-38579 Medium  The system boot loader configuration file(s) must be owned by root
   file: path=/boot/grub/grub.conf owner=root group=root mode=0600
