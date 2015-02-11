@@ -11,10 +11,11 @@
   tags: [ 'cat2' , 'V-38580' , 'V-38680' , 'V-38527' , 'V-38525' , 'V-38522' , 'V-38552' , 'V-38550' , 'V-38557' , 'V-38556' , 'V-38554' , 'V-38559' , 'V-38558' , 'V-38536' , 'V-38540' , 'V-38541' , 'V-38543' , 'V-38547' , 'V-38530' , 'V-38578' , 'V-38575' , 'auditd' ]
   notify: restart auditd
 
+- name: V-38458 V-38459 Medium  The /etc/group file must be owned and group-owned by root
+  file: path=/etc/group owner=root group=root mode=0644
+  tags: [ 'cat2' , 'V-38458' , 'V-38459' , 'file_perms' ]
 
-- name: V-38459 Medium  The /etc/group file must be group-owned by root
-  file: dest=/etc/group owner=root group=root mode=0644
-  tags: [ 'cat2' , 'V-38459' , 'file_perms' ]
+
 
 
 # Search for world writable files and print them out if any are found
