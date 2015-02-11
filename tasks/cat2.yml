@@ -11,19 +11,9 @@
   tags: [ 'cat2' , 'V-38580' , 'V-38680' , 'V-38527' , 'V-38525' , 'V-38522' , 'V-38552' , 'V-38550' , 'V-38557' , 'V-38556' , 'V-38554' , 'V-38559' , 'V-38558' , 'V-38536' , 'V-38540' , 'V-38541' , 'V-38543' , 'V-38547' , 'V-38530' , 'V-38578' , 'V-38575' , 'auditd' ]
   notify: restart auditd
 
-- name: V-38458 V-38459 Medium  The /etc/group file must be owned and group-owned by root
-  file: path=/etc/group owner=root group=root mode=0644
-  tags: [ 'cat2' , 'V-38458' , 'V-38459' , 'file_perms' ]
-
-- name: Check file permissions on /etc/group
-  stat: path=/etc/group
-  register: etc_group
-  tags: [ 'cat2' , 'V-38461' , 'file_perms' ]
-
-- name: V-38461 Medium  The /etc/group file must have mode 0644 or less permissive
-  file: path=/etc/group mode=0644
-  when: etc_group.stat.mode >= 0644
-  tags: [ 'cat2' , 'V-38461' , 'file_perms' ]
+- name: "V-38461 Medium  The /etc/group file must have mode 0644 or less permissive\n    V-38458 V-38459 Medium  The /etc/group file must be owned and group-owned by root"
+  file: path=/etc/group owner=root group=root mode="u-x,g-wx,o-wx"
+  tags: [ 'cat2' , 'V-38458' , 'V-38459' , 'V-38461' , 'file_perms' ]
 
 
 # Search for world writable files and print them out if any are found
@@ -68,19 +58,10 @@
   tags: [ 'cat2' , 'V-38499' , 'passwords' ]
 
 
-- name: V-38450 V-38451 Medium  The /etc/passwd file must be owned and group owned by root
-  file: path=/etc/passwd owner=root group=root mode=0644
-  tags: [ 'cat2' , 'V-38450' , 'V-38451' , 'file_perms' ]
+- name: "V-38457 Medium  The /etc/passwd file must have mode 0644 or less permissive\n    V-38450 V-38451 Medium  The /etc/passwd file must be owned and group owned by root"
+  file: path=/etc/passwd owner=root group=root mode="u-x,g-wx,o-wx"
+  tags: [ 'cat2' , 'V-38450' , 'V-38451' , 'V-38457' , 'file_perms' ]
 
-- name: Check file permissions on /etc/passwd
-  stat: path=/etc/passwd
-  register: etc_passwd
-  tags: [ 'cat2' , 'V-38457' , 'file_perms' ]
-
-- name: V-38457 Medium  The /etc/passwd file must have mode 0644 or less permissive
-  file: path=/etc/passwd mode=0644
-  when: etc_passwd.stat.mode >= 0644
-  tags: [ 'cat2' , 'V-38457' , 'file_perms' ]
 
 - name: "V-38581 Medium  The system boot loader configuration file(s) must be group-owned by root\n    V-38583 Medium  The system boot loader configuration file(s) must have mode 0600 or less permissive"
   file: path=/boot/grub/grub.conf owner=root group=root mode=0600
