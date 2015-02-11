@@ -68,9 +68,10 @@
   tags: [ 'cat2' , 'V-38499' , 'passwords' ]
 
 
-- name: "V-38450 V-38451 Medium  The /etc/passwd file must be owned and group owned by root\n    V-38457 Medium  The /etc/passwd file must have mode 0644 or less permissive"
+- name: V-38450 V-38451 Medium  The /etc/passwd file must be owned and group owned by root
   file: path=/etc/passwd owner=root group=root mode=0644
-  tags: [ 'cat2' , 'V-38450' , 'passwords' ]
+  tags: [ 'cat2' , 'V-38450' , 'V-38451' , 'file_perms' ]
+
 
 - name: "V-38581 Medium  The system boot loader configuration file(s) must be group-owned by root\n    V-38583 Medium  The system boot loader configuration file(s) must have mode 0600 or less permissive"
   file: path=/boot/grub/grub.conf owner=root group=root mode=0600
