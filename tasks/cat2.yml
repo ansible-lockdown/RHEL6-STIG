@@ -650,7 +650,7 @@
   when: rhel6stig_ipv6_in_use
   tags: [ 'cat2' , 'V-38444' , 'firewall' , 'ipv6' ]
 
-- name: "V-38504 Medium  The /etc/shadow file must have mode 0000\n    V-38502 Medium  The /etc/shadow file must be owned by root\n    V-38503 Medium  The /etc/shadow file must be group-owned by root"
+- name: "V-38504 Medium  The /etc/shadow file must have mode 0000\n    V-38502 V-38503 Medium  The /etc/shadow file must be owned and group-owned by root"
   file: dest=/etc/shadow owner=root group=root mode=0000
   tags: [ 'cat2' , 'V-38504' , 'V-38502' , 'V-38503' , 'file_perms' ]
 
