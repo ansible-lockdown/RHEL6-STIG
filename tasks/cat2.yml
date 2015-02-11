@@ -72,6 +72,15 @@
   file: path=/etc/passwd owner=root group=root mode=0644
   tags: [ 'cat2' , 'V-38450' , 'V-38451' , 'file_perms' ]
 
+- name: Check file permissions on /etc/passwd
+  stat: path=/etc/passwd
+  register: etc_passwd
+  tags: [ 'cat2' , 'V-38457' , 'file_perms' ]
+
+- name: V-38457 Medium  The /etc/passwd file must have mode 0644 or less permissive
+  file: path=/etc/passwd mode=0644
+  when: etc_passwd.stat.mode >= 0644
+  tags: [ 'cat2' , 'V-38457' , 'file_perms' ]
 
 - name: "V-38581 Medium  The system boot loader configuration file(s) must be group-owned by root\n    V-38583 Medium  The system boot loader configuration file(s) must have mode 0600 or less permissive"
   file: path=/boot/grub/grub.conf owner=root group=root mode=0600
