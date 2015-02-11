@@ -144,8 +144,7 @@
   notify: unload usb-storage
   tags: [ 'cat2' , 'V-38490' , 'mobile_devices' , 'usb_devices' , 'kernel_modules' ]
 
-- name: V-38443 V-38448 V-38449 Medium  The /etc/gshadow file must be owned by root
-        be group-owned by root and must have mode 0000
+- name: "V-38449 Medium  The /etc/gshadow file must have mode 0000\n    V-38443 V-38448 Medium  The /etc/gshadow file must be owned and group-owned by root"
   file: path=/etc/gshadow owner=root group=root mode=0000
   tags: [ 'cat2' , 'V-38443' , 'V-38448' , 'V-38449' , 'file_perms' ]
 
