@@ -15,7 +15,15 @@
   file: path=/etc/group owner=root group=root mode=0644
   tags: [ 'cat2' , 'V-38458' , 'V-38459' , 'file_perms' ]
 
+- name: Check file permissions on /etc/group
+  stat: path=/etc/group
+  register: etc_group
+  tags: [ 'cat2' , 'V-38461' , 'file_perms' ]
 
+- name: V-38461 Medium  The /etc/group file must have mode 0644 or less permissive
+  file: path=/etc/group mode=0644
+  when: etc_group.stat.mode >= 0644
+  tags: [ 'cat2' , 'V-38461' , 'file_perms' ]
 
 
 # Search for world writable files and print them out if any are found
