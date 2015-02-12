@@ -288,8 +288,8 @@
   notify: restart auditd
   tags: [ 'cat2' , 'V-38464' , 'V-38468' , 'V-38678' , 'V-38470' , 'V-38634' , 'V-38633' , 'auditd' ]
 
-- name: V-38469 Medium  All system command files must have mode 0755 or less permissive
-  command: "find -L {{ item }} -perm /022 -exec chmod go-w '{}' ';'"
+- name: V-38472 Medium  All system command files must be owned by root
+  file: dest={{ item }} owner=root recurse=yes
   with_items:
     - /bin
     - /usr/bin
@@ -297,6 +297,27 @@
     - /sbin
     - /usr/sbin
     - /usr/local/sbin
+  tags: [ 'cat2' , 'V-38472' , 'file_perms' ]
+
+- name: Check system library permissions
+  command: "find -L {{ item }} -perm /022"
+  changed_when: false
+  with_items:
+    - /bin
+    - /usr/bin
+    - /usr/local/bin
+    - /sbin
+    - /usr/sbin
+    - /usr/local/sbin
+  register: sys_cmd_perms
+  tags: [ 'cat2' , 'V-38469' , 'file_perms' ]
+
+- name: V-38469 Medium  All system command files must have mode 0755 or less permissive
+  file: path={{ item.1 }} mode=go-w follow=yes
+  with_subelements:
+    - sys_cmd_perms.results
+    - stdout_lines
+  when: item.0.stdout != ''
   tags: [ 'cat2' , 'V-38469' , 'file_perms' ]
 
 - name: V-38553 Medium  The operating system must prevent public IPv6 access into an organizations internal networks, except as appropriately mediated by managed interfaces employing boundary protection devices
@@ -385,17 +406,6 @@
 - name: V-38477 Medium  Users must not be able to change passwords more than once every 24 hours
   lineinfile: "state=present dest=/etc/login.defs regexp='^rhel6stig_pass_MIN_DAYS' line='rhel6stig_pass_MIN_DAYS   {{ rhel6stig_pass_min_days }}' backup=yes"
   tags: [ 'cat2' , 'V-38477' , 'passwords' ]
-
-- name: V-38472 Medium  All system command files must be owned by root
-  file: dest={{ item }} owner=root recurse=yes
-  with_items:
-    - /bin
-    - /usr/bin
-    - /usr/local/bin
-    - /sbin
-    - /usr/sbin
-    - /usr/local/sbin
-  tags: [ 'cat2' , 'V-38472' , 'file_perms' ]
 
 - name: V-38479 Medium  User passwords must be changed at least every 60 days
   lineinfile: "state=present dest=/etc/login.defs regexp='^rhel6stig_pass_MAX_DAYS' line='rhel6stig_pass_MAX_DAYS   {{ rhel6stig_pass_max_days }}' backup=yes"
