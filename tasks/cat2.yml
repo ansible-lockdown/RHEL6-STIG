@@ -273,22 +273,13 @@
   notify: update postfix aliases.db
   tags: [ 'cat2' , 'V-38446' , 'mail' , 'postfix' ]
 
-- name: "V-38466 Medium  Library files must be owned by root\n    V-38465 Medium  Library files must have mode 0755 or less permissive"
-  file: dest={{ item }} owner=root recurse=yes mode="g-w,o-w"
-  with_items:
-    - /lib
-    - /lib64
-    - /usr/lib
-    - /usr/lib64
-  tags: [ 'cat2' , 'V-38465' , 'V-38466' , 'file_perms' ]
-
 
 - name: "Copy STIG compliant audit.conf\n    V-38464 Medium  The audit system must take appropriate action when there are disk errors on the audit storage volume\n    V-38468 Medium  The audit system must take appropriate action when the audit storage volume is full\n    V-38678 Medium  The audit system must provide a warning when allocated audit record storage volume reaches a documented percentage of maximum audit record storage capacity\n    V-38470 Medium  The audit system must alert designated staff members when the audit storage volume approaches capacity\n    V-38636 Medium  The system must retain enough rotated audit logs to cover the required log retention period\n    V-38634 Medium  The system must rotate audit log files that reach the maximum file size\n    V-38633 Medium  The system must set a maximum audit log file size"
   template: src=auditd.conf.j2 dest=/etc/audit/auditd.conf owner=root group=root mode=0640 backup=yes
   notify: restart auditd
   tags: [ 'cat2' , 'V-38464' , 'V-38468' , 'V-38678' , 'V-38470' , 'V-38634' , 'V-38633' , 'auditd' ]
 
-- name: V-38472 Medium  All system command files must be owned by root
+- name: V-38472 V-38466 Medium  All system command and library files must be owned by root
   file: dest={{ item }} owner=root recurse=yes
   with_items:
     - /bin
@@ -297,10 +288,14 @@
     - /sbin
     - /usr/sbin
     - /usr/local/sbin
-  tags: [ 'cat2' , 'V-38472' , 'file_perms' ]
+    - /lib
+    - /lib64
+    - /usr/lib
+    - /usr/lib64
+  tags: [ 'cat2' , 'V-38472' , 'V-38466' , 'file_perms' ]
 
-- name: Check system command file permissions
-  command: "find -L {{ item }} -perm /022"
+- name: Check system command and library file permissions
+  command: "find -L {{ item }} -perm /022 -type f"
   changed_when: false
   with_items:
     - /bin
@@ -309,16 +304,20 @@
     - /sbin
     - /usr/sbin
     - /usr/local/sbin
-  register: sys_cmd_perms
-  tags: [ 'cat2' , 'V-38469' , 'file_perms' ]
+    - /lib
+    - /lib64
+    - /usr/lib
+    - /usr/lib64
+  register: sys_cmdlib_perms
+  tags: [ 'cat2' , 'V-38469' , 'V-38465' , 'file_perms' ]
 
-- name: V-38469 Medium  All system command files must have mode 0755 or less permissive
+- name: V-38469 V-38465 Medium  All system command and library files must have mode 0755 or less permissive
   file: path={{ item.1 }} mode=go-w follow=yes
   with_subelements:
-    - sys_cmd_perms.results
+    - sys_cmdlib_perms.results
     - stdout_lines
   when: item.0.stdout != ''
-  tags: [ 'cat2' , 'V-38469' , 'file_perms' ]
+  tags: [ 'cat2' , 'V-38469' , 'V-38465' , 'file_perms' ]
 
 - name: V-38553 Medium  The operating system must prevent public IPv6 access into an organizations internal networks, except as appropriately mediated by managed interfaces employing boundary protection devices
   service: name=ip6tables enabled=yes state=started
