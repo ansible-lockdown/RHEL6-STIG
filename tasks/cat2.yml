@@ -299,7 +299,7 @@
     - /usr/local/sbin
   tags: [ 'cat2' , 'V-38472' , 'file_perms' ]
 
-- name: Check system library permissions
+- name: Check system command file permissions
   command: "find -L {{ item }} -perm /022"
   changed_when: false
   with_items:
