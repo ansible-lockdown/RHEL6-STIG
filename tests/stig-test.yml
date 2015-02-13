@@ -48,6 +48,6 @@
        ignore_errors: yes
 
      - name: Run Stigma
-       script: ./stigma -P /tmp/results.xml -H {{ high_pct }} -M {{ med_pct }} -L {{ low_pct }} -T {{ tot_pct }}
+       script: ./stigma.py -P /tmp/results.xml -H {{ high_pct }} -M {{ med_pct }} -L {{ low_pct }} -T {{ tot_pct }}
        args:
          chdir: /tmp/ 
