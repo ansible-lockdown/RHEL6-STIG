@@ -11,8 +11,11 @@
      scap_prefix: "U_RedHat_6_V1R6_STIG_SCAP_1-1_Benchmark"
 
   tasks:
-     - name: Install OpenSCAP
-       yum: pkg="openscap-utils" state=latest
+     - name: Install OpenSCAP and Pip
+       yum: pkg={{ item }} state=latest
+       with_items:
+         - openscap-utils
+         - python-pip
 
      - name: Install Python Libraries
        pip: requirements=./tests/requirements.txt
