@@ -11,9 +11,14 @@
      scap_prefix: "U_RedHat_6_V1R6_STIG_SCAP_1-1_Benchmark"
 
   tasks:
-     - name: Install OpenSCAP and Pip
-       yum: pkg={{ item }} state=latest
+
+     - name: Download EPEL
+       get_url: url="http://dl.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm"
+
+     - name: Install EPEL OpenSCAP and Pip
+       yum: pkg={{ item }} state=installed
        with_items:
+         - ./epel-release-6-8.noarch.rpm
          - openscap-utils
          - python-pip
 
