@@ -23,7 +23,7 @@
          - python-pip
 
      - name: Install Python Libraries
-       pip: requirements=./tests/requirements.txt
+       pip: requirements=/home/ubuntu/src/github.com/nousdefions/ansible-role-stig/tests/requirements.txt
 
      - name: Download RHEL6 STIG files for OSCAP
        get_url: url={{ scap_url }} dest=/tmp/
