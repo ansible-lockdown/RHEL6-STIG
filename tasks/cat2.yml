@@ -550,13 +550,25 @@
   shell: "grep /var/log/ /etc/rsyslog.conf | awk '{print $2}' | sed 's/-//'"
   register: rsyslog_log_files
   changed_when: false
-  tags: [ 'cat2' , 'V-38519' , 'file_perms' ]
+  tags: [ 'cat2' , 'V-38519' , 'V-38518' , 'V-38623' , 'file_perms' ]
 
-- name: "V-38519 Medium  All rsyslog-generated log files must be group-owned by root\n    V-38518 Medium  All rsyslog-generated log files must be owned by root\n    V-38623 Medium  All rsyslog-generated log files must have mode 0600 or less permissive"
-  file: dest={{ item }} owner=root group=root mode=0600
+- name: Check file state and type to avoid hard link failures
+  stat: path={{ item }}
   with_items: rsyslog_log_files.stdout_lines
-  tags: [ 'cat2' , 'V-38519' , 'file_perms' ]
+  register: log_files_st
+  tags: [ 'cat2' , 'V-38519' , 'V-38518' , 'V-38623' , 'file_perms' ]
 
+- name: "V-38519 V-38518 Medium  All rsyslog-generated log files must be owned and group-owned by root\n    V-38623 Medium  All rsyslog-generated log files must have mode 0600 or less permissive"
+  file: path={{ item.item }} owner=root group=root mode=u-x,go-rwx follow=yes
+  with_items: log_files_st.results
+  when: item.stat.exists and item.stat.isreg and item.stat.nlink|int == 1
+  tags: [ 'cat2' , 'V-38519' , 'V-38623' , 'V-38518' , 'file_perms' ]
+
+- name: V-38623 Medium  All rsyslog-generated log files must have mode 0600 or less permissive HARD LINKED FILES
+  shell: chown root:root {{ item.item }} && chmod u-x,go-rwx {{ item.item }}
+  with_items: log_files_st.results
+  when: item.stat.exists and item.stat.isreg and item.stat.nlink|int > 1
+  tags: [ 'cat2' , 'V-38519' , 'V-38623' , 'V-38518' , 'file_perms' ]
 
 - name: "V-38517 Medium  The Transparent Inter-Process Communication (TIPC) protocol must be disabled unless required
          V-38515 Medium  The Stream Control Transmission Protocol (SCTP) must be disabled unless required\n
