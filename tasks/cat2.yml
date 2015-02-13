@@ -325,18 +325,17 @@
   tags: [ 'cat2' , 'V-38553' , 'kernel_parameters' , 'network' , 'ipv6' ]
 
 
-# Get a list of all audit log files
-- name: List all audit log files
-  shell: 'grep "^log_file" /etc/audit/auditd.conf | sed "s/^[^\/]*//"'
-  register: auditd_log_files
-  changed_when: false
-  tags: [ 'cat2' , 'V-38498' , 'V-38445' , 'V-38495' , 'auditd' , 'file_perms' , 'audit_permissions' ]
+- name: "V-38445 V-38495 Medium  Audit log files must be owned and group-owned by root\n    V-38493 Medium  Audit log directories must have mode 0755 or less permissive"
+  shell: chown -c -f -R root:root /var/log/audit && chmod -c -f -R go-w /var/log/audit
+  register: result
+  changed_when: result.stdout
+  tags: [ 'cat2' , 'V-38493' , 'V-38445' , 'V-38495' , 'file_perms' , 'auditd' , 'audit_permissions']
 
-- name: "V-38498 Medium  Audit log files must have mode 0640 or less permissive\n    V-38445 Medium  Audit log files must be group-owned by root\n    V-38495 Medium  Audit log files must be owned by root."
-  file: dest={{ item }} owner=root group=root mode=0600
-  with_items: auditd_log_files.stdout_lines
-  tags: [ 'cat2' , 'V-38498' , 'V-38445' , 'V-38495' , 'auditd' , 'file_perms' , 'audit_permissions' ]
-
+- name: V-38498 Medium  Audit log files must have mode 0640 or less permissive
+  shell: find /var/log/audit -type f -exec chmod -c -f -R g-wx,o-rwx {} +;
+  register: result
+  changed_when: result.stdout
+  tags: [ 'cat2' , 'V-38498' , 'auditd' , 'file_perms' , 'audit_permissions' ]
 
 - name: "V-38555 Medium  The system must employ a local IPv4 firewall\n    V-38560 Medium  The operating system must connect to external networks or information systems only through managed IPv4 interfaces consisting of boundary protection devices arranged in accordance with an organizational security architecture\n    V-38512  Medium  The operating system must prevent public IPv4 access into an organizations internal networks, except as appropriately mediated by managed interfaces employing boundary protection devices"
   service: name=iptables enabled=yes state=started
@@ -346,9 +345,6 @@
   lineinfile: state=absent dest=/etc/securetty regexp='^.*vc/?\d' backup=yes
   tags: [ 'cat2' , 'V-38492' , 'root_access' , 'tty' ]
 
-- name: V-38493 Medium  Audit log directories must have mode 0755 or less permissive
-  file: dest=/var/log/audit owner=root group=root mode=0750
-  tags: [ 'cat2' , 'V-38493' , 'file_perms' , 'auditd' ]
 
 - name: "V-38496 Medium  Default system accounts, other than root, must be locked"
   command: passwd -l {{ item }}
