@@ -14,6 +14,9 @@
      - name: Install OpenSCAP
        yum: pkg="openscap-utils" state=latest
 
+     - name: Install Python Libraries
+       pip: requirements=./tests/requirements.txt
+
      - name: Download RHEL6 STIG files for OSCAP
        get_url: url={{ scap_url }} dest=/tmp/
 
