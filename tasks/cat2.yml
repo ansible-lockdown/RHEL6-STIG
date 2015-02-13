@@ -294,9 +294,10 @@
     - /usr/lib64
   tags: [ 'cat2' , 'V-38472' , 'V-38466' , 'file_perms' ]
 
-- name: Check system command and library file permissions
-  command: "find -L {{ item }} -perm /022 -type f"
-  changed_when: false
+- name: V-38469 V-38465 Medium  All system command and library files must have mode 0755 or less permissive
+  shell: find {{ item }} -perm /022 -type f -exec chmod -c -f go-w {} +;
+  register: result
+  changed_when: result.stdout
   with_items:
     - /bin
     - /usr/bin
@@ -308,15 +309,6 @@
     - /lib64
     - /usr/lib
     - /usr/lib64
-  register: sys_cmdlib_perms
-  tags: [ 'cat2' , 'V-38469' , 'V-38465' , 'file_perms' ]
-
-- name: V-38469 V-38465 Medium  All system command and library files must have mode 0755 or less permissive
-  file: path={{ item.1 }} mode=go-w follow=yes
-  with_subelements:
-    - sys_cmdlib_perms.results
-    - stdout_lines
-  when: item.0.stdout != ''
   tags: [ 'cat2' , 'V-38469' , 'V-38465' , 'file_perms' ]
 
 - name: V-38553 Medium  The operating system must prevent public IPv6 access into an organizations internal networks, except as appropriately mediated by managed interfaces employing boundary protection devices
