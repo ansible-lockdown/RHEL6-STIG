@@ -49,8 +49,6 @@ parser.add_argument('-L', '--low-pass', required=False, dest='low_pass', type=in
 args = parser.parse_args()
 result_meta = untangle.parse(args.results_xml)
 
-
-
 metrics = {
     'high_pass'  : 0,
     'high_fail'  : 0,
