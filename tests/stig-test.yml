@@ -13,12 +13,12 @@
   tasks:
 
      - name: Download EPEL
-       get_url: url="http://dl.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm"
+       get_url: url="http://dl.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm" dest=/tmp/
 
      - name: Install EPEL OpenSCAP and Pip
        yum: pkg={{ item }} state=installed
        with_items:
-         - ./epel-release-6-8.noarch.rpm
+         - /tmp/epel-release-6-8.noarch.rpm
          - openscap-utils
          - python-pip
 
