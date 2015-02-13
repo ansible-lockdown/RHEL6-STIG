@@ -23,8 +23,13 @@
          chdir: /tmp/
 
      - name: Run OpenScap Checks
-       command: oscap xccdf eval --profile {{ profile }} --results results.xml --cpe {{ scap_prefix }}-cpe-dictionary.xml {{ scap_prefix }}-xccdf.xml
+       shell: oscap xccdf eval --profile {{ profile }} --results results.xml --cpe {{ scap_prefix }}-cpe-dictionary.xml {{ scap_prefix }}-xccdf.xml > /dev/null 2>&1
        args:
          chdir: /tmp/
        register: results
        ignore_errors: yes
+
+     - name: Run Stigma
+       script: ./stigma -P ./results.xml -H 90 -M 50 -L 24 -T 44
+       args:
+         chdir: /tmp/ 
