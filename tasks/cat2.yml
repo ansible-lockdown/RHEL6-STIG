@@ -721,7 +721,7 @@
     - { st: 'present', rx: "'^#?IgnoreRhosts'", ln: "'IgnoreRhosts yes'" }
     - { st: 'present', rx: "'^#?HostbasedAuthentication'", ln: "'HostbasedAuthentication no'" }
     - { st: 'present', rx: "'^#?PermitRootLogin'", ln: "'PermitRootLogin no'" }
-  tags: [ 'cat2' , 'V-38617' , 'V-38611' , 'V-38612' , 'V-38612' , 'V-38613', 'ssh' ]
+  tags: [ 'cat2' , 'V-38617' , 'V-38611' , 'V-38612' , 'V-38613', 'ssh' ]
   notify: restart ssh
 
 - name: V-38615 Medium  The SSH daemon must be configured with the Department of Defense (DoD) login banner.
