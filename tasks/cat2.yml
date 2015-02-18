@@ -1,10 +1,4 @@
 ---
-- name: V-38612 Medium  The SSH daemon must not allow host-based authentication
-  lineinfile: state=present dest=/etc/ssh/sshd_config regexp='^(#)?HostbasedAuthentication' line='HostbasedAuthentication no'
-  tags: [ 'ssh' , 'cat2', 'V-38612' , 'ssh' ]
-  notify: restart ssh
-
-
 # This audit.rules file is from https://github.com/RedHatGov/stig-fix-el6/tree/master/config
 - name: "Medium  Copy STIG compliant audit.rules\n    V-38580 Medium  The audit system must be configured to audit the loading and unloading of dynamic kernel modules\n    V-38527 Low     The audit system must be configured to audit all attempts to alter system time through clock_settime\n    V-38525 Low     The audit system must be configured to audit all attempts to alter system time through stime\n    V-38522 Low     The audit system must be configured to audit all attempts to alter system time through settimeofday\n    V-38552 Low     The audit system must be configured to audit all discretionary access control permission modifications using fchown\n    V-38550 Low     The audit system must be configured to audit all discretionary access control permission modifications using fchmodat\n    V-38557 Low     The audit system must be configured to audit all discretionary access control permission modifications using fsetxattr\n    V-38556 Low     The audit system must be configured to audit all discretionary access control permission modifications using fremovexattr\n    V-38554 Low     The audit system must be configured to audit all discretionary access control permission modifications using fchownat\n    V-38559 Low     The audit system must be configured to audit all discretionary access control permission modifications using lremovexattr\n    V-38558 Low     The audit system must be configured to audit all discretionary access control permission modifications using lchown\n    V-38536 Low     The operating system must automatically audit account disabling actions\n    V-38540 Low     The audit system must be configured to audit modifications to the systems network configuration\n    V-38541 Low     The audit system must be configured to audit modifications to the systems Mandatory Access Control (MAC) configuration (SELinux)\n    V-38543 Low     The audit system must be configured to audit all discretionary access control permission modifications using chmod\n    V-38547 Low     The audit system must be configured to audit all discretionary access control permission modifications using fchmod\n    V-38530 Low     The audit system must be configured to audit all attempts to alter system time through /etc/localtime\n    V-38578 Low     The audit system must be configured to audit changes to the /etc/sudoers file\n    V-38575 Low     The audit system must be configured to audit user deletions of files and programs"
   template: src=audit.rules.j2 dest=/etc/audit/audit.rules owner=root group=root mode=0640 backup=yes
@@ -168,14 +162,6 @@
     - /etc/hushlogins
     - users.stdout_lines
   tags: [ 'cat2' , 'V-38485' , 'logon_settings' , 'tty' ]
-
-- name: "V-38484 Medium  The operating system, upon successful logon, must display to the user the date and time of the last logon or access via ssh"
-  lineinfile: state=present dest=/etc/ssh/sshd_config regexp='^(#)?PrintLastLog' line='PrintLastLog yes'
-  notify: restart ssh
-  tags: [ 'cat2' , 'V-38484' , 'logon_settings' ]
-
-# - name: V-38486 Medium  The operating system must conduct backups of system-level information contained in the information system per organization defined frequency to conduct backups that are consistent with recovery time and recovery point objectives
-
 
 - name: Checking for updates
   command: yum check-update
@@ -507,11 +493,6 @@
   sysctl: name=net.ipv4.conf.default.send_redirects value=0 state=present reload=yes ignoreerrors=yes
   tags: [ 'cat2' , 'V-38600' , 'icmp_redirects' , 'kernel_parameters' , 'network' ]
 
-- name: V-38613 Medium  The system must not permit root logins using remote access programs such as ssh
-  lineinfile: "state=present backup=yes dest=/etc/ssh/sshd_config regexp='^(#)?PermitRootLogin' line='PermitRootLogin no'"
-  tags: [ 'cat2' , 'V-38613' , 'ssh' , 'config' ]
-  notify: restart ssh
-
 - name: V-38577 Medium  The system must use a FIPS 140-2 approved cryptographic hashing algorithm for generating account password hashes (libuser.conf)
   lineinfile: "state=present backup=yes dest=/etc/libuser.conf regexp='crypt_style' line='crypt_style = sha512'"
   tags: [ 'cat2' , 'V-38577' , 'passwords' ]
@@ -720,22 +701,37 @@
   lineinfile: state=present backup=yes dest=/etc/sysconfig/init regexp='^(#)?SINGLE' line='SINGLE=/sbin/sulogin'
   tags: [ 'cat2' , 'V-38586' , 'root_access' ]
 
-- name: V-38615 Medium  The SSH daemon must be configured with the Department of Defense (DoD) login banner.
-  lineinfile: "state=present backup=yes dest=/etc/ssh/sshd_config regexp='^#?Banner' line='Banner /etc/issue'"
-  tags: [ 'cat2' , 'V-38615' , 'ssh' , 'logon_settings' , 'dod_logon_banner' ]
-  notify: restart ssh
-
 - name: V-38622 Medium  Mail relaying must be restricted
   lineinfile: "state=present backup=yes dest=/etc/postfix/main.cf regexp='^inet_interfaces' line='inet_interfaces = localhost' insertafter='^#\\s?inet_interfaces'"
   notify: restart postfix
   tags: [ 'cat2' , 'V-38622' , 'postfix' ]
 
-- name: V-38617 Medium  The SSH daemon must be configured to use only FIPS 140-2 approved ciphers
-  lineinfile: "state=present backup=yes dest=/etc/ssh/sshd_config line='Ciphers aes128-ctr,aes192-ctr,aes256-ctr,aes128-cbc,3des-cbc,aes192-cbc,aes256-cbc'"
-  tags: [ 'cat2' , 'V-38614' , 'ssh' ]
+# /etc/ssh/sshd_config settings
+- name: "V-38617 Medium  The SSH daemon must be configured to use only FIPS 140-2 approved ciphers\n    
+        \tV-38611 Medium  The SSH daemon must ignore .rhosts files\n       
+        \tV-38612 Medium  The SSH daemon must not allow host-based authentication\n       
+        \tV-38613 Medium  The system must not permit root logins using remote access programs such as ssh"
+  lineinfile: >
+    state={{ item.st }}
+    backup=yes dest=/etc/ssh/sshd_config
+    regexp={{ item.rx }}
+    line={{ item.ln }}
+  with_items:
+    - { st: 'present', rx: "'^#?(Ciphers)?'", ln: "'Ciphers aes128-ctr,aes192-ctr,aes256-ctr,aes128-cbc,3des-cbc,aes192-cbc,aes256-cbc'" }
+    - { st: 'present', rx: "'^#?IgnoreRhosts'", ln: "'IgnoreRhosts yes'" }
+    - { st: 'present', rx: "'^#?HostbasedAuthentication'", ln: "'HostbasedAuthentication no'" }
+    - { st: 'present', rx: "'^#?PermitRootLogin'", ln: "'PermitRootLogin no'" }
+  tags: [ 'cat2' , 'V-38617' , 'V-38611' , 'V-38612' , 'V-38612' , 'V-38613', 'ssh' ]
   notify: restart ssh
 
-- name: V-38611 Medium  The SSH daemon must ignore .rhosts files
-  lineinfile: "state=present backup=yes dest=/etc/ssh/sshd_config regexp='^#?IgnoreRhosts' line='IgnoreRhosts yes'"
-  tags: [ 'cat2' , 'V-38611' , 'ssh' ]
+- name: V-38615 Medium  The SSH daemon must be configured with the Department of Defense (DoD) login banner.
+  lineinfile: >
+    state={{ item.st }}
+    backup=yes dest=/etc/ssh/sshd_config
+    regexp={{ item.rx }}
+    line={{ item.ln }}
+  with_items:
+    - { st: 'present', rx: "'^#?Banner'", ln: "'Banner /etc/issue'" }
+    - { st: 'present', rx: "'^(#)?PrintLastLog'", ln: "'PrintLastLog yes'" }
+  tags: [ 'cat2' , 'V-38615' , 'V-38484' , 'ssh' , 'logon_settings' , 'dod_logon_banner' ]
   notify: restart ssh
