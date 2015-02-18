@@ -15,6 +15,9 @@ rhel6stig_system_auth_ac_pam_cracklib_parameters: try_first_pass retry=3 type= d
 # Set this to true to omit all the pauses in the role
 rhel6stig_fullauto: false
 
+# Set to true to install all patches and updates available via yum
+rhel6stig_update_packages: true
+
 # Set maximum number of simultaneous system logins (V-38684)
 rhel6stig_maxlogins: 10
 
