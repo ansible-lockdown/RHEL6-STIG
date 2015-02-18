@@ -60,10 +60,27 @@
     - /usr/lib/rpm/redhat/rpmrc
     - ~root/.rpmrc
   tags: [ 'cat1' , 'V-38462' , 'rpm' , 'packages' ]
-
-- name: V-38497 High  The system must not have accounts configured with blank or null passwords
-  template: src=system-auth-ac.j2 dest=/etc/pam.d/system-auth-ac owner=root group=root mode=0640 backup=yes
-  tags: [ 'cat1' , 'V-38497' , 'passwords' ]
+- name: "V-38497 High  The system must not have accounts configured with blank or null passwords\n
+        \tV-38658 Medium  The system must prohibit the reuse of passwords within twenty-four iterations\n
+        \tV-38574 Medium  The system must use a FIPS 140-2 approved cryptographic hashing algorithm for generating account password hashes (system-auth)\n
+        \tV-38573 Medium  The system must disable accounts after three consecutive unsuccessful login attempts\n
+        \tV-38592 Medium  The system must require administrator action to unlock an account locked by excessive failed login attempts\n
+        \tV-38501 Medium  The system must disable accounts after excessive login failures within a 15-minute interval\n
+        \tV-38482 Low     The system must require passwords to contain at least one numeric character\n
+        \tV-38571 Low     The system must require passwords to contain at least one lowercase alphabetic character\n
+        \tV-38572 Low     The system must require at least four characters be changed between the old and new passwords during a password change"
+  lineinfile: >
+    dest={{ item.dest }}
+    regexp={{ item.rx }}
+    line="{{ item.ln }}"
+    backrefs=yes
+    follow=yes owner=root group=root mode=0644
+  with_items:
+    - { st: 'present', rx: "'^(password\\s+requisite\\s+pam_cracklib.so\\s)(.*)$'", ln: "\\1{{rhel6stig_pam_cracklib_params}}", dest: '/etc/pam.d/system-auth' }
+    - { st: 'present', rx: "'^(password\\s+requisite\\s+pam_cracklib.so\\s)(.*)$'", ln: "\\1{{rhel6stig_pam_cracklib_params}}", dest: '/etc/pam.d/password-auth' }
+    - { st: 'present', rx: "'^(password\\s+sufficient\\s+pam_unix.so\\s)(.*)$'", ln: "\\1{{rhel6stig_pam_unix_params}}", dest: '/etc/pam.d/system-auth' }
+    - { st: 'present', rx: "'^(password\\s+sufficient\\s+pam_unix.so\\s)(.*)$'", ln: "\\1{{rhel6stig_pam_unix_params}}", dest: '/etc/pam.d/password-auth' }
+  tags: [ 'cat1' , 'cat2' , 'V-38497' , 'V-38658' , 'V-38574' , 'V-38573' , 'V-38492' , 'V-38501' , 'V-38482' , 'V-38571' , 'V-38572' , 'passwords' , 'accounts' ]
 
 - name: V-38677 High  The NFS server must not have the insecure file locking option enabled
   replace: dest=/etc/exports regexp='insecure_locks'
