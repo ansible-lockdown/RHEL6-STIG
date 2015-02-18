@@ -15,7 +15,7 @@
 
 - name: PRELIM | Set gpg_key_url for Red Hat 6
   set_fact: gpg_key_url=https://www.redhat.com/security/fd431d51.txt
-  when: "ansible_distribution == 'Red Hat'"
+  when: "ansible_distribution == 'RedHat'"
   always_run: yes
   tags: [ 'cat1' , 'cat2' , 'cat3' ]
 
