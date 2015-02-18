@@ -46,6 +46,14 @@ rhel6stig_system_is_router: false
 # unless this variable is set to 'true'
 rhel6stig_change_grub_password: false
 
+# The new grub password to insert if  rhel6stig_change_grub_password is TRUE
+# This should be a pre-encrypted string created with
+# grub-crypt --sha-512
+# a completely random 40 character password has been generated for you
+# ONLY USE IF YOU DON'T EVER WANT TO ACCESS THE BOOTLOADER
+# i.e. If this system is running in AWS
+rhel6stig_bootloader_password: $6$t8wbzLbzO0qLbSP8$imtV5DYW43wF4sLhTV.xrwY4.OZnT17ZQSzN.p6P.4bTRTdW0/P9CnpdaHSgVGliP7tvzf3bLWkaTKbhRwOOo0
+
 # NTP configuration used in ntp.conf
 rhel6stig_ntp_config_servers:
   - 0.centos.pool.ntp.org

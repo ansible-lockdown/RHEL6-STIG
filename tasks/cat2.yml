@@ -27,13 +27,6 @@
   when: world_writable_files.stdout_lines and not rhel6stig_fullauto
   tags: [ 'cat2' , 'V-38643', 'file_perms' ]
 
-
-- name: "V-38551 Medium  The operating system must connect to external networks or information systems only through managed IPv6 interfaces consisting of boundary protection devices arranged in accordance with an organizational security architecture\n    V-38549 Medium  The system must employ a local IPv6 firewall"
-  service: name=ip6tables enabled=yes state=started
-  when: rhel6stig_ipv6_in_use
-  tags: [ 'cat2' , 'V-38551' , 'V-38549' , 'ipv6' , 'firewall' , 'network']
-
-
 # Look in /etc/password for hashes and print them out if any are found
 - name: V-38499 Medium  The /etc/passwd file must not contain password hashes
   shell: "awk -F: '($2 != \"x\") {print}' /etc/passwd"
@@ -279,12 +272,6 @@
     - /usr/lib64
   tags: [ 'cat2' , 'V-38469' , 'V-38465' , 'file_perms' ]
 
-- name: V-38553 Medium  The operating system must prevent public IPv6 access into an organizations internal networks, except as appropriately mediated by managed interfaces employing boundary protection devices
-  service: name=ip6tables enabled=yes state=started
-  when: rhel6stig_ipv6_in_use
-  tags: [ 'cat2' , 'V-38553' , 'kernel_parameters' , 'network' , 'ipv6' ]
-
-
 - name: "V-38445 V-38495 Medium  Audit log files must be owned and group-owned by root\n    V-38493 Medium  Audit log directories must have mode 0755 or less permissive"
   shell: chown -c -f -R root:root /var/log/audit && chmod -c -f -R go-w /var/log/audit
   register: result
@@ -296,10 +283,6 @@
   register: result
   changed_when: result.stdout
   tags: [ 'cat2' , 'V-38498' , 'auditd' , 'file_perms' , 'audit_permissions' ]
-
-- name: "V-38555 Medium  The system must employ a local IPv4 firewall\n    V-38560 Medium  The operating system must connect to external networks or information systems only through managed IPv4 interfaces consisting of boundary protection devices arranged in accordance with an organizational security architecture\n    V-38512  Medium  The operating system must prevent public IPv4 access into an organizations internal networks, except as appropriately mediated by managed interfaces employing boundary protection devices"
-  service: name=iptables enabled=yes state=started
-  tags: [ 'cat2' , 'V-38555' , 'V-38560' , 'iptables' , 'firewall' ]
 
 - name: V-38492 Medium  The system must prevent the root account from logging in from virtual consoles
   lineinfile: state=absent dest=/etc/securetty regexp='^.*vc/?\d' backup=yes
@@ -378,12 +361,6 @@
   with_flattened:
     - /etc/yum.conf
     - yum_repos.stdout_lines
-
-
-- name: V-38546 Medium  The IPv6 protocol handler must not be bound to the network stack unless needed
-  copy: backup=yes src=disable-ipv6.conf dest=/etc/modprobe.d/disable-ipv6.conf owner=root group=root mode=0644
-  when: not rhel6stig_ipv6_in_use
-  tags: [ 'cat2' , 'V-38546' , 'ipv6' , 'network']
 
 # DOD login banner for GUI environments
 - name: "V-38689 Medium  The Department of Defense (DoD) login banner must be displayed immediately prior to, or as part of, graphical desktop environment login prompts"
@@ -510,17 +487,7 @@
   when: "'bluetooth' in sysv_services.stdout_lines"
   tags: [ 'cat2' , 'V-38691' , 'bluetooth' ]
 
-- name: V-38597 Medium  The system must limit the ability of processes to have simultaneous write and execute access to memory
-  sysctl: name=kernel.exec-shield value=1 state=present reload=yes ignoreerrors=yes
-  tags: [ 'cat2' , 'V-38597' , 'kernel_parameters' ]
-
-- name: V-38596 Medium  The system must implement virtual address space randomization
-  sysctl: name=kernel.randomize_va_space state=present reload=yes ignoreerrors=yes
-  tags: [ 'cat2' , 'V-38596' , 'kernel_parameters' ]
-
-# - name: V-38595 Medium  The system must be configured to require the use of a CAC, PIV compliant hardware token, or Alternate Logon Token (ALT) for authentication
-
-- name: V-38593 Medium  The Department of Defense (DoD) login banner must be displayed immediately prior to, or as part of, console login prompts
+- name: V-38593 Medium  The Department of Defense (DoD) login banner must be displayed immediately prior to or as part of console login prompts
   copy: src=issue dest=/etc/{{ item }} owner=root group=root mode=0644 backup=yes
   with_items:
     - issue
@@ -542,27 +509,30 @@
 # Check for the presence of a bootloader password.
 # If one is not found, add it to grub.conf
 - name: Check for password in grub.conf
-  command: grep password /boot/grub/grub.conf
+  command: grep password /etc/grub.conf
   register: grub_password_check
   changed_when: false
   failed_when: grub_password_check.stderr
   tags: [ 'cat2' , 'V-38585' , 'grub_password' ]
 
 - name: V-38585 Medium  The system boot loader must require authentication
-  lineinfile: "state=present backup=yes dest=/boot/grub/grub.conf regexp='password' line='password --encrypted {{ rhel6stig_bootloader_password }}' insertafter='^#\\s'"
+  lineinfile: "state=present backup=yes dest=/etc/grub.conf regexp='password' line='password --encrypted {{ rhel6stig_bootloader_password }}' insertafter='^#\\s'"
   when: grub_password_check.rc != 0 or rhel6stig_change_grub_password
   tags: [ 'cat2' , 'V-38585' , 'grub_password' ]
 
 
-- name: V-38444 Medium  The systems local IPv6 firewall must implement a deny-all, allow-by-exception policy for inbound packets
-  lineinfile: "state=present backup=yes dest=/etc/sysconfig/ip6tables regexp=':FORWARD' line=':FORWARD DROP [0:0]'"
-  when: rhel6stig_ipv6_in_use
-  tags: [ 'cat2' , 'V-38444' , 'firewall' , 'ipv6' , 'network']
+- name: V-38586 Medium  The system must require authentication upon booting into single-user and maintenance modes.
+  lineinfile: state=present backup=yes dest=/etc/sysconfig/init regexp='^(#)?SINGLE' line='SINGLE=/sbin/sulogin'
+  tags: [ 'cat2' , 'V-38586' , 'root_access' ]
+
+- name: V-38588 Medium  The system must not permit interactive boot
+  lineinfile: "state=present backup=yes dest=/etc/sysconfig/init regexp='^PROMPT=' line='PROMPT=no'"
+  tags: [ 'cat2' , 'V-38588' , 'interactive_boot' ]
+
 
 - name: "V-38504 Medium  The /etc/shadow file must have mode 0000\n    V-38502 V-38503 Medium  The /etc/shadow file must be owned and group-owned by root"
   file: dest=/etc/shadow owner=root group=root mode=0000
   tags: [ 'cat2' , 'V-38504' , 'V-38502' , 'V-38503' , 'file_perms' ]
-
 
 - name: List accounst with UID 0
   shell: "awk -F: '($3 == \"0\") {print}' /etc/passwd | grep -v root"
@@ -616,17 +586,6 @@
   service: name=auditd state=started enabled=yes
   tags: [ 'cat2' , 'V-38623' , 'V-38631' , 'auditd' ]
 
-- name: V-38588 Medium  The system must not permit interactive boot
-  lineinfile: "state=present backup=yes dest=/etc/sysconfig/init regexp='^PROMPT=' line='PROMPT=no'"
-  tags: [ 'cat2' , 'V-38588' , 'interactive_boot' ]
-
-- name: V-38513 Medium  The systems local IPv4 firewall must implement a deny-all, allow-by-exception policy for inbound packets
-  lineinfile: "state=present backup=yes dest=/etc/sysconfig/iptables regexp=':INPUT' line=':INPUT DROP [0:0]'"
-  tags: [ 'cat2' , 'V-38513' , 'firewall' , 'network']
-  notify: restart iptables
-
-# - name: V-38439 Medium  The system must provide automated support for account management functions
-
 - name: V-38638 Medium  The graphical desktop environment must have automatic lock enabled
   command: gconftool-2 --direct --config-source xml:readwrite:/etc/gconf/gconf.xml.mandatory --type bool --set /apps/gnome-screensaver/lock_enabled true
   when: rhel6stig_xwindows_required
@@ -645,14 +604,71 @@
   when: audit_integrity_check.stdout
   tags: [ 'cat2' , 'V-38637' , 'auditd' , 'rpm' ]
 
-- name: V-38586 Medium  The system must require authentication upon booting into single-user and maintenance modes.
-  lineinfile: state=present backup=yes dest=/etc/sysconfig/init regexp='^(#)?SINGLE' line='SINGLE=/sbin/sulogin'
-  tags: [ 'cat2' , 'V-38586' , 'root_access' ]
-
 - name: V-38622 Medium  Mail relaying must be restricted
   lineinfile: "state=present backup=yes dest=/etc/postfix/main.cf regexp='^inet_interfaces' line='inet_interfaces = localhost' insertafter='^#\\s?inet_interfaces'"
   notify: restart postfix
   tags: [ 'cat2' , 'V-38622' , 'postfix' ]
+
+# sysctl kernel settings
+- name: V-38597 Medium  The system must limit the ability of processes to have simultaneous write and execute access to memory
+  sysctl: name=kernel.exec-shield value=1 state=present reload=yes ignoreerrors=yes
+  tags: [ 'cat2' , 'V-38597' , 'kernel_parameters' ]
+
+- name: V-38596 Medium  The system must implement virtual address space randomization
+  sysctl: name=kernel.randomize_va_space state=present reload=yes ignoreerrors=yes
+  tags: [ 'cat2' , 'V-38596' , 'kernel_parameters' ]
+
+
+# sysctl network settings
+- name: V-38511 Medium  IP forwarding for IPv4 must not be enabled unless the system is a router
+  sysctl: name=net.ipv4.ip_forward value=0 state=present reload=yes ignoreerrors=yes
+  when: not rhel6stig_system_is_router
+  tags: [ 'cat2' , 'V-38511' , 'kernel_parameters' , 'network' ]
+
+- name: V-38523 Medium  The system must not accept IPv4 source-routed packets on any interface
+  sysctl: name=net.ipv4.conf.all.accept_source_route value=0 state=present reload=yes ignoreerrors=yes
+  tags: [ 'cat2' , 'V-38523' , 'kernel_parameters' , 'network' ]
+
+- name: V-38524 Medium  The system must not accept ICMPv4 redirect packets on any interface
+  sysctl: name=net.ipv4.conf.all.accept_redirects value=0 state=present reload=yes ignoreerrors=yes
+  tags: [ 'cat2' , 'V-38524' , 'kernel_parameters' , 'network' ]
+
+- name: V-38526 Medium  The system must not accept ICMPv4 secure redirect packets on any interface
+  sysctl: name=net.ipv4.conf.all.secure_redirects value=0 state=present reload=yes ignoreerrors=yes
+  tags: [ 'cat2' , 'V-38526' , 'kernel_parameters' , 'network' ]
+
+- name: V-38529 Medium  The system must not accept IPv4 source-routed packets by default
+  sysctl: name=net.ipv4.conf.default.accept_source_route value=0 state=present reload=yes ignoreerrors=yes
+  tags: [ 'cat2' , 'V-38529' , 'kernel_parameters' , 'network' ]
+
+- name: V-38532 Medium  The system must not accept ICMPv4 secure redirect packets by default.
+  sysctl: name=net.ipv4.conf.default.secure_redirects value=0 state=present reload=yes ignoreerrors=yes
+  tags: [ 'cat2' , 'V-38532' , 'kernel_parameters' , 'network' ]
+
+- name: V-38539 Medium  The system must be configured to use TCP syncookies
+  sysctl: name=net.ipv4.tcp_syncookies value=1 state=present reload=yes ignoreerrors=yes
+  tags: [ 'cat2' , 'V-38539' , 'kernel_parameters' , 'network' ]
+
+- name: V-38542 Medium  The system must use a reverse-path filter for IPv4 network traffic when possible on all interfaces
+  sysctl: name=net.ipv4.conf.all.rp_filter value=1 state=present reload=yes ignoreerrors=yes
+  tags: [ 'cat2' , 'V-38542' , 'kernel_parameters' , 'network' ]
+
+- name: V-38544 Medium  The system must use a reverse-path filter for IPv4 network traffic when possible by default.
+  sysctl: name=net.ipv4.conf.default.rp_filter value=1 state=present reload=yes ignoreerrors=yes
+  tags: [ 'cat2' , 'V-38544' , 'kernel_parameters' , 'network' ]
+
+- name: V-38548 Medium  The system must ignore ICMPv6 redirects by default
+  sysctl: name=net.ipv6.conf.default.accept_redirects value=0 state=present reload=yes ignoreerrors=yes
+  tags: [ 'cat2' , 'V-38548' , 'kernel_parameters' , 'network' ]
+
+- name: V-38600 Medium  The system must not send ICMPv4 redirects by default
+  sysctl: name=net.ipv4.conf.default.send_redirects value=0 state=present reload=yes ignoreerrors=yes
+  tags: [ 'cat2' , 'V-38600' , 'kernel_parameters' , 'network' ]
+
+- name: V-38601 Medium  The system must not send ICMPv4 redirects from any interface
+  sysctl: name=net.ipv4.conf.all.send_redirects value=0 state=present reload=yes ignoreerrors=yes
+  tags: [ 'cat2' , 'V-38544' , 'kernel_parameters' , 'network' ]
+
 
 # /etc/ssh/sshd_config settings
 - name: "V-38617 Medium  The SSH daemon must be configured to use only FIPS 140-2 approved ciphers\n    
@@ -683,3 +699,34 @@
     - { st: 'present', rx: "'^(#)?PrintLastLog'", ln: "'PrintLastLog yes'" }
   tags: [ 'cat2' , 'V-38615' , 'V-38484' , 'ssh' , 'logon_settings' , 'dod_logon_banner' ]
   notify: restart ssh
+
+# IPv6 Firewall and Network settings
+- name: V-38444 Medium  The systems local IPv6 firewall must implement a deny-all allow-by-exception policy for inbound packets
+  lineinfile: "state=present backup=yes dest=/etc/sysconfig/ip6tables regexp=':FORWARD' line=':FORWARD DROP [0:0]'"
+  when: rhel6stig_ipv6_in_use
+  tags: [ 'cat2' , 'V-38444' , 'firewall' , 'ipv6' , 'network']
+  notify: restart ip6tables
+
+- name: V-38546 Medium  The IPv6 protocol handler must not be bound to the network stack unless needed
+  copy: backup=yes src=disable-ipv6.conf dest=/etc/modprobe.d/disable-ipv6.conf owner=root group=root mode=0644
+  when: not rhel6stig_ipv6_in_use
+  tags: [ 'cat2' , 'V-38546' , 'ipv6' , 'network']
+
+- name: "V-38549 Medium  The system must employ a local IPv6 firewall\n
+        \tV-38551 Medium  The operating system must connect to external networks or information systems only through managed IPv6 interfaces consisting of boundary protection devices arranged in accordance with an organizational security architecture\n
+        \tV-38553 Medium  The operating system must prevent public IPv6 access into an organizations internal networks except as appropriately mediated by managed interfaces employing boundary protection devices"
+  service: name=ip6tables enabled=yes state=started
+  when: rhel6stig_ipv6_in_use
+  tags: [ 'cat2' , 'V-38551' , 'V-38549' , 'V-38553' , 'ipv6' , 'firewall' , 'network']
+
+# IPv4 Firewall and Network Settings
+- name: "V-38555 Medium  The system must employ a local IPv4 firewall\n
+        \tV-38560 Medium  The operating system must connect to external networks or information systems only through managed IPv4 interfaces consisting of boundary protection devices arranged in accordance with an organizational security architecture\n
+        \tV-38512  Medium  The operating system must prevent public IPv4 access into an organizations internal networks except as appropriately mediated by managed interfaces employing boundary protection devices"
+  service: name=iptables enabled=yes state=started
+  tags: [ 'cat2' , 'V-38555' , 'V-38560' , 'V-38512' , 'ipv4' , 'network' , 'firewall' ]
+
+- name: V-38513 Medium  The systems local IPv4 firewall must implement a deny-all allow-by-exception policy for inbound packets
+  lineinfile: "state=present backup=yes dest=/etc/sysconfig/iptables regexp=':INPUT' line=':INPUT DROP [0:0]'"
+  tags: [ 'cat2' , 'V-38513' , 'ipv4' , 'firewall' , 'network']
+  notify: restart iptables
