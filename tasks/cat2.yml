@@ -179,19 +179,14 @@
 
 - name: Checking for updates
   command: yum check-update
-  changed_when: false
-  register: yum_update_status
-  failed_when: yum_update_status.rc == 1
-  tags: [ 'cat2' , 'V-38481' , 'yum' , 'updates' ]
-
-- name: "The following updates are available:"
-  debug: var=yum_update_status.stdout_lines
-  when: yum_update_status.rc == 100 and not rhel6stig_fullauto
+  changed_when: result.rc == 100
+  failed_when: result.rc == 1
+  register: result
   tags: [ 'cat2' , 'V-38481' , 'yum' , 'updates' ]
 
 - name: V-38481 Medium  System security patches and updates must be installed and up-to-date
-  pause: prompt="Updates are available and not installed. This is a finding. Press Enter to continue"
-  when: yum_update_status.rc == 100 and not rhel6stig_fullauto
+  yum: name=* state=latest
+  when: rhel6stig_update_packages
   tags: [ 'cat2' , 'V-38481' , 'yum' , 'updates' ]
 
 
