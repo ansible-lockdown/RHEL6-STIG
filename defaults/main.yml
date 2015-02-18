@@ -9,8 +9,14 @@ rhel6stig_snmp_community: B0re4lis
 rhel6stig_pass_min_length: 14
 rhel6stig_pass_min_days: 1
 rhel6stig_pass_max_days: 60
-rhel6stig_pam_unix_params: sha512 shadow nullok try_first_pass use_authtok remember=24
-rhel6stig_pam_cracklib_params: try_first_pass retry=3 type= dcredit=-1 lcredit=-1 difok=4
+rhel6stig_pam_unix_params: sha512 shadow try_first_pass use_authtok remember=24
+rhel6stig_pam_cracklib_params: try_first_pass retry=3 maxrepeat=3 minlen=14 dcredit=-1 ucredit=-1 ocredit=-1 lcredit=-1 difok=4
+rhel6stig_pam_faillock_params:
+  - 'auth        [default=die] pam_faillock.so authfail deny=3 unlock_time=604800 fail_interval=900'
+  - 'auth        required      pam_faillock.so authsucc deny=3 unlock_time=604800 fail_interval=900'
+
+# SELinux settings
+rhel6stig_selinux_pol: targeted
 
 # Set this to true to omit all the pauses in the role
 rhel6stig_fullauto: false
@@ -148,3 +154,12 @@ rhel6stig_auditd_config:
   # something else entirely.
   # NOTE: SINGLE user mode setting will break cloud systems.
   admin_space_left_action: HALT
+
+# AIDE settings
+rhel6stig_aide_cron:
+  aide_job: '/usr/sbin/aide --check'
+  aide_minute: 04
+  aide_hour: 05
+  aide_day: '*'
+  aide_month: '*'
+  aide_weekday: '*' 

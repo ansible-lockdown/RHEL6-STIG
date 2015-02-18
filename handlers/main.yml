@@ -43,3 +43,8 @@
 
 - name: restart nfs
   service: name=nfs state=restarted
+
+- name: init aide
+  command: /usr/sbin/aide --init -B 'database_out=file:/var/lib/aide/aide.db.gz'
+  async: 45
+  poll: 0
