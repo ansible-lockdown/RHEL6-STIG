@@ -387,15 +387,15 @@
   tags: [ 'cat2' , 'V-38679' , 'network' , 'dhcp' ]
 
 - name: V-38475 Medium  The system must require passwords to contain a minimum of 14 characters
-  lineinfile: "state=present dest=/etc/login.defs regexp='^rhel6stig_pass_MIN_LEN' line='rhel6stig_pass_MIN_LEN    {{ rhel6stig_pass_min_length }}' backup=yes"
+  lineinfile: "state=present dest=/etc/login.defs regexp='^PASS_MIN_LEN' line='PASS_MIN_LEN    {{ rhel6stig_pass_min_length }}' backup=yes"
   tags: [ 'cat2' , 'V-38475' , 'passwords' ]
 
 - name: V-38477 Medium  Users must not be able to change passwords more than once every 24 hours
-  lineinfile: "state=present dest=/etc/login.defs regexp='^rhel6stig_pass_MIN_DAYS' line='rhel6stig_pass_MIN_DAYS   {{ rhel6stig_pass_min_days }}' backup=yes"
+  lineinfile: "state=present dest=/etc/login.defs regexp='^PASS_MIN_DAYS' line='PASS_MIN_DAYS   {{ rhel6stig_pass_min_days }}' backup=yes"
   tags: [ 'cat2' , 'V-38477' , 'passwords' ]
 
 - name: V-38479 Medium  User passwords must be changed at least every 60 days
-  lineinfile: "state=present dest=/etc/login.defs regexp='^rhel6stig_pass_MAX_DAYS' line='rhel6stig_pass_MAX_DAYS   {{ rhel6stig_pass_max_days }}' backup=yes"
+  lineinfile: "state=present dest=/etc/login.defs regexp='^PASS_MAX_DAYS' line='PASS_MAX_DAYS   {{ rhel6stig_pass_max_days }}' backup=yes"
   tags: [ 'cat2' , 'V-38479' , 'passwords' ]
 
 - name: V-38542 Medium  The system must use a reverse-path filter for IPv4 network traffic when possible on all interfaces
