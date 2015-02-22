@@ -144,9 +144,6 @@
   tags: [ 'cat2' , 'V-38443' , 'V-38448' , 'V-38449' , 'file_perms' ]
 
 
-
-# - name: V-38488 Medium  The operating system must conduct backups of user-level information contained in the operating system per organization defined frequency to conduct backups consistent with recovery time and recovery point objectives
-
 - name: Checking for remote log servers
   shell: grep -Er '(^[^#]?\*\.\*\s+@{1,2})|(\*\.\*\s+omrelp)' /etc/rsyslog.conf /etc/rsyslog.d/
   changed_when: false
@@ -184,40 +181,22 @@
   tags: [ 'cat2' , 'V-38481' , 'yum' , 'updates' ]
 
 
+- name: "V-38664 Medium  The system package management tool must verify ownership on all files and directories associated with the audit package\n
+        \tV-38665 Medium  The system package management tool must verify group-ownership on all files and directories associated with the audit package"
+  shell: "rpm -V audit | grep '^.....\\(U\\.\\|\\.G\\|UG\\)'"
+  register: audit_ownership
+  changed_when: audit_ownership.stdout != ''
+  failed_when: audit_ownership.stderr
+  notify: reset audit pkg ugids
+  tags: [ 'cat2' , 'V-38664' , 'V-38665' , 'file_perms' , 'auditd' , 'rpm' ]
 
-
-
-- name: Checking group group-ownership of audit files
-  shell: rpm -V audit | grep '^......G'
-  changed_when: false
-  register: audit_group_ownership
-  failed_when: audit_group_ownership.stderr
-  tags: [ 'cat2' , 'V-38665' , 'file_perms' , 'auditd' , 'rpm' ]
-
-- name: V-38665 Medium  The system package management tool must verify group-ownership on all files and directories associated with the audit package
-  command: rpm --setugids audit
-  changed_when: false
-  when: audit_group_ownership.stdout
-  tags: [ 'cat2' , 'V-38665' , 'file_perms' , 'rpm' ]
-
-
-- name: Checking user ownership of audit files
-  shell: rpm -V audit | grep '^......U'
-  changed_when: false
-  register: audit_user_ownership
-  failed_when: audit_user_ownership.stderr
-  tags: [ 'cat2' , 'V-38664' , 'file_perms' , 'auditd' , 'rpm' ]
-
-- name: V-38664 Medium  The system package management tool must verify ownership on all files and directories associated with the audit package
-  command: rpm --setugids audit
-  changed_when: false
-  when: audit_user_ownership.stdout
-  tags: [ 'cat2' , 'V-38664' , 'file_perms' , 'auditd' , 'rpm' ]
-
-- name: V-38667 Medium  The system must have a host-based intrusion detection tool installed
-  pause: prompt="Verify that a host-based intrusion detection tool is installed. Press Enter to continue"
-  when: not rhel6stig_fullauto
-  tags: [ 'cat2' , 'V-38667' , 'intrusion_detection' ]
+- name: V-38663 Medium  The system package management tool must verify permissions on all files and directories associated with the audit package
+  shell: rpm -V audit | grep '^.M'
+  register: audit_permissions
+  changed_when: audit_permissions.stdout != ''
+  failed_when: audit_permissions.stderr
+  notify: reset audit pkg perms
+  tags: [ 'cat2' , 'V-38663' , 'file_perms' , 'auditd' , 'rpm' ]
 
 
 # Look for prior versions of SNMP in use and disable them if found
@@ -239,19 +218,6 @@
   pause: prompt="Versions of SNMP prior to version 3 were found and disabled. More work must be done to fully convert to SNMPv3. Press Enter to continue"
   when: snmp_version_check.stdout is defined and snmpconf_test.stat.exists and not rhel6stig_fullauto
   tags: [ 'cat2' , 'V-38660' , 'snmp' ]
-
-
-- name: Checking permissions of audit files
-  shell: rpm -V audit | grep '^.M'
-  changed_when: false
-  register: audit_permissions
-  failed_when: audit_permissions.stderr
-  tags: [ 'cat2' , 'V-38663' , 'file_perms' , 'auditd' , 'rpm' ]
-
-- name: V-38663 Medium  The system package management tool must verify permissions on all files and directories associated with the audit package
-  command: rpm --setperms audit
-  when: audit_permissions.stdout
-  tags: [ 'cat2' , 'V-38663' , 'file_perms' , 'auditd' , 'rpm' ]
 
 
 - name: V-38446 Medium  The mail system must forward all mail for root to one or more system administrators
@@ -345,19 +311,16 @@
   shell: ls /etc/sysconfig/network-scripts/ifcfg-eth* | grep -v $(date +%Y)
   changed_when: false
   register: interface_config_files
+  when: not rhel6stig_use_dhcp
   tags: [ 'cat2' , 'V-38679' , 'network' , 'dhcp'  ]
 
 - name: V-38679 Medium  The DHCP client must be disabled if not needed
   lineinfile: "state=present dest={{ item }} regexp='^BOOTPROTO=' line='BOOTPROTO=\"static\"' backup=yes"
   with_items: interface_config_files.stdout_lines
   register: dhcp_change
-  when: interface_config_files.stdout
+  when: interface_config_files.stdout and not rhel6stig_use_dhcp
   tags: [ 'cat2' , 'V-38679' , 'network' , 'dhcp' ]
 
-- name: Changed to static IP address
-  pause: prompt="The network configuration was changed from dynamic to static. You need to set an IP address in /etc/sysconfig/network-scripts/ifcfg-eth*. Press Enter to continue"
-  when: dhcp_change.changed and not rhel6stig_fullauto
-  tags: [ 'cat2' , 'V-38679' , 'network' , 'dhcp' ]
 
 # default user and password settings
 - name: V-38475 Medium  The system must require passwords to contain a minimum of 14 characters
@@ -372,13 +335,13 @@
   lineinfile: "state=present dest=/etc/login.defs regexp='^PASS_MAX_DAYS' line='PASS_MAX_DAYS   {{ rhel6stig_pass_max_days }}' backup=yes"
   tags: [ 'cat2' , 'V-38479' , 'passwords' ]
 
-- name: V-38577 Medium  The system must use a FIPS 140-2 approved cryptographic hashing algorithm for generating account password hashes (libuser.conf)
-  lineinfile: "state=present backup=yes dest=/etc/libuser.conf regexp='crypt_style' line='crypt_style = sha512'"
-  tags: [ 'cat2' , 'V-38577' , 'passwords' ]
-
 - name: V-38576 Medium  The system must use a FIPS 140-2 approved cryptographic hashing algorithm for generating account password hashes (login.defs)
-  lineinfile: "state=present backup=yes dest=/etc/login.defs regexp='ENCRYPT_METHOD' line='ENCRYPT_METHOD SHA512 '"
+  lineinfile: "state=present backup=yes dest=/etc/login.defs regexp='^ENCRYPT_METHOD' line='ENCRYPT_METHOD SHA512'"
   tags: [ 'cat2' , 'V-38576' , 'passwords' ]
+
+- name: V-38577 Medium  The system must use a FIPS 140-2 approved cryptographic hashing algorithm for generating account password hashes (libuser.conf)
+  lineinfile: "state=present backup=yes dest=/etc/libuser.conf regexp='^crypt_style' line='crypt_style = sha512'"
+  tags: [ 'cat2' , 'V-38577' , 'passwords' ]
 
 
 # Get a list of all repo files on remote system
@@ -398,7 +361,7 @@
     - /etc/yum.conf
     - yum_repos.stdout_lines
 
-# DOD login banner for GUI environments
+# GUI logon settings
 - name: "V-38689 Medium  The Department of Defense (DoD) login banner must be displayed immediately prior to, or as part of, graphical desktop environment login prompts"
   command: "gconftool-2 --direct --config-source xml:readwrite:/etc/gconf/gconf.xml.mandatory --type string --set /apps/gdm/simple-greeter/banner_message_text '  You are accessing a U.S. Government (USG) Information System (IS) that is provided for USG-authorized use only.\n  By using this IS (which includes any device attached to this IS), you consent to the following conditions:\n\n  The USG routinely intercepts and monitors communications on this IS for purposes including, but not limited to, penetration testing, COMSEC monitoring, network operations and defense, personnel misconduct (PM), law enforcement (LE), and counterintelligence (CI) investigations.\n  At any time, the USG may inspect and seize data stored on this IS.\n  Communications using, or data stored on, this IS are not private, are subject to routine monitoring, interception, and search, and may be disclosed or used for any USG-authorized purpose.\n  This IS includes security measures (e.g., authentication and access controls) to protect USG interests -- not for your personal benefit or privacy.\n  Notwithstanding the above, using this IS does not constitute consent to PM, LE or CI investigative searching or monitoring of the content of privileged communications, or work product, related to personal representation or services by attorneys, psychotherapists, or clergy, and their assistants. Such communications and work product are private and confidential. See User Agreement for details.'"
   when: rhel6stig_xwindows_required
@@ -417,23 +380,18 @@
   tags: [ 'cat2' , 'V-38689' , 'logon_settings' , 'xwindows' , 'gui' , 'dod_logon_banner' ]
   notify: restart gdm
 
-- name: ????? Medium  Disable restart buttons on graphical logon screen
-  command: "gconftool-2 --direct --config-source xml:readwrite:/etc/gconf/gconf.xml.mandatory --type bool --set /apps/gdm/simple-greeter/disable_restart_buttons true"
-  when: rhel6stig_xwindows_required
-  tags: [ 'cat2' , '?????' , 'logon_settings' , 'xwindows' , 'gui' , 'dod_logon_banner' ]
-  notify: restart gdm
+# - name: ????? Medium  Disable restart buttons on graphical logon screen
+#   command: "gconftool-2 --direct --config-source xml:readwrite:/etc/gconf/gconf.xml.mandatory --type bool --set /apps/gdm/simple-greeter/disable_restart_buttons true"
+#   when: rhel6stig_xwindows_required
+#   tags: [ 'cat2' , '?????' , 'logon_settings' , 'xwindows' , 'gui' , 'dod_logon_banner' ]
+#   notify: restart gdm
 
-- name: ????? Medium  Disable user list on graphical logon screen
+- name: V-43150 Medium  The login user list must be disabled.
   command: "gconftool-2 --direct --config-source xml:readwrite:/etc/gconf/gconf.xml.mandatory --type bool --set /apps/gdm/simple-greeter/disable_user_list true"
   when: rhel6stig_xwindows_required
-  tags: [ 'cat2' , '?????' , 'logon_settings' , 'xwindows' , 'gui' , 'dod_logon_banner' ]
+  tags: [ 'cat2' , 'V-43150' , 'logon_settings' , 'xwindows' , 'gui' , 'dod_logon_banner' ]
   notify: restart gdm
 
-
-- name: V-38686 Medium  The system's local firewall must implement a deny-all, allow-by-exception policy for forwarded packets
-  lineinfile: "state=present backup=yes dest=/etc/sysconfig/iptables regexp=':FORWARD' line=':FORWARD DROP [0:0]'"
-  tags: [ 'cat2' , 'V-38686' , 'firewall' , 'network']
-  notify: restart iptables
 
 - name: V-38682 Medium  The Bluetooth kernel module must be disabled
   kernel_blacklist: name={{ item }}
@@ -448,7 +406,9 @@
   tags: [ 'cat2' , 'V-38489' , 'file_integrity' , 'aide' ]
   notify: init aide
 
-- name: "V-38695 Medium  A file integrity tool must be used at least weekly to check for unauthorized file changes, particularly the addition of unauthorized system libraries or binaries, or for unauthorized modification to authorized system libraries or binaries\n
+- name: "V-38670 Medium   The operating system must detect unauthorized changes to software and information.\n
+         \tV-38673 Medium  The operating system must ensure unauthorized, security-relevant configuration changes detected are tracked.\n
+         \tV-38695 Medium  A file integrity tool must be used at least weekly to check for unauthorized file changes, particularly the addition of unauthorized system libraries or binaries, or for unauthorized modification to authorized system libraries or binaries\n
          \tV-38696 Medium  The operating system must employ automated mechanisms, per organization defined frequency, to detect the addition of unauthorized components/devices into the operating system\n
          \tV-38698 Medium  The operating system must employ automated mechanisms to detect the presence of unauthorized software on organizational information systems and notify designated organizational officials in accordance with the organization defined frequency\n
          \tV-38700  Medium  The operating system must provide a near real-time alert when any of the organization defined list of compromise or potential compromise indicators occurs"
@@ -460,7 +420,7 @@
     month={{ rhel6stig_aide_cron["aide_month"] | default('*') }}
     weekday={{ rhel6stig_aide_cron["aide_weekday"] | default('*') }}
     job="{{ rhel6stig_aide_cron["aide_job"] }}"
-  tags: [ 'cat2' , 'V-38695' , 'V-38696' , 'V-38698' , 'V-38700' , 'file_integrity' , 'aide' ]
+  tags: [ 'cat2' , 'V-38670' , 'V-38673' , 'V-38695' , 'V-38696' , 'V-38698' , 'V-38700' , 'file_integrity' , 'aide' ]
 
 
 - name: "V-51875 Medium  The operating system, upon successful logon/access, must display to the user the number of unsuccessful logon/access attempts since the last successful logon/access."
@@ -594,7 +554,7 @@
   tags: [ 'cat2' , 'V-38621' , 'ntp' ]
   notify: restart ntpd
 
-- name: V-38620 Medium  The system clock must be synchronized continuously, or at least daily
+- name: V-38620 Medium  The system clock must be synchronized continuously or at least daily
   service: name=ntpd state=started enabled=yes
   tags: [ 'cat2' , 'V-38620' , 'ntp' ]
 
@@ -604,7 +564,7 @@
   register: ldap_test
   tags: [ 'cat2' , 'V-38625' ]
 
-- name: V-38625 Medium  If the system is using LDAP for authentication or account information, the system must use a TLS connection using FIPS 140-2 approved cryptographic algorithms
+- name: V-38625 Medium  If the system is using LDAP for authentication or account information the system must use a TLS connection using FIPS 140-2 approved cryptographic algorithms
   lineinfile: "state=present backup=yes dest=/etc/pam_ldap.conf regexp='^#?ssl start_tls' line='ssl start_tls'"
   when: ldap_test.stat.exists
   tags: [ 'cat2' , 'V-38625' , 'ldap' ]
@@ -619,9 +579,11 @@
   when: rhel6stig_xwindows_required
   tags: [ 'cat2' , 'V-38629' , 'gui' , 'screen_lock' ]
 
-- name: "V-38628 Medium  The operating system must produce audit records containing sufficient information to establish the identity of any user/subject associated with the event\n    V-38631 Medium  The operating system must employ automated mechanisms to facilitate the monitoring and control of remote access methods"
+- name: "V-38628 Medium  The operating system must produce audit records containing sufficient information to establish the identity of any user/subject associated with the event\n
+        \tV-38631 Medium  The operating system must employ automated mechanisms to facilitate the monitoring and control of remote access methods\n
+        \tV-38632 Medium  The operating system must produce audit records containing sufficient information to establish what type of events occurred."
   service: name=auditd state=started enabled=yes
-  tags: [ 'cat2' , 'V-38623' , 'V-38631' , 'auditd' ]
+  tags: [ 'cat2' , 'V-38628' , 'V-38631' , 'V-38632' , 'auditd' ]
 
 - name: V-38638 Medium  The graphical desktop environment must have automatic lock enabled
   command: gconftool-2 --direct --config-source xml:readwrite:/etc/gconf/gconf.xml.mandatory --type bool --set /apps/gnome-screensaver/lock_enabled true
@@ -643,6 +605,7 @@
 
 - name: V-38622 Medium  Mail relaying must be restricted
   lineinfile: "state=present backup=yes dest=/etc/postfix/main.cf regexp='^inet_interfaces' line='inet_interfaces = localhost' insertafter='^#\\s?inet_interfaces'"
+  when: not rhel6stig_is_mail_relay
   notify: restart postfix
   tags: [ 'cat2' , 'V-38622' , 'postfix' ]
 
@@ -764,9 +727,19 @@
   tags: [ 'cat2' , 'V-38555' , 'V-38560' , 'V-38512' , 'ipv4' , 'network' , 'firewall' ]
 
 - name: V-38513 Medium  The systems local IPv4 firewall must implement a deny-all allow-by-exception policy for inbound packets
-  lineinfile: "state=present backup=yes dest=/etc/sysconfig/iptables regexp=':INPUT' line=':INPUT DROP [0:0]'"
+  lineinfile: "state=present dest=/etc/sysconfig/iptables regexp=':INPUT' line=':INPUT DROP [0:0]'"
   tags: [ 'cat2' , 'V-38513' , 'ipv4' , 'firewall' , 'network']
   notify: restart iptables
+
+- name: V-38686 Medium  The system's local firewall must implement a deny-all, allow-by-exception policy for forwarded packets
+  lineinfile: "state=present dest=/etc/sysconfig/iptables regexp=':FORWARD' line=':FORWARD DROP [0:0]'"
+  tags: [ 'cat2' , 'V-38686' , 'firewall' , 'network']
+  notify: restart iptables
+
+
+- name: V-51363 Medium  The system must use a Linux Security Module configured to enforce limits on system services.
+  selinux: conf=/etc/selinux/config policy={{ rhel6stig_selinux_pol }} state=enforcing
+  tags: [ 'cat2' , 'V-51363' , 'selinux' ]
 
 # SELinux settings
 - name: V-51337 Medium  The system must use a Linux Security Module at boot time.

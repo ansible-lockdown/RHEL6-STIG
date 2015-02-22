@@ -48,3 +48,9 @@
   command: /usr/sbin/aide --init -B 'database_out=file:/var/lib/aide/aide.db.gz'
   async: 45
   poll: 0
+
+- name: reset audit pkg perms
+  command: rpm --setperms audit
+
+- name: reset audit pkg ugids
+  command: rpm --setugids audit

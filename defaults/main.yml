@@ -18,6 +18,13 @@ rhel6stig_pam_faillock_params:
 # SELinux settings
 rhel6stig_selinux_pol: targeted
 
+# Network Settings
+# WARNING!
+# Setting this to false will cause the playbook to execute tasks
+# that disable DHCP in /etc/sysconfig/network-scripts/ifcfg-eth*
+# and may leave your system in an unusable state after a reboot.
+rhel6stig_use_dhcp: true
+
 # Set this to true to omit all the pauses in the role
 rhel6stig_fullauto: false
 
@@ -42,10 +49,14 @@ rhel6stig_ipv6_in_use: false
 # and configure tftp to run securely
 rhel6stig_tftp_required: false
 
-# Set to true is system is acting as a router
+# Set to true if system is acting as a router
 # This will disable changing net.ipv4 settings as well as
 # allow the kernel to forward packets
 rhel6stig_system_is_router: false
+
+# Set to true if system is an authorized mail relay
+# This will disable the postfix settings V-38622
+rhel6stig_is_mail_relay: false
 
 # Force the grub password to be updated
 # If a password entry is found in grub.conf, the password will not be changed
@@ -61,6 +72,7 @@ rhel6stig_change_grub_password: false
 rhel6stig_bootloader_password: $6$t8wbzLbzO0qLbSP8$imtV5DYW43wF4sLhTV.xrwY4.OZnT17ZQSzN.p6P.4bTRTdW0/P9CnpdaHSgVGliP7tvzf3bLWkaTKbhRwOOo0
 
 # NTP configuration used in ntp.conf
+# These should be set to DoD authoritative time source
 rhel6stig_ntp_config_servers:
   - 0.centos.pool.ntp.org
   - 1.centos.pool.ntp.org
