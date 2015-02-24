@@ -25,8 +25,8 @@ rhel6stig_selinux_pol: targeted
 # and may leave your system in an unusable state after a reboot.
 rhel6stig_use_dhcp: true
 
-# Set this to true to omit all the pauses in the role
-rhel6stig_fullauto: false
+# Set this to false to have the role pause
+rhel6stig_fullauto: true
 
 # Set to true to install all patches and updates available via yum
 rhel6stig_update_packages: true
