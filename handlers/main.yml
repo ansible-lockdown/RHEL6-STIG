@@ -40,6 +40,7 @@
 
 - name: restart samba
   service: name=smb state=restarted
+  when: "'smb' in sysv_services.stdout"
 
 - name: restart nfs
   service: name=nfs state=restarted
