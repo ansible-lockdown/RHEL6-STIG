@@ -311,7 +311,6 @@
   shell: ls /etc/sysconfig/network-scripts/ifcfg-eth* | grep -v $(date +%Y)
   changed_when: false
   register: interface_config_files
-  when: not rhel6stig_use_dhcp
   tags: [ 'cat2' , 'V-38679' , 'network' , 'dhcp'  ]
 
 - name: V-38679 Medium  The DHCP client must be disabled if not needed
