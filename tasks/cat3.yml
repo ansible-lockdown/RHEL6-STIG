@@ -7,11 +7,17 @@
   lineinfile: state=present backup=yes dest=/etc/init.d/functions regexp="umask \d\d\d" line="umask 022"
   tags: [ 'cat3' , 'V-38642' , 'umask' ]
 
-- name: "V-38648 Low  The qpidd service must not be running\n    V-38641 Low  The atd service must be disabled\n    V-38640 Low  The Automatic Bug Reporting Tool (abrtd) service must not be running\n    V-38646 Low  The oddjobd service must not be running\n    V-38644 Low  The ntpdate service must not be running\n    V-38650 Low  The rdisc service must not be running\n    V-38437 Low  Automated file system mounting tools must not be enabled unless needed\n    V-38669 Low  The postfix service must be enabled for mail delivery\n    V-38672 Low  The netconsole service must be disabled unless required\n    V-38478 Low  The Red Hat Network Service (rhnsd) service must not be running, unless using RHN or an RHN Satellite"
+- name: "V-38648 Low  The qpidd service must not be running\n    V-38641 Low  The atd service must be disabled\n    V-38640 Low  The Automatic Bug Reporting Tool (abrtd) service must not be running\n    V-38646 Low  The oddjobd service must not be running\n    V-38644 Low  The ntpdate service must not be running\n    V-38650 Low  The rdisc service must not be running\n    V-38437 Low  Automated file system mounting tools must not be enabled unless needed\n    V-38669 Low  The postfix service must be enabled for mail delivery\n    V-38672 Low  The netconsole service must be disabled unless required"
   service: name={{ item.name }} state={{ item.state }} enabled={{ item.enabled }}
-  when: "'{{ item.name }}' in sysv_services.stdout_lines"
+  when: "'{{ item.name }}' in sysv_services.stdout_lines and '{{ item.name }}' != 'rhnsd'"
   with_items: rhel6stig_cat3_services
   tags: [ 'cat3' , 'V-38640' , 'abrtd', 'V-38648' , 'qpidd' , 'V-38641' , 'atd' , 'V-38646' , 'oddjobd' , 'V-38644' , 'ntpdate' , 'V-38650' , 'rdisc' , 'V-38437' , 'autofs' , 'V-38669' , 'postfix' , 'V-38672' , 'netconsole' , 'V-38478' , 'rhnsd' ]
+
+- name: V-38478 Low  The Red Hat Network Service (rhnsd) service must not be running, unless using RHN or an RHN Satellite
+  shell: "chkconfig rhnsd off && service rhnsd stop"
+  register: result
+  failed_when: result.rc != 0 and result.rc != 6
+  tags: [ 'cat3' , 'V-38478' , 'rhnsd' ]
 
 - name: V-38647 Low  The system default umask in /etc/profile must be 077
   replace: backup=yes dest={{ item }} regexp="umask \d\d\d" replace="umask 077"
@@ -52,11 +58,11 @@
   failed_when: rpm_file_permissions_check.stderr
   tags: [ 'cat3' , 'V-38452' , 'rpm' ]
 
-- name: V-38452 Low  The system package management tool must verify permissions on all files and directories associated with packages
-  shell: rpm --setperms $(rpm -qf {{ item }})
-  when: rpm_file_permissions_check.stdout
-  with_items: rpm_file_permissions_check.stdout_lines
-  tags: [ 'cat3' , 'V-38452' , 'rpm' ]
+# - name: V-38452 Low  The system package management tool must verify permissions on all files and directories associated with packages
+#   shell: rpm --setperms $(rpm -qf {{ item }})
+#   when: rpm_file_permissions_check.stdout
+#   with_items: rpm_file_permissions_check.stdout_lines
+#   tags: [ 'cat3' , 'V-38452' , 'rpm' ]
 
 
 - name: Check group-ownership on all files and directories associated with packages
@@ -66,11 +72,11 @@
   failed_when: rpm_group_ownership_check.stderr
   tags: [ 'cat3' , 'V-38453' , 'rpm' ]
 
-- name: V-38453 Low  The system package management tool must verify group-ownership on all files and directories associated with packages
-  shell: rpm --setugids $(rpm -qf {{ item }})
-  when: rpm_group_ownership_check.stdout
-  with_items: rpm_group_ownership_check.stdout_lines
-  tags: [ 'cat3' , 'V-38453' , 'rpm' ]
+# - name: V-38453 Low  The system package management tool must verify group-ownership on all files and directories associated with packages
+#   shell: rpm --setugids $(rpm -qf {{ item }})
+#   when: rpm_group_ownership_check.stdout
+#   with_items: rpm_group_ownership_check.stdout_lines
+#   tags: [ 'cat3' , 'V-38453' , 'rpm' ]
 
 
 - name: V-38608 Low  The SSH daemon must set a timeout interval on idle sessions
@@ -86,11 +92,11 @@
   failed_when: rpm_integrity_check.stderr
   tags: [ 'cat3' , 'V-38447' , 'rpm' ]
 
-- name: V-38447 Low  The system package management tool must verify contents of all files associated with packages
-  shell: yum reinstall -y $(rpm -qf {{ item }})
-  when: rpm_integrity_check.stdout
-  with_items: rpm_integrity_check.stdout_lines
-  tags: [ 'cat3' , 'V-38447' , 'rpm' ]
+# - name: V-38447 Low  The system package management tool must verify contents of all files associated with packages
+#   shell: yum reinstall -y $(rpm -qf {{ item }})
+#   when: rpm_integrity_check.stdout
+#   with_items: rpm_integrity_check.stdout_lines
+#   tags: [ 'cat3' , 'V-38447' , 'rpm' ]
 
 
 # - name: V-38659 Low  The operating system must employ cryptographic mechanisms to protect information in storage
@@ -168,11 +174,11 @@
   failed_when: rpm_file_ownership_check.stderr
   tags: [ 'cat3' , 'V-38454' , 'rpm' ]
 
-- name: V-38454 Low  The system package management tool must verify ownership on all files and directories associated with packages
-  shell: rpm --setugids $(rpm -qf {{ item }})
-  when: rpm_file_ownership_check.stdout
-  with_items: rpm_file_ownership_check.stdout_lines
-  tags: [ 'cat3' , 'V-38454' , 'rpm' ]
+# - name: V-38454 Low  The system package management tool must verify ownership on all files and directories associated with packages
+#   shell: rpm --setugids $(rpm -qf {{ item }})
+#   when: rpm_file_ownership_check.stdout
+#   with_items: rpm_file_ownership_check.stdout_lines
+#   tags: [ 'cat3' , 'V-38454' , 'rpm' ]
 
 - name: V-38687 Low  The system must provide VPN connectivity for communications over untrusted networks
   yum: name=openswan state=present
