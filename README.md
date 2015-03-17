@@ -7,6 +7,12 @@ This role **will make changes to the system** that could break things. This is n
 
 The role tries to be helpful and pause to let you know it found something. You can disable this behaviour if you want to run it unattended by setting `rhel6stig_fullauto` to `true`.
 
+## IMPORANT INSTALL STEP
+
+If you want to install this via the `ansible-galaxy` command you'll need to run it like this: 
+
+`ansible-galaxy install -p roles nousdefions.STIG-RHEL6,devel`
+
 Based on [Red Hat Enterprise Linux 6 STIG Version 1 Release 6 - 2015-01-23](http://iase.disa.mil/stigs/os/unix-linux/Pages/index.aspx).
 
 Inspiration and some config files taken from [RedHatGov](https://github.com/RedHatGov) [stig-fix-el6](https://github.com/RedHatGov/stig-fix-el6).
