@@ -7,7 +7,7 @@ This role **will make changes to the system** that could break things. This is n
 
 The role tries to be helpful and pause to let you know it found something. You can disable this behaviour if you want to run it unattended by setting `rhel6stig_fullauto` to `true`.
 
-## IMPORANT INSTALL STEP
+## IMPORTANT INSTALL STEP
 
 If you want to install this via the `ansible-galaxy` command you'll need to run it like this: 
 
