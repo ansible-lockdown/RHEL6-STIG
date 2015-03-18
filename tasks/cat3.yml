@@ -14,9 +14,7 @@
   tags: [ 'cat3' , 'V-38640' , 'abrtd', 'V-38648' , 'qpidd' , 'V-38641' , 'atd' , 'V-38646' , 'oddjobd' , 'V-38644' , 'ntpdate' , 'V-38650' , 'rdisc' , 'V-38437' , 'autofs' , 'V-38669' , 'postfix' , 'V-38672' , 'netconsole' , 'V-38478' , 'rhnsd' ]
 
 - name: V-38478 Low  The Red Hat Network Service (rhnsd) service must not be running, unless using RHN or an RHN Satellite
-  shell: "chkconfig rhnsd off && service rhnsd stop"
-  register: result
-  failed_when: result.rc != 0 and result.rc != 6
+  service: name=rhnsd state=stopped enabled=false
   tags: [ 'cat3' , 'V-38478' , 'rhnsd' ]
 
 - name: V-38647 Low  The system default umask in /etc/profile must be 077
@@ -246,6 +244,6 @@
   tags: [ 'cat3' , 'V-38533' , 'tcp_timestamps' , 'kerner_parameters' , 'network' ]
 
 - name: Use strong MAC algorithms
-  lineinfile: "state=present backup=yes dest=/etc/ssh/sshd_config line='MACS    hmac-sha1,umac-64@openssh.com,hmac-ripemd160,hmac-sha2-256,hmac-sha2-512'"
+  lineinfile: "state=present backup=yes dest=/etc/ssh/sshd_config regexp='^#?MACS' line='MACS    hmac-sha1,umac-64@openssh.com,hmac-ripemd160,hmac-sha2-256,hmac-sha2-512'"
   tags: [ 'cat3' , 'ssh' , 'config' ]
   notify: restart ssh
