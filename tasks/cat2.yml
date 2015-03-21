@@ -440,8 +440,8 @@
     line="{{ rhel6stig_pam_faillock_params[0] }}"
     follow=yes owner=root group=root mode=0644
   with_items:
-    - ./system-auth
-    - ./password-auth
+    - /etc/pam.d/system-auth
+    - /etc/pam.d/password-auth
   tags: [ 'cat2' , 'V-38573' , 'V-38492' , 'V-38501', 'passwords' , 'failed_logins' ]
 
 - name: "V-38573 Medium  The system must disable accounts after three consecutive unsuccessful login attempts\n
@@ -454,8 +454,8 @@
     line="{{ rhel6stig_pam_faillock_params[1] }}"
     follow=yes owner=root group=root mode=0644
   with_items:
-    - ./system-auth
-    - ./password-auth
+    - /etc/pam.d/system-auth
+    - /etc/pam.d/password-auth
   tags: [ 'cat2' , 'V-38573' , 'V-38492' , 'V-38501', 'passwords' , 'failed_logins' ]
 
 
