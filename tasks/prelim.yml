@@ -27,13 +27,6 @@
   always_run: yes
   tags: [ 'cat1' , 'cat2' , 'cat3' ]
 
-- name: PRELIM | List /etc/shadow for account lock status
-  shell: "grep -Ev '/home|root' /etc/shadow | cut -d : -f 1,2"
-  register: shadow_out
-  changed_when: false
-  always_run: yes
-  tags: ['cat1', 'cat2', 'cat3']
-
 - name: PRELIM | List system accounts
   shell: "grep -Ev '/home|root' /etc/passwd | cut -d : -f 1"
   register: system_users
