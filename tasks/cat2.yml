@@ -282,8 +282,11 @@
 
 
 - name: "V-38496 Medium  Default system accounts, other than root, must be locked"
-  command: passwd -l {{ item }}
-  with_items: system_users.stdout_lines
+  command: passwd -l {{ item.0 }}
+  when: "item.0 in item.1 and '!!' not in item.1"
+  with_nested:
+      - system_users.stdout_lines
+      - shadow_out.stdout_lines
   tags: [ 'cat2' , 'V-38496' , 'accounts' ]
 
 # - name: V-38673 Medium  The operating system must ensure unauthorized, security-relevant configuration changes detected are tracked
@@ -685,9 +688,9 @@
 
 
 # /etc/ssh/sshd_config settings
-- name: "V-38617 Medium  The SSH daemon must be configured to use only FIPS 140-2 approved ciphers\n    
-        \tV-38611 Medium  The SSH daemon must ignore .rhosts files\n       
-        \tV-38612 Medium  The SSH daemon must not allow host-based authentication\n       
+- name: "V-38617 Medium  The SSH daemon must be configured to use only FIPS 140-2 approved ciphers\n
+        \tV-38611 Medium  The SSH daemon must ignore .rhosts files\n
+        \tV-38612 Medium  The SSH daemon must not allow host-based authentication\n
         \tV-38613 Medium  The system must not permit root logins using remote access programs such as ssh"
   lineinfile: >
     state={{ item.st }}
