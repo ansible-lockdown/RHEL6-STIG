@@ -13,9 +13,15 @@
   with_items: rhel6stig_cat3_services
   tags: [ 'cat3' , 'V-38640' , 'abrtd', 'V-38648' , 'qpidd' , 'V-38641' , 'atd' , 'V-38646' , 'oddjobd' , 'V-38644' , 'ntpdate' , 'V-38650' , 'rdisc' , 'V-38437' , 'autofs' , 'V-38669' , 'postfix' , 'V-38672' , 'netconsole' , 'V-38478' , 'rhnsd' ]
 
+- name: V-38478 Low check if rhnsd exists
+  stat: path='/etc/init.d/rhnsd'
+  register: rhnsd_check
+  tags: [ 'cat3' , 'V-38478' , 'rhnsd' ]
+
 - name: V-38478 Low  The Red Hat Network Service (rhnsd) service must not be running, unless using RHN or an RHN Satellite
   shell: "chkconfig rhnsd off && service rhnsd stop"
   register: result
+  when: rhnsd_check.stat.exists
   failed_when: result.rc != 0 and result.rc != 6
   tags: [ 'cat3' , 'V-38478' , 'rhnsd' ]
 
