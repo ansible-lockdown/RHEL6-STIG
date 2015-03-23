@@ -246,6 +246,6 @@
   tags: [ 'cat3' , 'V-38533' , 'tcp_timestamps' , 'kerner_parameters' , 'network' ]
 
 - name: Use strong MAC algorithms
-  lineinfile: "state=present backup=yes dest=/etc/ssh/sshd_config line='MACS    hmac-sha1,umac-64@openssh.com,hmac-ripemd160,hmac-sha2-256,hmac-sha2-512'"
+  lineinfile: "state=present backup=yes dest=/etc/ssh/sshd_config regexp='^#?MACS' line='MACS    hmac-sha1,umac-64@openssh.com,hmac-ripemd160,hmac-sha2-256,hmac-sha2-512'"
   tags: [ 'cat3' , 'ssh' , 'config' ]
   notify: restart ssh
