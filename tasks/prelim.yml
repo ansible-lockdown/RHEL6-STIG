@@ -97,3 +97,8 @@
   failed_when: false
   when: rhel6stig_cat3
   tags: [ 'selinux' ]
+
+- name: Check for samba
+  stat: path=/etc/samba/smb.conf
+  register: samba_check
+  tags: [ 'cat3' , 'V-38656' , 'smb' ]

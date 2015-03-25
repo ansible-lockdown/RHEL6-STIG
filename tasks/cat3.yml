@@ -113,6 +113,7 @@
 
 - name: V-38656 Low  The system must use SMB client signing for connecting to samba servers using smbclient
   lineinfile: "state=present backup=yes dest=/etc/samba/smb.conf regexp='client signing' line='client signing = mandatory' insertafter='\\[global\\]'"
+  when: samba_check.stat.exists
   tags: [ 'cat3' , 'V-38656' , 'smb' ]
   notify: restart samba
 
