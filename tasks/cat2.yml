@@ -133,16 +133,13 @@
   when: nfs_mounts_missing_nosuid.stdout and not rhel6stig_fullauto
   tags: [ 'cat2' , 'V-38652' , 'nfs' ]
 
-
 - name: V-38490 Medium  The operating system must enforce requirements for the connection of mobile devices to operating systems
-  kernel_blacklist: name=usb-storage
-  notify: unload usb-storage
+  copy: backup=no src=disable-usb.conf dest=/etc/modprobe.d/disable-usb.conf owner=root group=root mode=0644
   tags: [ 'cat2' , 'V-38490' , 'mobile_devices' , 'usb_devices' , 'kernel_modules' ]
 
 - name: "V-38449 Medium  The /etc/gshadow file must have mode 0000\n    V-38443 V-38448 Medium  The /etc/gshadow file must be owned and group-owned by root"
   file: path=/etc/gshadow owner=root group=root mode=0000
   tags: [ 'cat2' , 'V-38443' , 'V-38448' , 'V-38449' , 'file_perms' ]
-
 
 - name: Checking for remote log servers
   shell: grep -Er '(^[^#]?\*\.\*\s+@{1,2})|(\*\.\*\s+omrelp)' /etc/rsyslog.conf /etc/rsyslog.d/
@@ -485,11 +482,11 @@
 - name: "V-38517 Medium  The Transparent Inter-Process Communication (TIPC) protocol must be disabled unless required
          V-38515 Medium  The Stream Control Transmission Protocol (SCTP) must be disabled unless required\n
          V-38514 Medium  The Datagram Congestion Control Protocol (DCCP) must be disabled unless required"
-  kernel_blacklist: name={{ item }}
+  copy: backup=no src={{ item }} dest=/etc/modprobe.d/{{ item }} owner=root group=root mode=0644
   with_items:
-    - tipc
-    - sctp
-    - dccp
+    - disable-tipc.conf
+    - disable-sctp.conf
+    - disable-dccp.conf
   tags: [ 'cat2' , 'V-38517' , 'V-38515' , 'V-38514' , 'tipc' , 'sctp' , 'dccp' , 'kernel_modules' ]
 
 - name: V-38691 Medium  The Bluetooth service must be disabled
