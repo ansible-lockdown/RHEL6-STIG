@@ -78,8 +78,8 @@
     - { rx: "'^(password\\s+requisite\\s+pam_cracklib.so\\s)(.*)$'", ln: "\\1{{rhel6stig_pam_cracklib_params}}", dest: '/etc/pam.d/password-auth' }
     - { rx: "'^(password\\s+sufficient\\s+pam_unix.so\\s)(.*)$'", ln: "\\1{{rhel6stig_pam_unix_params}}", dest: '/etc/pam.d/system-auth' }
     - { rx: "'^(password\\s+sufficient\\s+pam_unix.so\\s)(.*)$'", ln: "\\1{{rhel6stig_pam_unix_params}}", dest: '/etc/pam.d/password-auth' }
-    - { rx: "'^(auth\\s+sufficient\\s+pam_unix.so)(?:\\snullok)(.*?)$'", ln: "\\1\\2", dest: '/etc/pam.d/password-auth' }
-    - { rx: "'^(auth\\s+sufficient\\s+pam_unix.so)(?:\\snullok)(.*?)$'", ln: "\\1\\2", dest: '/etc/pam.d/system-auth' }
+    - { rx: "'^(auth\\s+sufficient\\s+pam_unix.so)(.*)$'", ln: "auth        sufficient    {{rhel6stig_pam_auth_sufficient}}", dest: '/etc/pam.d/system-auth' }
+    - { rx: "'^(auth\\s+sufficient\\s+pam_unix.so)(.*)$'", ln: "auth        sufficient    {{rhel6stig_pam_auth_sufficient}}", dest: '/etc/pam.d/password-auth' }
   tags: [ 'cat1' , 'cat2' , 'V-38497' , 'V-38658' , 'V-38574' , 'V-38482' , 'V-38571' , 'V-38572' , 'passwords' , 'accounts' ]
 
 - name: V-38677 High  The NFS server must not have the insecure file locking option enabled

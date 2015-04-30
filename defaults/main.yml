@@ -10,6 +10,7 @@ rhel6stig_pass_min_length: 14
 rhel6stig_pass_min_days: 1
 rhel6stig_pass_max_days: 60
 rhel6stig_pam_unix_params: sha512 shadow try_first_pass use_authtok remember=24
+rhel6stig_pam_auth_sufficient: pam_unix.so try_first_pass
 rhel6stig_pam_cracklib_params: try_first_pass retry=3 maxrepeat=3 minlen=14 dcredit=-1 ucredit=-1 ocredit=-1 lcredit=-1 difok=4
 rhel6stig_pam_faillock_params:
   - 'auth        [default=die] pam_faillock.so authfail deny=3 unlock_time=604800 fail_interval=900'
