@@ -310,7 +310,7 @@
   tags: [ 'cat2' , 'V-38679' , 'network' , 'dhcp'  ]
 
 - name: V-38679 Medium  The DHCP client must be disabled if not needed
-  lineinfile: "state=present dest={{ item }} regexp='^BOOTPROTO=' line='BOOTPROTO=\"none\"' backup=yes"
+  lineinfile: "state=present dest={{ item }} regexp='^BOOTPROTO=' line='BOOTPROTO=\"none\"' backup=no"
   with_items: interface_config_files.stdout_lines
   register: dhcp_change
   when: interface_config_files.stdout and not rhel6stig_use_dhcp
