@@ -239,8 +239,19 @@
   when: missing_group_check.stdout_lines and not rhel6stig_fullauto
   tags: [ 'cat3' , 'V-38681' , 'accounts' ]
 
+- name: "V-38516 Low  The Reliable Datagram Sockets (RDS) protocol must be disabled unless required"
+  copy: backup=no src={{ item }} dest=/etc/modprobe.d/{{ item }} owner=root group=root mode=0644
+  with_items:
+    - disable-rds.conf
+  tags: [ 'cat3' , 'V-38516' , 'rds' , 'kernel_modules' ]
 
+- name: V-38535 Low  The system must not respond to ICMPv4 sent to a broadcast address
+  sysctl: name=net.ipv4.icmp_echo_ignore_broadcasts value=1 state=present reload=yes ignoreerrors=yes
+  tags: [ 'cat3' , 'V-38535' , 'kernel_parameters' , 'network' ]
 
+- name: V-38537 Low  The system must ignore ICMPv4 bogus error responses
+  sysctl: name=net.ipv4.icmp_ignore_bogus_error_responses value=1 state=present reload=yes ignoreerrors=yes
+  tags: [ 'cat3' , 'V-38537' , 'kernel_parameters' , 'network' ]
 
 # --- BREAK --- #
 

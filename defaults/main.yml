@@ -46,7 +46,7 @@ rhel6stig_xwindows_required: false
 rhel6stig_ipv6_in_use: false
 
 # Whether or not TFTP is required
-# This will prevent the removal of tftp and tftp-server packges
+# This will prevent the removal of tftp and tftp-server packages
 # and configure tftp to run securely
 rhel6stig_tftp_required: false
 
