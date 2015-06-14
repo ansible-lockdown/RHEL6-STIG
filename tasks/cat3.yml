@@ -245,7 +245,13 @@
     - disable-rds.conf
   tags: [ 'cat3' , 'V-38516' , 'rds' , 'kernel_modules' ]
 
+- name: V-38535 Low  The system must not respond to ICMPv4 sent to a broadcast address
+  sysctl: name=net.ipv4.icmp_echo_ignore_broadcasts value=1 state=present reload=yes ignoreerrors=yes
+  tags: [ 'cat3' , 'V-38535' , 'kernel_parameters' , 'network' ]
 
+- name: V-38537 Low  The system must ignore ICMPv4 bogus error responses
+  sysctl: name=net.ipv4.icmp_ignore_bogus_error_responses value=1 state=present reload=yes ignoreerrors=yes
+  tags: [ 'cat3' , 'V-38537' , 'kernel_parameters' , 'network' ]
 
 # --- BREAK --- #
 
