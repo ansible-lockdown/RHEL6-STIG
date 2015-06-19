@@ -279,7 +279,7 @@
 
 - name: "V-38496 Medium  Default system accounts, other than root, must be locked"
   command: passwd -l {{ item }}
-  with_items: unlocked_accounts.stdout_lines
+  with_items: unlocked_sys_accounts.stdout_lines
   tags: [ 'cat2' , 'V-38496' , 'accounts' ]
 
 # - name: V-38673 Medium  The operating system must ensure unauthorized, security-relevant configuration changes detected are tracked
