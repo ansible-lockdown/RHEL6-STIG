@@ -253,6 +253,10 @@
   sysctl: name=net.ipv4.icmp_ignore_bogus_error_responses value=1 state=present reload=yes ignoreerrors=yes
   tags: [ 'cat3' , 'V-38537' , 'kernel_parameters' , 'network' ]
 
+- name: V-38590 Low The system must allow locking of the console screen in text mode
+  yum: name=screen state=latest
+  tags: [ 'cat3' , 'V-38590' , 'screen' ]
+
 # --- BREAK --- #
 
 - name: V-38533 Low  The system must ignore IPv4 ICMP redirect messages.
