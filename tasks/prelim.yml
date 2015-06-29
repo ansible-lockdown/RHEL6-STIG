@@ -35,6 +35,14 @@
   always_run: yes
   tags: [ 'cat1' , 'cat2' , 'cat3' ]
 
+- name: PRELIM | Identify Unlocked Sys Accounts
+  shell: >
+   awk -F: '$1 !~ /^root$/ && $2 !~ /^[!*]/ {print $1}' /etc/shadow | xargs -I{} grep {} /etc/passwd | awk -F: '$3 < 500 {print $1}'
+  register: unlocked_sys_accounts
+  changed_when: false
+  always_run: yes
+  tags: [ 'cat1' , 'cat2' , 'cat3' ]
+
 - name: PRELIM | List system accounts
   shell: "grep -Ev '/home|root' /etc/passwd | cut -d : -f 1"
   register: system_users
