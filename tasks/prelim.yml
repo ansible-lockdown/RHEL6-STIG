@@ -1,23 +1,40 @@
 ---
 # Prelimi|ary tasks that should always be run
-- name: PRELIM | Check for /etc/snmp/snmpd.conf
-  stat: path=/etc/snmp/snmpd.conf
+- name: | PRELIM | Check for /etc/snmp/snmpd.conf
+  stat:
+      path: /etc/snmp/snmpd.conf
   register: snmpconf_test
   always_run: yes
-  tags: [ 'cat1' , 'cat2' , 'cat3' , 'V-38653' , 'snmp' ]
+  tags:
+    - cat1
+    - cat2
+    - V-38653
+    - snmp
+    - audit
+    - patch
 
 # Setup variables based on operating system
-- name: PRELIM | Set gpg_key_url for CentOS
-  set_fact: gpg_key_url=http://mirror.centos.org/centos/RPM-GPG-KEY-{{ ansible_distribution }}-{{ ansible_distribution_major_version }}
+- name: | PRELIM | Set gpg_key_url for CentOS
+  set_fact:
+      gpg_key_url: http://mirror.centos.org/centos/RPM-GPG-KEY-{{ ansible_distribution }}-{{ ansible_distribution_major_version }}
   when: "ansible_distribution == 'CentOS'"
   always_run: yes
-  tags: [ 'cat1' , 'cat2' , 'cat3' ]
+  tags:
+    - cat1
+    - V-38476
+    - audit
+    - patch
 
-- name: PRELIM | Set gpg_key_url for Red Hat 6
-  set_fact: gpg_key_url=https://www.redhat.com/security/fd431d51.txt
+- name: | PRELIM | Set gpg_key_url for Red Hat 6
+  set_fact:
+      gpg_key_url: https://www.redhat.com/security/fd431d51.txt
   when: "ansible_distribution == 'RedHat'"
   always_run: yes
-  tags: [ 'cat1' , 'cat2' , 'cat3' ]
+  tags:
+    - cat1
+    - V-38476
+    - audit
+    - patch
 
 # List users in order to look files inside each home directory
 - name: PRELIM | List users accounts
@@ -25,7 +42,9 @@
   register: users
   changed_when: false
   always_run: yes
-  tags: [ 'cat1' , 'cat2' , 'cat3' ]
+  tags:
+   - cat1
+   - cat2
 
 - name: PRELIM | Identify Unlocked Accounts
   shell: >

@@ -1,0 +1,53 @@
+# CAT I
+
+# CAT I
+
+# CAT III
+- name: V-38455 Low. The system must use a separate file system for /tmp. 
+  shell: mount | grep "on /tmp "
+  register: tmp_mounted
+  always_run: yes
+  tags: [ 'cat3', 'V-38455', 'partitions' ]
+  ignore_errors: yes
+
+- name: V-38455 Low  The system must use a separate file system for /tmp.
+  assert:
+      that: tmp_mounted.rc == 0
+  when: tmp_mounted is defined
+  tags: [ 'cat3', 'V-38455', 'partitions' ]
+
+- name: V-38456 Low  The system must use a separate file system for /var.
+  shell: mount | grep "on /var "
+  register: var_mounted
+  always_run: yes
+  tags: [ 'cat3', 'V-38456', 'partitions' ]
+
+- name: V-38456 Low  The system must use a separate file system for /var.
+  assert:
+      that: var_mounted.rc == 0
+  when: var_mounted is defined
+  tags: [ 'cat3', 'V-38456', 'partitions' ]
+
+- name: V-38463 Low  The system must use a separate file system for /var/log
+  shell: mount | grep "on /var/log "
+  register: varlog_mounted
+  always_run: yes
+  tags: [ 'cat3', 'V-38463', 'partitions' ]
+
+- name: V-38463 Low  The system must use a separate file system for /var/log.
+  assert:
+      that: varlog_mounted.rc == 0
+  when: var_mounted is defined
+  tags: [ 'cat3', 'V-38463', 'partitions' ]
+
+- name: V-38467 Low  The system must use a separate file system for /var/log/audit
+  shell: mount | grep "on /var/log/audit "
+  register: varlogaudit_mounted
+  always_run: yes
+  tags: [ 'cat3', 'V-38467', 'partitions' ]
+
+- name: V-38467 Low  The system must use a separate file system for /var/log/audit
+  assert:
+      that: varlogaudit_mounted.rc == 0
+  when: varlogaudit_mounted is defined
+  tags: [ 'cat3', 'V-38457', 'partitions' ]

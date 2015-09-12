@@ -1,4 +1,7 @@
 ---
+# Generate an audit report
+make_audit_report: false
+
 # Enable or disable remediation for each category
 rhel6stig_cat1: true
 rhel6stig_cat2: false
@@ -168,8 +171,8 @@ rhel6stig_auditd_config:
   # NOTE: SINGLE user mode setting will break cloud systems.
   admin_space_left_action: HALT
   # auditd_failure_flag
-  # 2    Tells your system to perform an immediate shutdown without 
-  #      flushing any pending data to disk when the limits of your 
+  # 2    Tells your system to perform an immediate shutdown without
+  #      flushing any pending data to disk when the limits of your
   #      audit system are exceeded. Because this shutdown is not a clean shutdown.
   #      restrict the use of -f 2 to only the most security conscious environments
   # 1    System continues to run, issues a warning and audit stops.
@@ -183,4 +186,4 @@ rhel6stig_aide_cron:
   aide_hour: 05
   aide_day: '*'
   aide_month: '*'
-  aide_weekday: '*' 
+  aide_weekday: '*'
