@@ -454,6 +454,33 @@
     - /etc/pam.d/password-auth
   tags: [ 'cat2' , 'V-38573' , 'V-38492' , 'V-38501', 'passwords' , 'failed_logins' ]
 
+- name: "V-38573 Medium  The system must disable accounts after three consecutive unsuccessful login attempts\n
+        \tV-38592 Medium  The system must require administrator action to unlock an account locked by excessive failed login attempts\n
+        \tV-38501 Medium  The system must disable accounts after excessive login failures within a 15-minute interval"
+  lineinfile: >
+    dest={{ item }}
+    insertbefore='^auth\s+sufficient\s+pam_unix.so.*$'
+    regexp='^auth\s+sufficient\s+pam_unix.so.*$'
+    line="{{ rhel6stig_pam_faillock_params[2] }}"
+    follow=yes owner=root group=root mode=0644
+  with_items:
+    - /etc/pam.d/system-auth
+    - /etc/pam.d/password-auth
+  tags: [ 'cat2' , 'V-38573' , 'V-38492' , 'V-38501', 'passwords' , 'failed_logins' ]
+
+- name: "V-38573 Medium  The system must disable accounts after three consecutive unsuccessful login attempts\n
+        \tV-38592 Medium  The system must require administrator action to unlock an account locked by excessive failed login attempts\n
+        \tV-38501 Medium  The system must disable accounts after excessive login failures within a 15-minute interval"
+  lineinfile: >
+    dest={{ item }}
+    insertbefore='^account\s+required\s+pam_unix.so\s.*$'
+    regexp="^account\s+required\s+pam_unix.so.*$"
+    line="account required pam_faillock.so"
+    follow=yes owner=root group=root mode=0644
+  with_items:
+    - /etc/pam.d/system-auth
+    - /etc/pam.d/password-auth
+  tags: [ 'cat2' , 'V-38573' , 'V-38492' , 'V-38501', 'passwords' , 'failed_logins' ]
 
 - name: List all log files in /etc/rsyslog.conf
   shell: "grep /var/log/ /etc/rsyslog.conf | awk '{print $2}' | sed 's/-//'"

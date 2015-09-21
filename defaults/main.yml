@@ -15,6 +15,7 @@ rhel6stig_pam_cracklib_params: try_first_pass retry=3 maxrepeat=3 minlen=14 dcre
 rhel6stig_pam_faillock_params:
   - 'auth        [default=die] pam_faillock.so authfail deny=3 unlock_time=604800 fail_interval=900'
   - 'auth        required      pam_faillock.so authsucc deny=3 unlock_time=604800 fail_interval=900'
+  - 'auth        required      pam_faillock.so preauth silent deny=3 unlock_time=604800 fail_interval=900'
 
 # SELinux settings
 rhel6stig_selinux_pol: targeted
@@ -168,8 +169,8 @@ rhel6stig_auditd_config:
   # NOTE: SINGLE user mode setting will break cloud systems.
   admin_space_left_action: HALT
   # auditd_failure_flag
-  # 2    Tells your system to perform an immediate shutdown without 
-  #      flushing any pending data to disk when the limits of your 
+  # 2    Tells your system to perform an immediate shutdown without
+  #      flushing any pending data to disk when the limits of your
   #      audit system are exceeded. Because this shutdown is not a clean shutdown.
   #      restrict the use of -f 2 to only the most security conscious environments
   # 1    System continues to run, issues a warning and audit stops.
@@ -183,4 +184,4 @@ rhel6stig_aide_cron:
   aide_hour: 05
   aide_day: '*'
   aide_month: '*'
-  aide_weekday: '*' 
+  aide_weekday: '*'
