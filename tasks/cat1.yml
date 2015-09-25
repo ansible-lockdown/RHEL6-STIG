@@ -1,18 +1,50 @@
 ---
 # CAT I Findings
+- name: "| HIGH | V-38462 | AUDIT |\n
+        The RPM package management tool must cryptographically verify the authenticity of all software packages during installation."
+  command: grep nosignature /etc/rpmrc /usr/lib/rpm/rpmrc /usr/lib/rpm/redhat/rpmrc ~root/.rpmrc 
+  register: rpm_sig_audit
+  always_run: yes
+  changed_when: no
+  ignore_errors: yes
+  tags:
+      - cat1
+      - high
+      - V-38462
+      - rpm
+      - audit
+      - packages
+
+- name: "| HIGH | V-38462 | AUDIT |\n
+        The RPM package management tool must cryptographically verify the authenticity of all software packages during installation."
+  lineinfile: 
+      state: absent 
+      dest: "{{ item }}"
+      regexp: nosignature
+  with_items:
+      - /etc/rpmrc
+      - /usr/lib/rpm/rpmrc
+      - /usr/lib/rpm/redhat/rpmrc
+      - ~root/.rpmrc
+  tags:
+      - cat1
+      - V-38462
+      - rpm
+      - packages
+      - patch
 
 - name: "| HIGH | V-38476 | AUDIT |\n
         Vendor-provided cryptographic certificates must be installed to verify the integrity of system software."
-  shell: rpm -q gpg-pubkey
+  command: rpm -q gpg-pubkey
   register: rpm_key_audit
   always_run: yes
   changed_when: no
   tags:
-    - cat1
-    - high
-    - V-38476
-    - rpm
-    - audit
+      - cat1
+      - high
+      - V-38476
+      - rpm
+      - audit
 
 - name: "| HIGH | V-38476 | PATCH |\n
         Vendor-provided cryptographic certificates must be installed to verify the integrity of system software."
@@ -20,11 +52,11 @@
       state: present
       key: "{{ gpg_key_url }}"
   tags:
-    - cat1
-    - high
-    - V-38476
-    - rpm
-    - patch
+      - cat1
+      - high
+      - V-38476
+      - rpm
+      - patch
 
 - name: "| HIGH | V-38491 | AUDIT |\n
         There must be no hosts.equiv on the system"
@@ -33,11 +65,23 @@
   register: hosts_equiv_audit
   always_run: yes
   tags:
-    - cat1
-    - high
-    - V-38491
-    - hosts_equiv
-    - audit
+      - cat1
+      - high
+      - V-38491
+      - hosts_equiv
+      - audit
+
+- name: "| HIGH | V-38491 | PATCH |\n
+        There must be no hosts.equiv on the system"
+  file:
+      state: absent
+      dest: /etc/hosts.equiv
+  tags:
+      - cat1
+      - high
+      - V-38491
+      - hosts_equiv
+      - patch
 
 - name: "| HIGH | V-38491 | AUDIT |\n
         There must be no .rhosts files on the system"
@@ -47,23 +91,11 @@
   always_run: yes
   with_items: users.stdout_lines
   tags:
-    - cat1
-    - high
-    - V-38491
-    - hosts_equiv
-    - audit
-
-- name: "| HIGH | V-38491 | PATCH |\n
-        There must be no hosts.equiv on the system"
-  file:
-      state: absent
-      dest: /etc/hosts.equiv
-  tags:
-    - cat1
-    - high
-    - V-38491
-    - hosts_equiv
-    - patch
+      - cat1
+      - high
+      - V-38491
+      - hosts_equiv
+      - audit
 
 - name: "| HIGH | V-38491 | PATCH |\n
         There must be no .rhosts files on the system"
@@ -72,23 +104,25 @@
     dest: ~{{ item }}/.rhosts
   with_items: users.stdout_lines
   tags:
-    - cat1
-    - high
-    - V-38491
-    - rhosts
-    - patch
+      - cat1
+      - high
+      - V-38491
+      - rhosts
+      - patch
 
 - name: "| HIGH | V-38497 | AUDIT |\n
         The system must not have accounts configured with blank or null passwords"
-  shell: grep nullok /etc/pam.d/system-auth
+  command: grep nullok /etc/pam.d/system-auth
   changed_when: false
+  always_run: yes
+  ignore_errors: yes
   register: nullok_audit
   tags:
-    - cat1
-    - high
-    - V-38497
-    - passwords
-    - audit
+      - cat1
+      - high
+      - V-38497
+      - passwords
+      - audit
 
 - name: "| HIGH | V-38497 | PATCH |\n
         The system must not have accounts configured with blank or null passwords"
@@ -96,23 +130,26 @@
       dest: /etc/pam.d/system-auth
       regexp: nullok
   tags:
-    - cat1
-    - high
-    - V-38497
-    - passwords
-    - patch
+      - cat1
+      - high
+      - V-38497
+      - passwords
+      - patch
 
 - name: "| HIGH | V-38587 | AUDIT |\n
         The telnet-server package must not be installed"
   command: rpm -q telnet-server
+  ignore_errors: yes
+  always_run: yes
+  changed_when: no
   register: telnet_server_audit
   tags:
-    - cat1
-    - high
-    - V-38587
-    - telnet
-    - unsecure_services
-    - audit
+      - cat1
+      - high
+      - V-38587
+      - telnet
+      - unsecure_services
+      - audit
 
 - name: "| HIGH | V-38587 | PATCH |\n
         The telnet-server package must not be installed"
@@ -120,26 +157,27 @@
     name: telnet-server
     state: absent
   tags:
-    - cat1
-    - high
-    - V-38587
-    - telnet
-    - unsecure_services
-    - patch
+      - cat1
+      - high
+      - V-38587
+      - telnet
+      - unsecure_services
+      - patch
 
 - name: "| HIGH | V-38589 | AUDIT |\n
         The telnet daemon must not be running"
-  command: sudo chkconfig "telnet" --list
+  command: chkconfig "telnet" --list
   register: telnet_service_audit
   changed_when: false
+  always_run: yes
   ignore_errors: yes
   tags:
-    - cat1
-    - high
-    - V-38589
-    - telnet
-    - unsecure_services
-    - audit
+      - cat1
+      - high
+      - V-38589
+      - telnet
+      - unsecure_services
+      - audit
 
 - name: "| HIGH | V-38589 | PATCH |\n
         The telnet daemon must not be running"
@@ -149,17 +187,19 @@
     enabled: no
   ignore_errors: yes
   tags:
-    - cat1
-    - high
-    - V-38589
-    - telnet
-    - unsecure_services
-    - patch
+      - cat1
+      - high
+      - V-38589
+      - telnet
+      - unsecure_services
+      - patch
 
 - name: "| HIGH | V-38591 | AUDIT |\n
         The rsh-server package must not be installed"
   command: rpm -q rsh-server
+  always_run: yes
   register: rsh_server_audit
+  changed_when: no
   ignore_errors: yes
 
 - name: "| HIGH | V-38591 | PATCH |\n
@@ -168,58 +208,112 @@
     name: rsh-server
     state: absent
   tags:
-    - cat1
-    - high
-    - V-38591
-    - rsh
-    - unsecure_services
-    - patch
+      - cat1
+      - high
+      - V-38591
+      - rsh
+      - unsecure_services
+      - patch
 
 - name: "| HIGH | V-38594 | AUDIT |\n
         The rshd service must not be running"
-  shell: chkconfig 'rsh' --list
+  command: chkconfig 'rsh' --list
   register: rsh_service_audit
   changed_when: false
+  always_run: yes
   ignore_errors: yes
   tags:
-    - cat1
-    - high
-    - V-38594
-    - rsh
-    - rlogin
-    - unsecure_services
-    - audit
+      - cat1
+      - high
+      - V-38594
+      - rsh
+      - rlogin
+      - unsecure_services
+      - audit
 
-- name: "| HIGH | V-38594 | AUDIT |\n
+- name: "| HIGH | V-38594 | PATCH |\n
         The rshd service must not be running"
   service:
     name: rsh
     state: stopped
     enabled: no
+  when: rsh_service_audit.rc == 0
   tags:
-    - cat1
-    - high
-    - V-38594
-    - rsh
-    - unsecure_services
-    - patch
+      - cat1
+      - high
+      - V-38594
+      - rsh
+      - unsecure_services
+      - patch
 
+- name: "| HIGH | V-38598 | AUDIT |\n
+        The rexecd service must not be running"
+  command: service rexec status
+  ignore_errors: yes
+  register: rexec_status_audit
+  always_run: yes
+  changed_when: no
+  tags:
+      - cat1
+      - high
+      - V-38598
+      - rexec
+      - audit
 
+- name: "| HIGH | V-38598 | PATCH |\n
+        The rexecd service must not be running"
+  service:
+      name: rexec
+      state: stopped
+  when: rexec_status_audit.rc == 0
+  tags:
+      - cat1
+      - high
+      - V-38598
+      - rexec
+      - patch
+
+- name: "| HIGH | V-38602 | AUDIT |\n
+        The rlogind service must not be running"
+  command: service rlogin status
+  ignore_errors: yes
+  register: rlogin_status_audit
+  always_run: yes
+  changed_when: no
+  tags:
+      - cat1
+      - high
+      - V-38602
+      - rlogin
+      - audit
+
+- name: "| HIGH | V-38602 | PATCH |\n
+        The rlogind service must not be running"
+  service:
+    name: rlogin
+    enabled: no
+  when: rlogin_status_audit.rc == 0
+  tags:
+      - cat1
+      - high
+      - V-38602
+      - rlogin
+      - patch 
 
 - name: "| HIGH | V-38653 | AUDIT |\n
         The snmpd service must not use a default password"
   shell: grep -v "^#" /etc/snmp/snmpd.conf| grep public
   register: snmpd_audit
   failed_when: snmpd_audit.rc not in [0,1]
+  always_run: yes
   when: snmpconf_test.stat.exists
   changed_when: no
   tags:
-    - cat1
-    - high
-    - V-38653
-    - snmp
-    - audit
-
+      - cat1
+      - high
+      - V-38653
+      - snmp
+      - audit
 
 - name: "| HIGH | V-38653 | PATCH |\n
         The snmpd service must not use a default password"
@@ -231,105 +325,132 @@
   when: snmpconf_test.stat.exists and snmpd_audit.stdout != []
   notify: restart snmpd
   tags:
-    - cat1
-    - high
-    - V-38653
-    - snmp
-    - patch
+      - cat1
+      - high
+      - V-38653
+      - snmp
+      - patch
 
-
-
-
-
-
-
-
-- name: Looking for the presence of a DoD-approved virus scan program
-  shell: grep uvscan /etc/cron* /var/spool/cron/*
-  register: av_present
-  changed_when: false
-  failed_when: "'FAIL' in av_present.stderr"
-  tags: [ 'cat1' , 'V-38666', 'antivirus' ]
-
-- name: V-38666 High  The system must use and update a DoD-approved virus scan program
-  pause: prompt="No AV software present. Press ENTER to continue"
-  when: av_present.rc != 0 and not rhel6stig_fullauto
-  tags: [ 'cat1' , 'V-38666' , 'antivirus' ]
-
-- name: Looking for virus definitions older than seven days
-  command: find /usr/local/uvscan -type f -mtime +7
-  register: av_defs
-  changed_when: false
-  failed_when: '"FAIL" in av_defs.stderr'
-  tags: [ 'cat1' , 'V-38666' , 'antivirus' ]
-
-- name: V-38666 High  The system must use and update a DoD-approved virus scan program
-  pause: prompt="AV definitions are outdated. Press ENTER to continue"
-  when: av_defs.stdout_lines and not rhel6stig_fullauto
-  tags: [ 'cat1' , 'V-38666' , 'antivirus' ]
-
-- name: V-38666 High  The system must use and update a DoD-approved virus scan program
-  pause: prompt="No AV definitions found in /usr/local/uvscan. Press ENTER to continue"
-  when: av_defs.stderr and not rhel6stig_fullauto
-  tags: [ 'cat1' , 'V-38666' , 'antivirus' ]
-
-
-- name: V-38668 High  The x86 Ctrl-Alt-Delete key sequence must be disabled
-  copy: src=control-alt-delete.override dest=/etc/init/control-alt-delete.override owner=root group=root mode=0644
-  tags: [ 'cat1' , 'V-38668' , 'ctrl_alt_delete' ]
-
-- name: V-38462 High  The RPM package management tool must cryptographically verify the authenticity of all software packages during installation
-  lineinfile: state=absent dest={{ item }} regexp=nosignature
-  with_items:
-    - /etc/rpmrc
-    - /usr/lib/rpm/rpmrc
-    - /usr/lib/rpm/redhat/rpmrc
-    - ~root/.rpmrc
-  tags: [ 'cat1' , 'V-38462' , 'rpm' , 'packages' ]
-
-- name: V-38677 High  The NFS server must not have the insecure file locking option enabled
-  replace: dest=/etc/exports regexp='insecure_locks'
-  tags: [ 'cat1' , 'V-38677' , 'nfs' ]
-
-- name: V-38607 High  The SSH daemon must be configured to use only the SSHv2 protocol
-  lineinfile: state=present dest=/etc/ssh/sshd_config regexp='^(#)?Protocol \d' line='Protocol 2'
+- name: "| HIGH | V-38607 | AUDIT |\n
+        The SSH daemon must be configured to use only the SSHv2 protocol."
+  command: grep "Protocol 2" /etc/ssh/sshd_config
+  register: proto2_audit
+  ignore_errors: yes
+  always_run: yes
+  changed_when: no
+  tags:
+      - cat1
+      - high
+      - V-38607
+      - ssh
+      - audit
+  
+- name: "| HIGH | V-38607 | PATCH |\n
+        The SSH daemon must be configured to use only the SSHv2 protocol."
+  lineinfile: 
+      state: present 
+      dest: /etc/ssh/sshd_config 
+      regexp: '^(#)?Protocol \d' 
+      line: 'Protocol 2'
   notify: restart ssh
-  tags: [ 'ssh' , 'cat1' , 'V-38607' , 'ssh' ]
+  tags: 
+      - high 
+      - cat1
+      - V-38607
+      - ssh
+      - patch 
 
-- name: Check status of rlogin
-  shell: chkconfig --list | grep rlogin
-  register: rlogin_status
+- name: "| HIGH | V-38614 | AUDIT |\n
+        The SSH daemon must not allow authentication using an empty password"
+  command: grep "PermitEmptyPasswords yes" /etc/ssh/sshd_config
+  ignore_errors: yes
+  always_run: yes
   changed_when: false
-  when: "'rlogin' in xinetd_services.stdout_lines"
-  tags: [ 'cat1' , 'V-38602' , 'rlogin', 'unsecure_services' ]
+  register: ssh_empty_pass_audit
+  tags:
+      - high
+      - cat1
+      - ssh
+      - audit
+      - V-38614
 
-- name: "V-38602 High  The rlogind service must not be running"
-  command: chkconfig rlogin off
-  when: "'rlogin' in xinetd_services.stdout_lines and rlogin_status.stdout.find('\toff') == -1"
-  tags: [ 'cat1' , 'V-38602' , 'rlogin', 'unsecure_services' ]
+- name: "| HIGH | V-38614 | PATCH |\n
+        The SSH daemon must not allow authentication using an empty password"
+  lineinfile: 
+      state: present 
+      dest: /etc/ssh/sshd_config 
+      regexp: '^(#)?PermitEmptyPasswords' 
+      line: 'PermitEmptyPasswords no'
+  tags:
+      - ssh
+      - high
+      - cat1
+      - V-38614
+      - ssh
 
+# V-38666 checks can be found in not_automated.yml
 
-- name: Check status of rexec
-  shell: chkconfig --list | grep rexec
-  register: rexec_status
-  changed_when: false
-  when: "'rexec' in xinetd_services.stdout_lines"
-  tags: [ 'cat1' , 'V-38598' , 'rexec', 'unsecure_services' ]
+- name: "| HIGH | V-38668 | AUDIT |\n
+        The x86 Ctrl-Alt-Delete key sequence must be disabled"
+  command: grep "exec /sbin/shutdown" /etc/init/control-alt-delete.override
+  register: ctrl_alt_del_audit
+  ignore_errors: yes
+  always_run: yes
+  changed_when: no
+  tags:
+      - V-38668
+      - high
+      - cat1
+      - audit
+      - ctrl_alt_delete
 
-- name: V-38598 High  The rexecd service must not be running
-  command: chkconfig rexec off
-  when: "'rexec' in xinetd_services.stdout_lines and rexec_status.stdout.find('\toff') == -1"
-  tags: [ 'cat1' , 'V-38598' , 'rexec', 'unsecure_services' ]
+- name: "| HIGH | V-38668 | PATCH |\n
+        The x86 Ctrl-Alt-Delete key sequence must be disabled"
+  copy: 
+      src: control-alt-delete.override 
+      dest: /etc/init/control-alt-delete.override 
+      owner: root 
+      group: root 
+      mode: 0644
+  tags: 
+      - high
+      - cat1
+      - V-38668
+      - ctrl_alt_delete
+      - patch
 
+# V-38677 can be found in not_automated.yml
 
-- name: V-38701 High  The TFTP daemon must operate in secure mode which provides access only to a single directory on the host file system
-  lineinfile: "state=present backup=yes dest=/etc/xinetd.d/tftp regexp='server_args\\s+=\\s+(/.*$)' line='\tserver_args\t\t= -s \\1' backrefs=yes"
+- name: "| HIGH | V-38701 | AUDIT |\n
+        The TFTP daemon must operate in secure mode which provides access only to a single directory on the host file system"
+  command: grep "server_args = -s" /etc/xinetd.d/tftp
+  register: tftp_audit
+  always_run: yes
+  when: "'tftp' in xinetd_services.stdout_lines"
+  ignore_errors: yes
+  tags:
+      - tftp
+      - high
+      - cat1
+      - V-38701
+      - audit
+
+- name: "| HIGH | V-38701 | PATCH |\n
+        The TFTP daemon must operate in secure mode which provides access only to a single directory on the host file system"
+  lineinfile: 
+      state: present 
+      backup: yes 
+      dest: /etc/xinetd.d/tftp 
+      regexp: 'server_args\\s+=\\s+(/.*$)' 
+      line: '\tserver_args\t\t= -s \\1' 
+      backrefs: yes
   when: "rhel6stig_tftp_required and 'tftp' in xinetd_services.stdout_lines"
   ignore_errors: yes
-  tags: [ 'cat1' , 'V-38701' , 'tftp' , 'tftp-server' , 'unsecure_services' ]
+  tags:
+      - cat1
+      - V-38701
+      - high 
+      - tftp
+      - tftp-server
+      - unsecure_services
   notify: reload xinetd
-
-- name: V-38614 High  The SSH daemon must not allow authentication using an empty password
-  lineinfile: state=present dest=/etc/ssh/sshd_config regexp='^(#)?PermitEmptyPasswords' line='PermitEmptyPasswords no'
-  tags: [ 'ssh' , 'cat1' , 'V-38614' , 'ssh' ]
-  notify: restart ssh

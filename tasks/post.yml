@@ -4,10 +4,3 @@
   changed_when: false
   with_items:
    - /tmp/rhel6stig_rpm_verify
-
-- name: Generate Audit Report
-  template:
-    src: audit_report.j2
-    dest: "{{ report_dest | default('/tmp/audit_report.yml') }}"
-  delegate_to: localhost
-  when: make_audit_report == True
