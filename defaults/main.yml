@@ -18,6 +18,7 @@ rhel6stig_pam_cracklib_params: try_first_pass retry=3 maxrepeat=3 minlen=14 dcre
 rhel6stig_pam_faillock_params:
   - 'auth        [default=die] pam_faillock.so authfail deny=3 unlock_time=604800 fail_interval=900'
   - 'auth        required      pam_faillock.so authsucc deny=3 unlock_time=604800 fail_interval=900'
+  - 'auth        required      pam_faillock.so preauth silent deny=3 unlock_time=604800 fail_interval=900'
 
 # SELinux settings
 rhel6stig_selinux_pol: targeted
