@@ -1,4 +1,7 @@
 ---
+# Generate an audit report
+make_audit_report: false
+
 # Enable or disable remediation for each category
 rhel6stig_cat1: true
 rhel6stig_cat2: false
