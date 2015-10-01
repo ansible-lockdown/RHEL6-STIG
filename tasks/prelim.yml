@@ -52,9 +52,9 @@
   register: unlocked_accounts
   changed_when: false
   always_run: yes
-  tags: 
+  tags:
     - 'cat1'
-    - 'cat2' 
+    - 'cat2'
     - 'cat3'
 
 - name: "PRELIM | Identify Unlocked Sys Accounts"
@@ -63,9 +63,9 @@
   register: unlocked_sys_accounts
   changed_when: false
   always_run: yes
-  tags: 
+  tags:
     - 'cat1'
-    - 'cat2' 
+    - 'cat2'
     - 'cat3'
 
 - name: "PRELIM | List system accounts"
@@ -73,9 +73,9 @@
   register: system_users
   changed_when: false
   always_run: yes
-  tags: 
+  tags:
     - 'cat1'
-    - 'cat2' 
+    - 'cat2'
     - 'cat3'
 
 # Get separate lists of SysV and xinetd services
@@ -84,8 +84,8 @@
   register: sysv_services
   changed_when: false
   always_run: yes
-  tags: 
-    - 'cat1' 
+  tags:
+    - 'cat1'
     - 'cat2'
     - 'cat3'
 
@@ -94,8 +94,8 @@
   register: xinetd_services
   changed_when: false
   always_run: yes
-  tags: 
-    - 'cat1' 
+  tags:
+    - 'cat1'
     - 'cat2'
     - 'cat3'
 
@@ -107,14 +107,14 @@
   register: rhel6stig_ipv6test
   ignore_errors: yes
   always_run: yes
-  tags: 
+  tags:
     - 'ipv6'
 
 - name: "PRELIM | Set ipv6_in_use to 'true'"
   set_fact: ipv6_in_use=true
   when: rhel6stig_ipv6test.stdout
   always_run: yes
-  tags: 
+  tags:
     - 'ipv6'
 
 # Get list of shells
@@ -123,16 +123,8 @@
   register: shells
   changed_when: false
   always_run: yes
-  tags: 
+  tags:
     - 'umask'
-
-- name: "PRELIM | Verify all rpm packages and store output in /tmp/rhel6stig_rpm_verify"
-  shell: rpm -Va > /tmp/rhel6stig_rpm_verify
-  changed_when: false
-  failed_when: false
-  when: rhel6stig_cat3
-  tags: 
-    - 'rpm'
 
 - name: "PRELIM | Check for device files with unlabeled_t context"
   shell: ls -RZ /dev | grep unlabeled_t
@@ -140,13 +132,13 @@
   changed_when: false
   failed_when: false
   when: rhel6stig_cat3
-  tags: 
+  tags:
     - 'selinux'
 
 - name: "PRELIM | Check for samba"
   stat: path=/etc/samba/smb.conf
   register: samba_check
-  tags: 
-    - 'cat3' 
+  tags:
+    - 'cat3'
     - 'V-38656'
     - 'smb'

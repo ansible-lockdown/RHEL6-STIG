@@ -43,7 +43,7 @@
 
 - name: "| HIGH | V-38677 | AUDIT |\n
         The NFS server must not have the insecure file locking option enabled"
-  command: grep insecure_locks /etc/exports 
+  command: grep insecure_locks /etc/exports
   register: nfs_insecure_locking_audit
   ignore_errors: yes
   changed_when: no
@@ -65,14 +65,14 @@
   always_run: yes
   ignore_errors: yes
   changed_when: no
-  tags: 
+  tags:
       - cat3
       - low
       - V-38455
       - partitions
       - audit
 
-- name: "| LOW | V-38456 | AUDIT |\n  
+- name: "| LOW | V-38456 | AUDIT |\n
         The system must use a separate file system for /var"
   shell: mount | grep "on /var "
   register: var_mounted_audit
@@ -114,3 +114,44 @@
       - partitions
       - audit
 
+- name: "| LOW | V-38473 | AUDIT |\n
+        The system must use a separate file system for user home directories."
+  shell: mount | grep "on /home "
+  register: home_mounted_audit
+  always_run: yes
+  changed_when: no
+  ignore_errors: yes
+  tags:
+      - cat3
+      - low
+      - V-38473
+      - partitions
+      - audit
+
+- name: "| LOW | V-38681 | AUDIT |\n
+        All GIDs referenced in /etc/passwd must be defined in /etc/group"
+  shell: pwck -r | grep 'no group'
+  changed_when: false
+  failed_when: missing_group_audit.rc == 1 or missing_group_audit.rc >= 3
+  register: missing_group_audit
+  always_run: yes
+  tags:
+    - cat3
+    - low
+    - V-38681
+    - accounts
+    - audit
+
+- name: "| LOW | V-38683 | AUDIT |\n
+        All accounts on the system must have unique user or account names"
+  shell: pwck -rq | grep -A1 'duplicate' | grep -v 'duplicate'
+  changed_when: false
+  failed_when: duplicate_account_audit.rc == 1 or duplicate_account_audit.rc >= 3
+  register: duplicate_account_audit
+  always_run: yes
+  tags:
+    - cat3
+    - low
+    - V-38683
+    - accounts
+    - audit
