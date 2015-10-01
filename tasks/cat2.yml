@@ -1,20 +1,20 @@
 ---
 # This audit.rules file is from https://github.com/RedHatGov/stig-fix-el6/tree/master/config
 
-# Not automated V-38439 The system must provide automated support for account management functions.
+# V-38439 The system must provide automated support for account management functions.
 - name: "| MEDIUM | V-38443, V-38448, V-38449 | AUDIT |\n
          The /etc/gshadow file must be owned by root. The /etc/gshadow file must be group-owned by root. The /etc/gshadow file must have mode 0000"
   stat:
       path: /etc/gshadow
   register: gshadow_stat
   tags:
-      - cat2
-      - audit
-      - medium
-      - V-38449
-      - V-38448
-      - V-38443
-      - file_perms
+    - cat2
+    - audit
+    - medium
+    - V-38449
+    - V-38448
+    - V-38443
+    - file_perms
 
 - name: "| MEDIUM | V-38443 | PATCH |\n
          The /etc/gshadow file must be owned by root."
@@ -23,11 +23,11 @@
       owner: root
   register: gshadow_stat
   tags:
-      - cat2
-      - patch
-      - medium
-      - V-38443
-      - file_perms
+    - cat2
+    - patch
+    - medium
+    - V-38443
+    - file_perms
 
 - name: "| MEDIUM | V-38448 | PATCH |\n
          The /etc/gshadow file must be group-owned by root."
@@ -36,11 +36,11 @@
       group: root
   register: gshadow_stat
   tags:
-      - cat2
-      - patch
-      - medium
-      - V-38448
-      - file_perms
+    - cat2
+    - patch
+    - medium
+    - V-38448
+    - file_perms
 
 - name: "| MEDIUM | V-38449 | PATCH |\n
          The /etc/gshadow file must have mode 0000"
@@ -49,11 +49,11 @@
       mode: "0000"
   register: gshadow_stat
   tags:
-      - cat2
-      - patch
-      - medium
-      - V-38449
-      - file_perms
+    - cat2
+    - patch
+    - medium
+    - V-38449
+    - file_perms
 
 - name: "| MEDIUM | V-38450, V-38451, V-38457 | AUDIT |\n
         The /etc/passwd file must be owned by root. The /etc/passwd file must be group-owned by root.The /etc/passwd file must have mode 0644 or less permissive"
@@ -61,13 +61,13 @@
       path: /etc/passwd
   register: /etc/passwd_stat
   tags:
-      - medium
-      - cat2
-      - V-38450
-      - V-38451
-      - V-38457
-      - audit
-      - file_perms
+    - medium
+    - cat2
+    - V-38450
+    - V-38451
+    - V-38457
+    - audit
+    - file_perms
 
 - name: "| MEDIUM | V-38450 | PATCH |\n
          The /etc/passwd file be owned by root"
@@ -75,11 +75,11 @@
       path: /etc/passwd
       owner: root
   tags:
-      - cat2
-      - patch
-      - medium
-      - V-38450
-      - file_perms
+    - cat2
+    - patch
+    - medium
+    - V-38450
+    - file_perms
 
 - name: "| MEDIUM | V-38451 | PATCH |\n
          The /etc/passwd file be group-owned by root"
@@ -87,11 +87,11 @@
       path: /etc/passwd
       group: root
   tags:
-      - cat2
-      - patch
-      - medium
-      - V-38451
-      - file_perms
+    - cat2
+    - patch
+    - medium
+    - V-38451
+    - file_perms
 
 - name: "| MEDIUM | V-38457 | PATCH |\n
          The /etc/passwd file must have mode 0644 or less permissive"
@@ -99,11 +99,11 @@
       path: /etc/passwd
       mode: "u-x,g-wx,o-wx"
   tags:
-      - cat2
-      - patch
-      - medium
-      - V-38457
-      - file_perms
+    - cat2
+    - patch
+    - medium
+    - V-38457
+    - file_perms
 
 - name: "| MEDIUM | V-38458, V-38459, V-38461 | AUDIT |\n
         The /etc/group file must be owned by root. The /etc/group file must be group-owned by root.The /etc/group file must have mode 0644 or less permissive"
@@ -111,13 +111,13 @@
       path: /etc/group
   register: /etc/group_stat
   tags:
-      - medium
-      - cat2
-      - V-38458
-      - V-38459
-      - V-38461
-      - audit
-      - file_perms
+    - medium
+    - cat2
+    - V-38458
+    - V-38459
+    - V-38461
+    - audit
+    - file_perms
 
 - name: "| MEDIUM | V-38458 | PATCH |\n
          The /etc/group file be owned by root"
@@ -125,11 +125,11 @@
       path: /etc/group
       owner: root
   tags:
-      - cat2
-      - patch
-      - medium
-      - V-38458
-      - file_perms
+    - cat2
+    - patch
+    - medium
+    - V-38458
+    - file_perms
 
 - name: "| MEDIUM | V-38459 | PATCH |\n
          The /etc/group file be group-owned by root"
@@ -137,11 +137,11 @@
       path: /etc/group
       group: root
   tags:
-      - cat2
-      - patch
-      - medium
-      - V-38459
-      - file_perms
+    - cat2
+    - patch
+    - medium
+    - V-38459
+    - file_perms
 
 - name: "| MEDIUM | V-38461 | PATCH |\n
          The /etc/group file must have mode 0644 or less permissive"
@@ -149,412 +149,21 @@
       path: /etc/group
       mode: "u-x,g-wx,o-wx"
   tags:
-      - cat2
-      - patch
-      - medium
-      - V-38461
-      - file_perms
+    - cat2
+    - patch
+    - medium
+    - V-38461
+    - file_perms
 
-- name: "| MEDIUM | V-38464 | AUDIT |\n
-        The audit system must take appropriate action when there are disk errors on the audit storage volume."
-  shell: grep disk_error_action /etc/audit/auditd.conf | cut -d = -f 2 | xargs basename
-  register:  disk_err_action_audit
-  changed_when: no
-  always_run: yes
-  tags:
-      - cat2
-      - medium
-      - V-38464
-      - auditd
-      - audit
 
-- name: "| MEDIUM | V-38464 | PATCH |\n
-        The audit system must take appropriate action when there are disk errors on the audit storage volume."
-  lineinfile:
-      regexp: '(^disk_error_action\s*=)(\s*)' 
-      line: '\1 {{ rhel6stig_auditd_config['disk_full_action'] }}' 
-      dest: /etc/audit/auditd.conf 
-      backrefs: yes
-  tags:
-      - cat2
-      - medium
-      - V-38464
-      - auditd
-      - patch
+- name: "Medium  Copy STIG compliant audit.rules\n    V-38580 Medium  The audit system must be configured to audit the loading and unloading of dynamic kernel modules\n    V-38527 Low     The audit system must be configured to audit all attempts to alter system time through clock_settime\n    V-38525 Low     The audit system must be configured to audit all attempts to alter system time through stime\n    V-38522 Low     The audit system must be configured to audit all attempts to alter system time through settimeofday\n    V-38552 Low     The audit system must be configured to audit all discretionary access control permission modifications using fchown\n    V-38550 Low     The audit system must be configured to audit all discretionary access control permission modifications using fchmodat\n    V-38557 Low     The audit system must be configured to audit all discretionary access control permission modifications using fsetxattr\n    V-38556 Low     The audit system must be configured to audit all discretionary access control permission modifications using fremovexattr\n    V-38554 Low     The audit system must be configured to audit all discretionary access control permission modifications using fchownat\n    V-38559 Low     The audit system must be configured to audit all discretionary access control permission modifications using lremovexattr\n    V-38558 Low     The audit system must be configured to audit all discretionary access control permission modifications using lchown\n    V-38536 Low     The operating system must automatically audit account disabling actions\n    V-38540 Low     The audit system must be configured to audit modifications to the systems network configuration\n    V-38541 Low     The audit system must be configured to audit modifications to the systems Mandatory Access Control (MAC) configuration (SELinux)\n    V-38543 Low     The audit system must be configured to audit all discretionary access control permission modifications using chmod\n    V-38547 Low     The audit system must be configured to audit all discretionary access control permission modifications using fchmod\n    V-38530 Low     The audit system must be configured to audit all attempts to alter system time through /etc/localtime\n    V-38578 Low     The audit system must be configured to audit changes to the /etc/sudoers file\n    V-38575 Low     The audit system must be configured to audit user deletions of files and programs"
+  template: src=audit.rules.j2 dest=/etc/audit/audit.rules owner=root group=root mode=0640 backup=yes
+  tags: [ 'cat2' , 'V-38580' , 'V-38527' , 'V-38525' , 'V-38522' , 'V-38552' , 'V-38550' , 'V-38557' , 'V-38556' , 'V-38554' , 'V-38559' , 'V-38558' , 'V-38536' , 'V-38540' , 'V-38541' , 'V-38543' , 'V-38547' , 'V-38530' , 'V-38578' , 'V-38575' , 'auditd' ]
+  notify: restart auditd
 
-- name: "| MEDIUM | V-38465 | AUDIT |\n 
-        Library files must have mode 0755 or less permissive"
-  shell: find {/usr/{lib/,lib64},/lib{64,}} -perm /022 -type f
-  register: library_perms_audit
-  changed_when: no
-  tags:
-      - cat2
-      - medium
-      - V-38465
-      - file_perms
-      - audit
-
-- name: "| MEDIUM | V-38465 | PATCH |\n 
-        Library files must have mode 0755 or less permissive"
-  file: 
-      state: file
-      mode: "go-w"
-      path: "{{ item }}"
-  when: library_perms_audit.stdout != ''
-  with_items: library_perms_audit.stdout_lines
-  tags:
-      - cat2
-      - medium
-      - V-38465
-      - file_perms
-      - patch
-
-- name: "| MEDIUM | V-38466 | AUDIT |\n 
-        Library files must be owned by root"
-  shell: find {/usr/{lib/,lib64},/lib{64,}} -type f ! -user root
-  register: library_owner_audit
-  changed_when: no
-  tags:
-      - cat2
-      - medium
-      - V-38466
-      - file_perms
-      - audit
-
-- name: "| MEDIUM | V-38466 | PATCH |\n 
-        Library files must be owned by root"
-  file: 
-      state: file
-      owner: "root"
-      path: "{{ item }}"
-  when: library_owner_audit.stdout != ''
-  with_items: library_owner_audit.stdout_lines
-  tags:
-      - cat2
-      - medium
-      - V-38466
-      - file_perms
-      - patch
-
-- name: "| MEDIUM | V-384648 | AUDIT |\n
-        The audit system must take appropriate action when the audit storage volume is full."
-  shell: grep disk_full_action /etc/audit/auditd.conf | cut -d = -f 2 | xargs basename
-  register:  disk_full_action_audit
-  changed_when: no
-  always_run: yes
-  tags:
-      - cat2
-      - medium
-      - V-38468
-      - auditd
-      - audit
-
-- name: "| MEDIUM | V-38468 | PATCH |\n
-        The audit system must take appropriate action when the audit storage volume is full."
-  lineinfile:
-      regexp: '(^disk_full_action\s*=)(\s*)' 
-      line: '\1 {{ rhel6stig_auditd_config['disk_full_action'] }}' 
-      dest: /etc/audit/auditd.conf 
-      backrefs: yes
-  tags:
-      - cat2
-      - medium
-      - V-38468
-      - auditd
-      - patch
-
-- name: "| MEDIUM | V-38469 | AUDIT |\n
-         All system command files must have mode 755 or less permissive."
-  shell: find {/sbin/,/bin/,/usr/{{,s}bin/,local/{,s}bin}} -type f -perm /022
-  register: system_files_perms_audit
-  changed_when: no
-  always_run: yes
-  tags:
-      - cat2
-      - medium
-      - V-38469
-      - file_perms
-      - audit
-
-- name: "| MEDIUM | V-38469 | PATCH |\n 
-        All system command files must have mode 755 or less permissive"
-  file: 
-      state: file
-      mode: "og-w"
-  when: system_files_perms_audit.stdout != ''
-  with_items: system_files_perms_audit.stdout_lines
-  tags:
-      - cat2
-      - medium
-      - V-38469
-      - file_perms
-      - patch
-
-- name: "| MEDIUM | V-38470 | AUDIT |\n
-        The audit system must alert designated staff members when the audit storage volume approaches capacity.."
-  shell: grep space_left_action /etc/audit/auditd.conf | cut -d = -f 2 | xargs basename
-  register:  space_left_action_audit
-  changed_when: no
-  always_run: yes
-  tags:
-      - cat2
-      - medium
-      - V-38470
-      - auditd
-      - audit
-
-- name: "| MEDIUM | V-38470 | PATCH |\n
-        The audit system must alert designated staff members when the audit storage volume approaches capacity.."
-  lineinfile:
-      regexp: '(^space_left_action\s*=)(\s*)' 
-      line: '\1 {{ rhel6stig_auditd_config['space_left_action'] }}' 
-      dest: /etc/audit/auditd.conf 
-      backrefs: yes
-  tags:
-      - cat2
-      - medium
-      - V-38470
-      - auditd
-      - patch
-
-- name: "| MEDIUM | V-38472 | Audit |\n 
-        All system command files must be owned by root"
-  shell: find {/sbin/,/bin/,/usr/{{,s}bin/,local/{,s}bin}} -type f ! -user root
-  register: sys_commands_owner_audit
-  always_run: yes
-  changed_when: no
-  tags:
-      - cat2
-      - medium
-      - V-38472
-      - file_perms
-      - audit
-
-- name: "| MEDIUM | V-38472 | PATCH |\n 
-        All system command files must be owned by root"
-  file: 
-      state: file
-      owner: root
-  when: sys_commands_owner_audit.stdout != ''
-  with_items: sys_commands_owner_audit.stdout_lines
-  tags:
-      - cat2
-      - medium
-      - V-38472
-      - file_perms
-      - patch
-
-- name: "| MEDIUM | V-38475 | AUDIT |\n
-        The system must require passwords to contain a minimum of 14 characters."
-  shell: grep -E '^PASS_MIN_LEN' /etc/login.defs | awk '{print $2}'
-  register: min_pwd_len_audit
-  changed_when: no
-  always_run: yes
-  tags:
-      - cat2
-      - medium
-      - V-38475
-      - passwords
-      - audit
-
-- name: "| MEDIUM | V-38475 | PATCH |\n
-        The system must require passwords to contain a minimum of 14 characters."
-  lineinfile:
-      regexp: '(^PASS_MIN_LEN)\s*(\d*)' 
-      line: '\1 {{ rhel6stig_pass_min_length }}' 
-      dest: /etc/login.defs 
-      backrefs: yes
-  tags:
-      - cat2
-      - medium
-      - V-38475
-      - passwords
-      - patch
-
-- name: "| MEDIUM | V-38477 | AUDIT |\n
-        Users must not be able to change passwords more than once every 24 hours."
-  shell: grep -E '^PASS_MIN_DAYS' /etc/login.defs | awk '{print $2}'
-  register: pwd_min_days_audit
-  changed_when: no
-  always_run: yes
-  tags:
-      - cat2
-      - medium
-      - V-38477
-      - passwords
-      - audit
-
-- name: "| MEDIUM | V-38477 | PATCH |\n
-        The system must require passwords to contain a minimum of 14 characters."
-  lineinfile:
-      regexp: '(^PASS_MIN_DAYS)\s*(\d*)' 
-      line: '\1 {{ rhel6stig_pass_min_days }}' 
-      dest: /etc/login.defs 
-      backrefs: yes
-  tags:
-      - cat2
-      - medium
-      - V-38477
-      - passwords
-      - patch
-
-- name: "| MEDIUM | V-38479 | AUDIT |\n
-        User passwords must be changed at least every 60 days."
-  shell: grep -E '^PASS_MAX_DAYS' /etc/login.defs | awk '{print $2}'
-  register: pwd_max_days_audit
-  changed_when: no
-  always_run: yes
-  tags:
-      - cat2
-      - medium
-      - V-38479
-      - passwords
-      - audit
-
-- name: "| MEDIUM | V-38479 | PATCH |\n
-        User passwords must be changed at least every 60 days."
-  lineinfile:
-      regexp: '(^PASS_MAX_DAYS)\s*(\d*)' 
-      line: '\1 {{ rhel6stig_pass_max_days }}' 
-      dest: /etc/login.defs 
-      backrefs: yes
-  tags:
-      - cat2
-      - medium
-      - V-38479
-      - passwords
-      - patch
-
-- name: "| MEDIUM | V-38481 | AUDIT |\n
-        System security patches and updates must be installed and up-to-date."
-  command: yum check-update
-  changed_when: no
-  register: yum_pkgs_update_audit
-  tags:
-      - cat2
-      - medium
-      - V-38481
-      - yum
-      - updates
-      - audit
-
-- name: "| MEDIUM | V-38481 | PATCH |\n
-        System security patches and updates must be installed and up-to-date."
-  yum:
-      name: '*'
-      state: latest
-      update_cache: yes
-  tags:
-      - cat2
-      - medium
-      - V-38481
-      - yum
-      - updates
-      - patch
-
-- name: "| MEDIUM | V-38483 | AUDIT |\n
-        The system package management tool must cryptographically verify the authenticity of system software packages during installation."
-  shell: find /etc/yum{.conf,.repos.d/} -exec grep -ls '^gpgcheck=0' {} \;
-  changed_when: false
-  always_run: yes
-  register: repo_crypto_check_audit
-  tags:
-      - cat2
-      - medium
-      - V-38483
-      - rpm
-      - yum 
-      - audit
-      - gpgcheck
-
-- name: "| MEDIUM | V-38483 | PATCH |\n
-        The system package management tool must cryptographically verify the authenticity of system software packages during installation."
-  replace: 
-      backup: yes 
-      dest: '{{ item }}'' 
-      regexp: '^gpgcheck=0' 
-      replace: 'gpgcheck=1'
-  with_flattened:
-    - /etc/yum.conf
-    - repo_crypto_check_audit.stdout_lines
-  tags:
-      - cat2
-      - medium
-      - V-38483
-      - rpm
-      - gpgcheck
-      - patch
-
-- name: "| MEDIUM | V-38484 | AUDIT |\n
-        The operating system, upon successful logon, must display to the user the date and time of the last logon or access via ssh."
-  shell: grep -i "^PrintLastLog" /etc/ssh/sshd_config | awk '{ print $2 }'
-  register: last_log_audit
-  changed_when: no
-  always_run: yes
-  tags:
-      - medium
-      - cat2
-      - V-38484
-      - sshd
-      - audit
-
-- name: "| MEDIUM | V-38484 | PATCH |\n
-        The operating system, upon successful logon, must display to the user the date and time of the last logon or access via ssh."
-  lineinfile:
-      regexp: '(^PrintLastLog)\s*(\d*)' 
-      line: '\1 yes' 
-      dest: /etc/ssh/sshd_config
-      backrefs: yes
-
-  tags:
-      - medium
-      - cat2
-      - V-38484
-      - sshd
-      - patch
-
-- name: "| MEDIUM | V-38484 | PATCH |\n
-        The operating system, upon successful logon, must display to the user the date and time of the last logon or access via ssh."
-  lineinfile:
-      line: 'PrintLastLog yes' 
-      dest: /etc/ssh/sshd_config
-  tags:
-      - medium
-      - cat2
-      - V-38484
-      - sshd
-      - patch
-
-# V-38486 cannot be automated
-# V-38488 cannot be automated
-
-- name: "| MEDIUM | V-38489 | AUDIT |\n
-        A file integrity tool must be installed."
-  command: rpm -q aide
-  ignore_errors: yes
-  register: aide_installed_audit
-  changed_when: no
-  always_run: yes
-  tags:
-      - medium
-      - cat2
-      - V-38489
-      - audit
-      - aide
-      - integrity
-
-- name: "| MEDIUM | V-38489 | PATCH |\n
-        A file integrity tool must be installed."
-  yum:
-      name: aide
-      state: present
-  tags:
-      - medium
-      - cat2
-      - V-38489
-      - audit
-      - aide
-      - integrity
+- name: "V-38461 Medium  The /etc/group file must have mode 0644 or less permissive\n    V-38458 V-38459 Medium  The /etc/group file must be owned and group-owned by root"
+  file: path=/etc/group owner=root group=root mode="u-x,g-wx,o-wx"
+  tags: [ 'cat2' , 'V-38458' , 'V-38459' , 'V-38461' , 'file_perms' ]
 
 
 # Search for world writable files and print them out if any are found
@@ -620,6 +229,16 @@
   when: ypbind_test.msg is defined and "'FAIL' not in ypbind_test.msg"
   tags: [ 'cat2' , 'V-38604' , 'insecure_services' , 'ypbind' ]
 
+- name: V-38606 Medium  The tftp-server package must not be installed
+  yum: name=tftp-server state=absent
+  when: not rhel6stig_tftp_required
+  tags: [ 'cat2' , 'V-38606' , 'tftp' , 'tftp-server' , 'unauthorized_packages' ]
+
+- name: V-38609 Medium  The TFTP service must not be running
+  command: chkconfig tftp off
+  when: "not rhel6stig_tftp_required and 'tftp' in xinetd_services.stdout_lines"
+  tags: [ 'cat2' , 'V-38609' , 'tftp' , 'tftp-server' , 'insecure_services' ]
+  notify: reload xinetd
 
 # Required packages
 - name: V-38605 Medium  The cron service must be running
@@ -686,6 +305,19 @@
   when: not remote_logging_servers.stdout and not rhel6stig_fullauto
   tags: [ 'cat2' , 'V-38521' , 'auditd' , 'logging' ]
 
+- name: "V-38485 Medium  The operating system, upon successful logon, must display to the user the date and time of the last logon or access via a local console or tty"
+  file: path={{ item }} state=absent
+  with_flattened:
+    - /etc/hushlogins
+    - users.stdout_lines
+  tags: [ 'cat2' , 'V-38485' , 'logon_settings' , 'tty' ]
+
+- name: Checking for updates
+  command: yum check-update
+  changed_when: result.rc == 100
+  failed_when: result.rc == 1
+  register: result
+  tags: [ 'cat2' , 'V-38481' , 'yum' , 'updates' ]
 
 - name: V-38481 Medium  System security patches and updates must be installed and up-to-date
   yum: 
@@ -746,6 +378,37 @@
   notify: restart auditd
   tags: [ 'cat2' , 'V-38464' , 'V-38468' , 'V-38470' , 'V-38633' , 'V-38634' , 'V-38636' , 'V-38678' , 'V-38680' , 'V-54381' , 'auditd' ]
 
+- name: V-38472 V-38466 Medium  All system command and library files must be owned by root
+  file: dest={{ item }} owner=root recurse=yes
+  with_items:
+    - /bin
+    - /usr/bin
+    - /usr/local/bin
+    - /sbin
+    - /usr/sbin
+    - /usr/local/sbin
+    - /lib
+    - /lib64
+    - /usr/lib
+    - /usr/lib64
+  tags: [ 'cat2' , 'V-38472' , 'V-38466' , 'file_perms' ]
+
+- name: V-38469 V-38465 Medium  All system command and library files must have mode 0755 or less permissive
+  shell: find {{ item }} -perm /022 -type f -exec chmod -c -f go-w {} +;
+  register: result
+  changed_when: result.stdout
+  with_items:
+    - /bin
+    - /usr/bin
+    - /usr/local/bin
+    - /sbin
+    - /usr/sbin
+    - /usr/local/sbin
+    - /lib
+    - /lib64
+    - /usr/lib
+    - /usr/lib64
+  tags: [ 'cat2' , 'V-38469' , 'V-38465' , 'file_perms' ]
 
 - name: "V-38445 V-38495 Medium  Audit log files must be owned and group-owned by root\n    V-38493 Medium  Audit log directories must have mode 0755 or less permissive"
   shell: chown -c -f -R root:root /var/log/audit && chmod -c -f -R go-w /var/log/audit
@@ -802,6 +465,20 @@
   when: interface_config_files.stdout and not rhel6stig_use_dhcp
   tags: [ 'cat2' , 'V-38679' , 'network' , 'dhcp' ]
 
+
+# default user and password settings
+- name: V-38475 Medium  The system must require passwords to contain a minimum of 14 characters
+  lineinfile: "state=present dest=/etc/login.defs regexp='^PASS_MIN_LEN' line='PASS_MIN_LEN    {{ rhel6stig_pass_min_length }}' backup=yes"
+  tags: [ 'cat2' , 'V-38475' , 'passwords' ]
+
+- name: V-38477 Medium  Users must not be able to change passwords more than once every 24 hours
+  lineinfile: "state=present dest=/etc/login.defs regexp='^PASS_MIN_DAYS' line='PASS_MIN_DAYS   {{ rhel6stig_pass_min_days }}' backup=yes"
+  tags: [ 'cat2' , 'V-38477' , 'passwords' ]
+
+- name: V-38479 Medium  User passwords must be changed at least every 60 days
+  lineinfile: "state=present dest=/etc/login.defs regexp='^PASS_MAX_DAYS' line='PASS_MAX_DAYS   {{ rhel6stig_pass_max_days }}' backup=yes"
+  tags: [ 'cat2' , 'V-38479' , 'passwords' ]
+
 - name: V-38576 Medium  The system must use a FIPS 140-2 approved cryptographic hashing algorithm for generating account password hashes (login.defs)
   lineinfile: "state=present backup=yes dest=/etc/login.defs regexp='^ENCRYPT_METHOD' line='ENCRYPT_METHOD SHA512'"
   tags: [ 'cat2' , 'V-38576' , 'passwords' ]
@@ -814,7 +491,19 @@
 # Get a list of all repo files on remote system
 # Ideally, this would be done using with_fileglobs instead of two separate actions,
 # but with_fileglobs only operates on the host filesystem, not the remote.
+- name: List yum repository files
+  shell: ls /etc/yum.repos.d/*.repo
+  changed_when: false
+  register: yum_repos
+  failed_when: "'FAIL' in yum_repos.stdout"
+  tags: [ 'cat2' , 'V-38483' , 'V-38487' , 'rpm' , 'gpgcheck' ]
 
+- name: "V-38483 Medium  The system package management tool must cryptographically verify the authenticity of system software packages during installation\n     V-38487  Low     The system package management tool must cryptographically verify the authenticity of all software packages during installation"
+  replace: backup=yes dest={{ item }} regexp='^gpgcheck=0' replace='gpgcheck=1'
+  tags: [ 'cat2' , 'V-38483' , 'V-38487' , 'rpm' , 'gpgcheck' ]
+  with_flattened:
+    - /etc/yum.conf
+    - yum_repos.stdout_lines
 
 # GUI logon settings
 - name: "V-38689 Medium  The Department of Defense (DoD) login banner must be displayed immediately prior to, or as part of, graphical desktop environment login prompts"
@@ -855,6 +544,11 @@
     - net-pf-31
   tags: [ 'cat2' , 'V-38682' , 'kernel_modules' , 'bluetooth' ]
 
+
+- name: V-38489 Medium  A file integrity tool must be installed
+  yum: name=aide state=present
+  tags: [ 'cat2' , 'V-38489' , 'file_integrity' , 'aide' ]
+  notify: init aide
 
 - name: "V-38670 Medium   The operating system must detect unauthorized changes to software and information.\n
          \tV-38673 Medium  The operating system must ensure unauthorized, security-relevant configuration changes detected are tracked.\n
@@ -1032,6 +726,11 @@
   lineinfile: "state=present backup=yes dest=/etc/sysconfig/init regexp='^PROMPT=' line='PROMPT=no'"
   tags: [ 'cat2' , 'V-38588' , 'interactive_boot' ]
 
+
+- name: "V-38504 Medium  The /etc/shadow file must have mode 0000\n    V-38502 V-38503 Medium  The /etc/shadow file must be owned and group-owned by root"
+  file: dest=/etc/shadow owner=root group=root mode=0000
+  tags: [ 'cat2' , 'V-38504' , 'V-38502' , 'V-38503' , 'file_perms' ]
+
 - name: List accounst with UID 0
   shell: "awk -F: '($3 == \"0\") {print}' /etc/passwd | grep -v root"
   changed_when: false
@@ -1192,7 +891,17 @@
   tags: [ 'cat2' , 'V-38617' , 'V-38611' , 'V-38612' , 'V-38613', 'ssh' ]
   notify: restart ssh
 
-
+- name: V-38615 Medium  The SSH daemon must be configured with the Department of Defense (DoD) login banner.
+  lineinfile: >
+    state={{ item.st }}
+    backup=yes dest=/etc/ssh/sshd_config
+    regexp={{ item.rx }}
+    line={{ item.ln }}
+  with_items:
+    - { st: 'present', rx: "'^#?Banner'", ln: "'Banner /etc/issue'" }
+    - { st: 'present', rx: "'^(#)?PrintLastLog'", ln: "'PrintLastLog yes'" }
+  tags: [ 'cat2' , 'V-38615' , 'V-38484' , 'ssh' , 'logon_settings' , 'dod_logon_banner' ]
+  notify: restart ssh
 
 # IPv6 Firewall and Network settings
 - name: V-38444 Medium  The systems local IPv6 firewall must implement a deny-all allow-by-exception policy for inbound packets
