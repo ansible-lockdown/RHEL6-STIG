@@ -56,41 +56,6 @@
       - nfs
 
 # CAT II
-- name: "| MEDIUM | V-38439 | NONE |\n
-        The system must provide automated support for account management functions."
-  debug:
-      msg: "V-38439 not automated and cannot be checked"
-  always_run: yes
-  tags:
-      - medium
-      - cat2
-      - V-38439
-      - accounts
-      - none
-
-- name: "| MEDIUM | V-38486 | NONE |\n
-        The operating system must conduct backups of system-level information contained in the information system per organization defined frequency to conduct backups that are consistent with recovery time and recovery point objectives."
-  debug:
-      msg: "V-38486 cannot be automated and cannot be checked"
-  always_run: yes
-  tags:
-      - medium
-      - cat2
-      - V-38486
-      - backups
-      - none
-
-- name: "| MEDIUM | V-38488 | NONE |\n
-        The operating system must conduct backups of user-level information contained in the operating system per organization defined frequency to conduct backups consistent with recovery time and recovery point objectives."
-  debug:
-      msg: "V-38488 cannot be automated and cannot be checked"
-  always_run: yes
-  tags:
-      - medium
-      - cat2
-      - V-38488
-      - backups
-      - none
 
 # CAT III
 - name: "| LOW | V-38455 | AUDIT |\n
