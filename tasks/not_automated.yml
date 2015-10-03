@@ -136,11 +136,11 @@
   register: missing_group_audit
   always_run: yes
   tags:
-    - cat3
-    - low
-    - V-38681
-    - accounts
-    - audit
+      - cat3
+      - low
+      - V-38681
+      - accounts
+      - audit
 
 - name: "| LOW | V-38683 | AUDIT |\n
         All accounts on the system must have unique user or account names"
@@ -150,8 +150,8 @@
   register: duplicate_account_audit
   always_run: yes
   tags:
-    - cat3
-    - low
-    - V-38683
-    - accounts
-    - audit
+      - cat3
+      - low
+      - V-38683
+      - accounts
+      - audit

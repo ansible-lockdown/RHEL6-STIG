@@ -9,42 +9,46 @@
   failed_when: false
   always_run: yes
   tags:
-    - cat3
-    - low
-    - V-38437
-    - autofs
-    - services
-    - audit
+      - cat3
+      - low
+      - V-38437
+      - autofs
+      - services
+      - audit
 
 - name: "| LOW | V-38437 | PATCH |\n
         Automated file system mounting tools must not be enabled unless needed."
   service:
-    name: autofs
-    state: stopped
-    enabled: no
+      name: autofs
+      state: stopped
+      enabled: no
   when: "':on' in autofs_service_audit.stdout"
   tags:
-    - cat3
-    - low
-    - V-38437
-    - autofs
-    - services
-    - patch
+      - cat3
+      - low
+      - V-38437
+      - autofs
+      - services
+      - patch
 
 # V-38438 grub
 
 # V-38447 rpm hashes
-- name: "| PRELIM | V-38447, V-38452, V-38453, V-38454 |\n
+- name: "| LOW | V-38447, V-38452, V-38453, V-38454 | AUDIT |\n
         Verify all rpm packages and store output for later use."
   command: rpm -Va
   changed_when: false
   failed_when: false
   register: rpm_verify_packages
+  always_run: yes
   tags:
-    - V-38447
-    - V-38452
-    - V-38453
-    - V-38454
+      - cat3
+      - low
+      - V-38447
+      - V-38452
+      - V-38453
+      - V-38454
+      - audit
 
 - name: "| LOW | V-38447 | AUDIT |\n
         The system package management tool must verify contents of all files associated with packages."
@@ -52,12 +56,13 @@
   register: rpm_integrity_audit
   when: item | match("^..5......[^c]*/.+$")
   with_items: rpm_verify_packages.stdout_lines
+  always_run: yes
   tags:
-    - cat3
-    - low
-    - V-38447
-    - rpm
-    - audit
+      - cat3
+      - low
+      - V-38447
+      - rpm
+      - audit
 
 - name: "| LOW | V-38447 | PATCH |\n
         The system package management tool must verify contents of all files associated with packages."
@@ -65,11 +70,11 @@
   when: item|changed
   with_items: rpm_integrity_audit.results
   tags:
-    - cat3
-    - low
-    - V-38447
-    - rpm
-    - patch
+      - cat3
+      - low
+      - V-38447
+      - rpm
+      - patch
 
 # V-38452 rpm system permissions
 - name: "| LOW | V-38452 | AUDIT |\n
@@ -78,12 +83,13 @@
   when: item | match("^.M.......\\s+.*?/.+$")
   register: rpm_file_permissions_audit
   with_items: rpm_verify_packages.stdout_lines
+  always_run: yes
   tags:
-    - cat3
-    - low
-    - V-38452
-    - rpm
-    - audit
+      - cat3
+      - low
+      - V-38452
+      - rpm
+      - audit
 
 - name: "| LOW | V-38452 | PATCH |\n
         The system package management tool must verify permissions on all files and directories associated with packages."
@@ -91,11 +97,11 @@
   when: item|changed
   with_items: rpm_file_permissions_audit.results
   tags:
-    - cat3
-    - low
-    - V-38452
-    - rpm
-    - patch
+      - cat3
+      - low
+      - V-38452
+      - rpm
+      - patch
 
 # V-38453 rpm group perms
 - name: "| LOW | V-38453 | AUDIT |\n
@@ -104,12 +110,13 @@
   when: item | match("^......G..\\s+.*?/.+$")
   register: rpm_group_ownership_audit
   with_items: rpm_verify_packages.stdout_lines
+  always_run: yes
   tags:
-    - cat3
-    - low
-    - V-38453
-    - rpm
-    - audit
+      - cat3
+      - low
+      - V-38453
+      - rpm
+      - audit
 
 - name: "| LOW | V-38453 | PATCH |\n
         The system package management tool must verify group-ownership on all files and directories associated with packages."
@@ -117,11 +124,11 @@
   when: item|changed
   with_items: rpm_group_ownership_audit.results
   tags:
-    - cat3
-    - low
-    - V-38453
-    - rpm
-    - audit
+      - cat3
+      - low
+      - V-38453
+      - rpm
+      - audit
 
 # V-38454 rpm user perms
 - name: "| LOW | V-38454 | AUDIT |\n
@@ -130,12 +137,13 @@
   when: item | match("^.....U...\\s+.*?/.+$")
   register: rpm_group_ownership_audit
   with_items: rpm_verify_packages.stdout_lines
+  always_run: yes
   tags:
-    - cat3
-    - low
-    - V-38454
-    - rpm
-    - audit
+      - cat3
+      - low
+      - V-38454
+      - rpm
+      - audit
 
 - name: "| LOW | V-38454 | PATCH |\n
         The system package management tool must verify ownership on all files and directories associated with packages."
@@ -143,11 +151,11 @@
   when: item|changed
   with_items: rpm_group_ownership_audit.results
   tags:
-    - cat3
-    - low
-    - V-38454
-    - rpm
-    - audit
+      - cat3
+      - low
+      - V-38454
+      - rpm
+      - audit
 
 # V-38455 see not_automated.yml
 
@@ -166,12 +174,13 @@
   register: auditd_syslog_output_audit
   failed_when: auditd_syslog_output_audit.rc == 2
   changed_when: false
+  always_run: yes
   tags:
-    - cat3
-    - low
-    - V-38471
-    - auditd
-    - audit
+      - cat3
+      - low
+      - V-38471
+      - auditd
+      - audit
 
 - name: "| LOW | V-38471 | PATCH |\n
         The system must forward audit records to the syslog service."
@@ -183,11 +192,11 @@
       line: 'active = yes'
   notify: restart auditd
   tags:
-    - cat3
-    - low
-    - V-38471
-    - auditd
-    - patch
+      - cat3
+      - low
+      - V-38471
+      - auditd
+      - patch
 
 # V-38473 see not_automated.yml
 
@@ -197,23 +206,24 @@
   command: gconftool-2 --direct --config-source xml:readwrite:/etc/gconf/gconf.xml.mandatory --get /apps/gnome_settings_daemon/keybindings/screensaver
   when: rhel6stig_xwindows_required
   register: gui_screen_lock_hotkey_audit
+  always_run: yes
   tags:
-    - cat3
-    - low
-    - V-38474
-    - screen_lock
-    - audit
+      - cat3
+      - low
+      - V-38474
+      - screen_lock
+      - audit
 
 - name: "| LOW | V-38474 | PATCH |\n
         Low  The system must allow locking of graphical desktop sessions."
   command: gconftool-2 --direct --config-source xml:readwrite:/etc/gconf/gconf.xml.mandatory --type string --set /apps/gnome_settings_daemon/keybindings/screensaver "<Ctrl><Alt>l"
   when: rhel6stig_xwindows_required
   tags:
-    - cat3
-    - low
-    - V-38474
-    - screen_lock
-    - patch
+      - cat3
+      - low
+      - V-38474
+      - screen_lock
+      - patch
 
 # V-38478 rhnsd service
 - name: "| LOW | V-38478 | AUDIT |\n
@@ -224,11 +234,11 @@
   changed_when: false
   ignore_errors: yes
   tags:
-    - cat3
-    - low
-    - V-38478
-    - rhnsd
-    - audit
+      - cat3
+      - low
+      - V-38478
+      - rhnsd
+      - audit
 
 - name: "| LOW | V-38478 | PATCH |\n
         The Red Hat Network Service (rhnsd) service must not be running, unless using RHN or an RHN Satellite."
@@ -237,11 +247,11 @@
   when: "rhnsd_service_audit.rc == 0 and ':on' in rhnsd_service_audit.stdout"
   failed_when: "result.rc != 0 and ':on' in result.stdout"
   tags:
-    - cat3
-    - low
-    - V-38478
-    - rhnsd
-    - patch
+      - cat3
+      - low
+      - V-38478
+      - rhnsd
+      - patch
 
 - name: "| LOW | V-38478 | PATCH |\n
         The Red Hat Network Service (rhnsd) service must not be running, unless using RHN or an RHN Satellite."
@@ -251,11 +261,11 @@
   failed_when: result.rc != 0 and result.rc != 6
   changed_when: "result.rc == 0 and 'Stopping' in result.stdout and 'OK' in result.stdout"
   tags:
-    - cat3
-    - low
-    - V-38478
-    - rhnsd
-    - patch
+      - cat3
+      - low
+      - V-38478
+      - rhnsd
+      - patch
 
 # V-38480 pass warn age
 - name: "| LOW | V-38480 | AUDIT |\n
@@ -264,12 +274,13 @@
   register: logindefs_pass_warn_age_audit
   failed_when: logindefs_pass_warn_age_audit.rc == 2
   changed_when: false
+  always_run: yes
   tags:
-    - cat3
-    - low
-    - V-38480
-    - passwords
-    - audit
+      - cat3
+      - low
+      - V-38480
+      - passwords
+      - audit
 
 - name: "| LOW | V-38480 | PATCH |\n
         Users must be warned 7 days in advance of password expiration."
@@ -280,11 +291,11 @@
       regexp: '^#?PASS_WARN_AGE'
       line: 'PASS_WARN_AGE\t7'
   tags:
-    - cat3
-    - low
-    - V-38480
-    - passwords
-    - patch
+      - cat3
+      - low
+      - V-38480
+      - passwords
+      - patch
 
 # V-38482 pam cracklib digits
 
@@ -326,12 +337,13 @@
   register: securetty_serial_consoles_audit
   failed_when: securetty_serial_consoles_audit.rc == 2
   changed_when: false
+  always_run: yes
   tags:
-    - cat3
-    - low
-    - V-38494
-    - secure_tty
-    - audit
+      - cat3
+      - low
+      - V-38494
+      - secure_tty
+      - audit
 
 - name: "| LOW | V-38494 | PATCH |\n
         The system must prevent the root account from logging in from serial consoles."
@@ -341,11 +353,11 @@
       regexp: '^ttyS[0-9]'
       backup: no
   tags:
-    - cat3
-    - low
-    - V-38494
-    - secure_tty
-    - patch
+      - cat3
+      - low
+      - V-38494
+      - secure_tty
+      - patch
 
 # V-38516 modprobe rds
 - name: "| LOW | V-38516 | AUDIT |\n
@@ -353,13 +365,14 @@
   shell: find /etc/modprobe.* -type f -name '*.conf' -exec grep -ls '^install rds /bin/(true|false)' {} \;
   register: modprobe_disable_rds_audit
   failed_when: false
+  always_run: yes
   tags:
-    - cat3
-    - low
-    - V-38516
-    - rds
-    - kernel_modules
-    - audit
+      - cat3
+      - low
+      - V-38516
+      - rds
+      - kernel_modules
+      - audit
 
 - name: "| LOW | V-38516 | PATCH |\n
         The Reliable Datagram Sockets (RDS) protocol must be disabled unless required."
@@ -371,12 +384,12 @@
       group: root
       mode: 0644
   tags:
-    - cat3
-    - low
-    - V-38516
-    - rds
-    - kernel_modules
-    - patch
+      - cat3
+      - low
+      - V-38516
+      - rds
+      - kernel_modules
+      - patch
 
 # V-38522 auditd timeofday changes
 
@@ -459,13 +472,14 @@
   register: pkgs_screen_installed_audit
   changed_when: false
   failed_when: false
+  always_run: yes
   tags:
-    - cat3
-    - low
-    - V-38590
-    - screen_lock
-    - screen
-    - audit
+      - cat3
+      - low
+      - V-38590
+      - screen_lock
+      - screen
+      - audit
 
 - name: "| LOW | V-38590 | PATCH |\n
         The system must allow locking of the console screen in text mode."
@@ -473,12 +487,12 @@
       name: screen
       state: latest
   tags:
-    - cat3
-    - low
-    - V-38590
-    - screen_lock
-    - screen
-    - patch
+      - cat3
+      - low
+      - V-38590
+      - screen_lock
+      - screen
+      - patch
 
 # V-38608 sshd conf
 
@@ -505,12 +519,12 @@
   failed_when: false
   always_run: yes
   tags:
-    - cat3
-    - low
-    - V-38640
-    - abrtd
-    - services
-    - audit
+      - cat3
+      - low
+      - V-38640
+      - abrtd
+      - services
+      - audit
 
 - name: "| LOW | V-38640 | AUDIT |\n
         The Automatic Bug Reporting Tool (abrtd) service must not be running."
@@ -520,27 +534,27 @@
   failed_when: false
   always_run: yes
   tags:
-    - cat3
-    - low
-    - V-38640
-    - abrtd
-    - services
-    - audit
+      - cat3
+      - low
+      - V-38640
+      - abrtd
+      - services
+      - audit
 
 - name: "| LOW | V-38640 | PATCH |\n
         The Automatic Bug Reporting Tool (abrtd) service must not be running."
   service:
-    name: abrtd
-    state: stopped
-    enabled: no
+      name: abrtd
+      state: stopped
+      enabled: no
   when: "':on' in abrtd_service_enabled_audit or abrtd_service_running_audit.rc == 0"
   tags:
-    - cat3
-    - low
-    - V-38640
-    - abrtd
-    - services
-    - patch
+      - cat3
+      - low
+      - V-38640
+      - abrtd
+      - services
+      - patch
 
 # V-38641 atd service
 - name: "| LOW | V-38641 | AUDIT |\n
@@ -551,12 +565,12 @@
   failed_when: false
   always_run: yes
   tags:
-    - cat3
-    - low
-    - V-38641
-    - atd
-    - services
-    - audit
+      - cat3
+      - low
+      - V-38641
+      - atd
+      - services
+      - audit
 
 - name: "| LOW | V-38641 | AUDIT |\n
         The atd service must be disabled."
@@ -566,27 +580,27 @@
   failed_when: false
   always_run: yes
   tags:
-    - cat3
-    - low
-    - V-38641
-    - atd
-    - services
-    - audit
+      - cat3
+      - low
+      - V-38641
+      - atd
+      - services
+      - audit
 
 - name: "| LOW | V-38641 | PATCH |\n
         The atd service must be disabled."
   service:
-    name: atd
-    state: stopped
-    enabled: no
+      name: atd
+      state: stopped
+      enabled: no
   when: "':on' in atd_service_enabled_audit or atd_service_running_audit.rc == 0"
   tags:
-    - cat3
-    - low
-    - V-38641
-    - atd
-    - services
-    - patch
+      - cat3
+      - low
+      - V-38641
+      - atd
+      - services
+      - patch
 
 # V-38642 umask
 
@@ -599,12 +613,12 @@
   failed_when: false
   always_run: yes
   tags:
-    - cat3
-    - low
-    - V-38644
-    - ntpdate
-    - services
-    - audit
+      - cat3
+      - low
+      - V-38644
+      - ntpdate
+      - services
+      - audit
 
 - name: "| LOW | V-38644 | AUDIT |\n
         The ntpdate service must be disabled."
@@ -614,27 +628,27 @@
   failed_when: false
   always_run: yes
   tags:
-    - cat3
-    - low
-    - V-38644
-    - ntpdate
-    - services
-    - audit
+      - cat3
+      - low
+      - V-38644
+      - ntpdate
+      - services
+      - audit
 
 - name: "| LOW | V-38644 | PATCH |\n
         The ntpdate service must be disabled."
   service:
-    name: ntpdate
-    state: stopped
-    enabled: no
+      name: ntpdate
+      state: stopped
+      enabled: no
   when: "':on' in ntpdate_service_enabled_audit or ntpdate_service_running_audit.rc == 0"
   tags:
-    - cat3
-    - low
-    - V-38644
-    - ntpdate
-    - services
-    - patch
+      - cat3
+      - low
+      - V-38644
+      - ntpdate
+      - services
+      - patch
 
 # V-38645 umask
 
@@ -647,12 +661,12 @@
   failed_when: false
   always_run: yes
   tags:
-    - cat3
-    - low
-    - V-38646
-    - oddjobd
-    - services
-    - audit
+      - cat3
+      - low
+      - V-38646
+      - oddjobd
+      - services
+      - audit
 
 - name: "| LOW | V-38646 | AUDIT |\n
         The oddjobd service must be disabled."
@@ -662,27 +676,27 @@
   failed_when: false
   always_run: yes
   tags:
-    - cat3
-    - low
-    - V-38646
-    - oddjobd
-    - services
-    - audit
+      - cat3
+      - low
+      - V-38646
+      - oddjobd
+      - services
+      - audit
 
 - name: "| LOW | V-38646 | PATCH |\n
         The oddjobd service must be disabled."
   service:
-    name: oddjobd
-    state: stopped
-    enabled: no
+      name: oddjobd
+      state: stopped
+      enabled: no
   when: "':on' in oddjobd_service_enabled_audit or oddjobd_service_running_audit.rc == 0"
   tags:
-    - cat3
-    - low
-    - V-38646
-    - oddjobd
-    - services
-    - patch
+      - cat3
+      - low
+      - V-38646
+      - oddjobd
+      - services
+      - patch
 
 # V-38647 umask
 
@@ -695,12 +709,12 @@
   failed_when: false
   always_run: yes
   tags:
-    - cat3
-    - low
-    - V-38648
-    - qpidd
-    - services
-    - audit
+      - cat3
+      - low
+      - V-38648
+      - qpidd
+      - services
+      - audit
 
 - name: "| LOW | V-38648 | AUDIT |\n
         The qpidd service must be disabled."
@@ -710,27 +724,27 @@
   failed_when: false
   always_run: yes
   tags:
-    - cat3
-    - low
-    - V-38648
-    - qpidd
-    - services
-    - audit
+      - cat3
+      - low
+      - V-38648
+      - qpidd
+      - services
+      - audit
 
 - name: "| LOW | V-38648 | PATCH |\n
         The qpidd service must be disabled."
   service:
-    name: qpidd
-    state: stopped
-    enabled: no
+      name: qpidd
+      state: stopped
+      enabled: no
   when: "':on' in qpidd_service_enabled_audit or qpidd_service_running_audit.rc == 0"
   tags:
-    - cat3
-    - low
-    - V-38648
-    - qpidd
-    - services
-    - patch
+      - cat3
+      - low
+      - V-38648
+      - qpidd
+      - services
+      - patch
 
 # V-38649 umask
 
@@ -743,12 +757,12 @@
   failed_when: false
   always_run: yes
   tags:
-    - cat3
-    - low
-    - V-38650
-    - rdisc
-    - services
-    - audit
+      - cat3
+      - low
+      - V-38650
+      - rdisc
+      - services
+      - audit
 
 - name: "| LOW | V-38650 | AUDIT |\n
         The rdisc service must be disabled."
@@ -758,27 +772,27 @@
   failed_when: false
   always_run: yes
   tags:
-    - cat3
-    - low
-    - V-38650
-    - rdisc
-    - services
-    - audit
+      - cat3
+      - low
+      - V-38650
+      - rdisc
+      - services
+      - audit
 
 - name: "| LOW | V-38650 | PATCH |\n
         The rdisc service must be disabled."
   service:
-    name: rdisc
-    state: stopped
-    enabled: no
+      name: rdisc
+      state: stopped
+      enabled: no
   when: "':on' in rdisc_service_enabled_audit or rdisc_service_running_audit.rc == 0"
   tags:
-    - cat3
-    - low
-    - V-38650
-    - rdisc
-    - services
-    - patch
+      - cat3
+      - low
+      - V-38650
+      - rdisc
+      - services
+      - patch
 
 # V-38651 umask
 
@@ -796,7 +810,6 @@
 
 # V-38669 postfix serviceThe postfix service must be enabled for mail delivery.
 
-
 # V-38672 netconsole service
 - name: "| LOW | V-38672 | AUDIT |\n
         The netconsole service must not be running."
@@ -806,12 +819,12 @@
   failed_when: false
   always_run: yes
   tags:
-    - cat3
-    - low
-    - V-38672
-    - netconsole
-    - services
-    - audit
+      - cat3
+      - low
+      - V-38672
+      - netconsole
+      - services
+      - audit
 
 - name: "| LOW | V-38672 | AUDIT |\n
         The netconsole service must be disabled."
@@ -821,27 +834,27 @@
   failed_when: false
   always_run: yes
   tags:
-    - cat3
-    - low
-    - V-38672
-    - netconsole
-    - services
-    - audit
+      - cat3
+      - low
+      - V-38672
+      - netconsole
+      - services
+      - audit
 
 - name: "| LOW | V-38672 | PATCH |\n
         The netconsole service must be disabled."
   service:
-    name: netconsole
-    state: stopped
-    enabled: no
+      name: netconsole
+      state: stopped
+      enabled: no
   when: "':on' in netconsole_service_enabled_audit or netconsole_service_running_audit.rc == 0"
   tags:
-    - cat3
-    - low
-    - V-38672
-    - netconsole
-    - services
-    - patch
+      - cat3
+      - low
+      - V-38672
+      - netconsole
+      - services
+      - patch
 
 # V-38675 limits core
 
@@ -941,11 +954,6 @@
 - name: V-38528 Low  The system must log Martian packets
   sysctl: name=net.ipv4.conf.all.log_martians value=1 state=present reload=yes ignoreerrors=yes
   tags: [ 'cat3' , 'V-38528' , 'martian_packets' , 'kernel_parameters' ]
-
-# - name: V-38661 Low  The operating system must protect the confidentiality and integrity of data at rest
-# - name: V-38662 Low  The operating system must employ cryptographic mechanisms to prevent unauthorized disclosure of data at rest unless otherwise protected by alternative physical measures
-# - name: V-38467 Low The system must use a separate file system for the system audit data path
-# - name: V-38463 Low The system must use a separate file system for /var/log
 
 - name: V-38460 Low  The NFS server must not have the all_squash option enabled
   replace: backup=yes dest=/etc/exports regexp=',?all_squash'
