@@ -1,8 +1,8 @@
 ---
 - include: prelim.yml
   tags:
-    - prelim_tasks
-    - test
+      - prelim_tasks
+      - test
 
 - include: cat1.yml
   when: rhel6stig_cat1
@@ -15,9 +15,9 @@
 
 - include: post.yml
   tags:
-    - post_tasks
-    - test
+      - post_tasks
+      - test
 
 - include: not_automated.yml
   tags:
-    - not_auto_fixed
+      - not_auto_fixed
