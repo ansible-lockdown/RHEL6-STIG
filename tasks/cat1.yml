@@ -278,35 +278,6 @@
       - rlogin
       - patch
 
-- name: "HIGH | V-38653 | AUDIT | The snmpd service must not use a default password"
-  shell: grep -v "^#" /etc/snmp/snmpd.conf| grep public
-  register: snmpd_audit
-  failed_when: snmpd_audit.rc not in [0,1]
-  always_run: yes
-  when: snmpconf_test.stat.exists
-  changed_when: no
-  tags:
-      - cat1
-      - high
-      - V-38653
-      - snmp
-      - audit
-
-- name: "HIGH | V-38653 | PATCH | The snmpd service must not use a default password"
-  replace:
-      backup: yes
-      dest: /etc/snmp/snmpd.conf
-      regexp: (^com2sec.*default\s+)public
-      replace: \1{{ rhel6stig_snmp_community }}
-  when: snmpconf_test.stat.exists and snmpd_audit.stdout != []
-  notify: restart snmpd
-  tags:
-      - cat1
-      - high
-      - V-38653
-      - snmp
-      - patch
-
 - name: "HIGH | V-38607 | AUDIT | The SSH daemon must be configured to use only the SSHv2 protocol"
   command: grep "Protocol 2" /etc/ssh/sshd_config
   register: proto2_audit
@@ -359,6 +330,35 @@
       - cat1
       - V-38614
       - ssh
+
+- name: "HIGH | V-38653 | AUDIT | The snmpd service must not use a default password"
+  shell: grep -v "^#" /etc/snmp/snmpd.conf| grep public
+  register: snmpd_audit
+  failed_when: snmpd_audit.rc not in [0,1]
+  always_run: yes
+  when: snmpconf_test.stat.exists
+  changed_when: no
+  tags:
+      - cat1
+      - high
+      - V-38653
+      - snmp
+      - audit
+
+- name: "HIGH | V-38653 | PATCH | The snmpd service must not use a default password"
+  replace:
+      backup: yes
+      dest: /etc/snmp/snmpd.conf
+      regexp: (^com2sec.*default\s+)public
+      replace: \1{{ rhel6stig_snmp_community }}
+  when: snmpconf_test.stat.exists and snmpd_audit.stdout != []
+  notify: restart snmpd
+  tags:
+      - cat1
+      - high
+      - V-38653
+      - snmp
+      - patch
 
 # V-38666 checks can be found in not_automated.yml
 
@@ -422,3 +422,4 @@
       - tftp-server
       - unsecure_services
   notify: reload xinetd
+
