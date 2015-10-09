@@ -132,7 +132,7 @@
         All GIDs referenced in /etc/passwd must be defined in /etc/group"
   shell: pwck -r | grep 'no group'
   changed_when: false
-  failed_when: missing_group_audit.rc == 1 or missing_group_audit.rc >= 3
+  failed_when: false
   register: missing_group_audit
   always_run: yes
   tags:
@@ -146,7 +146,7 @@
         All accounts on the system must have unique user or account names"
   shell: pwck -rq | grep -A1 'duplicate' | grep -v 'duplicate'
   changed_when: false
-  failed_when: duplicate_account_audit.rc == 1 or duplicate_account_audit.rc >= 3
+  failed_when: false
   register: duplicate_account_audit
   always_run: yes
   tags:
@@ -154,4 +154,30 @@
       - low
       - V-38683
       - accounts
+      - audit
+
+- name: " LOW | V-38697 | AUDIT | The sticky bit must be set on all public directories."
+  shell: "lsblk | awk '$6 == \"part\" && $7 ~ /\\// {print $NF}' | xargs -I{} find {} -xdev -type d -perm -0002 \\! -perm -1000"
+  changed_when: false
+  register: stick_bit_public_dir_audit
+  always_run: yes
+  tags:
+      - cat3
+      - low
+      - V-38697
+      - permissions
+      - sticky_bit
+      - audit
+
+- name: " LOW | V-38699 | AUDIT | All public directories must be owned by a system account."
+  shell: "lsblk | awk '$6 == \"part\" && $7 ~ /\\// {print $NF}' | xargs -I{} find {} -xdev -type d -perm -0002 -uid +499 -print"
+  changed_when: false
+  register: system_account_public_dir_audit
+  always_run: yes
+  tags:
+      - cat3
+      - low
+      - V-38699
+      - permissions
+      - public_dir_ownership
       - audit
