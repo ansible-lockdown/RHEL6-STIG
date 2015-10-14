@@ -52,7 +52,29 @@
       - nfs
 
 # CAT II
+- name: "MEDIUM | V-38499 | AUDIT | The /etc/passwd file must not contain password hashes"
+  shell: "awk -F: '($2 != \"x\") {print}' /etc/passwd"
+  changed_when: false
+  always_run: yes
+  register: etc_password_hash_audit
+  tags:
+      - cat2
+      - V-38499
+      - medium
+      - passwords
+      - audit
 
+- name: "MEDIUM | V-38500 | AUDIT | The root account must be the only account having a UID of 0"
+  shell: "awk -F: '($3 == \"0\") {print}' /etc/passwd | grep -v root"
+  changed_when: no
+  always_run: yes
+  register: users_uid_0_audit
+  tags:
+      - cat2
+      - medium
+      - V-38500
+      - accounts
+      - audit
 # CAT III
 - name: "LOW | V-38455 | AUDIT | The system must use a separate file system for /tmp"
   shell: mount | grep "on /tmp "

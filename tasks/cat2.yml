@@ -169,7 +169,8 @@
       - patch
 
 - name: "MEDIUM | V-38465 | AUDIT | Library files must have mode 0755 or less permissive"
-  shell: find {/usr/{lib/,lib64},/lib{64,}} -perm /022 -type f
+  become_user: root
+  script: sys_libs_with_bad_perms.sh
   register: library_perms_audit
   changed_when: no
   tags:
@@ -184,7 +185,7 @@
       state: file
       mode: "go-w"
       path: "{{ item }}"
-  when: library_perms_audit.stdout != ''
+  when: library_perms_audit.stdout
   with_items: library_perms_audit.stdout_lines
   tags:
       - cat2
@@ -194,7 +195,8 @@
       - patch
 
 - name: "MEDIUM | V-38466 | AUDIT | Library files must be owned by root"
-  shell: find {/usr/{lib/,lib64},/lib{64,}} -type f ! -user root
+  become_user: root
+  script: sys_libs_with_bad_owner.sh
   register: library_owner_audit
   changed_when: no
   tags:
@@ -209,7 +211,7 @@
       state: file
       owner: "root"
       path: "{{ item }}"
-  when: library_owner_audit.stdout != ''
+  when: library_owner_audit.stdout 
   with_items: library_owner_audit.stdout_lines
   tags:
       - cat2
@@ -244,7 +246,8 @@
       - patch
 
 - name: "MEDIUM | V-38469 | AUDIT | All system command files must have mode 755 or less permissive."
-  shell: '{% raw %}find {/sbin/,/bin/,/usr/{{,s}bin/,local/{,s}bin}} -type f -perm /022{% endraw %}'
+  script: sys_command_files_with_bad_perms.sh
+  become_user: root
   register: system_files_perms_audit
   changed_when: no
   always_run: yes
@@ -259,7 +262,8 @@
   file: 
       state: file
       mode: "og-w"
-  when: "system_files_perms_audit.stdout != ''"
+      path: "{{ item }}"
+  when: system_files_perms_audit.stdout
   with_items: system_files_perms_audit.stdout_lines
   tags:
       - cat2
@@ -294,7 +298,8 @@
       - patch
 
 - name: "MEDIUM | V-38472 | Audit | All system command files must be owned by root"
-  shell: find {/sbin/,/bin/,/usr/{{,s}bin/,local/{,s}bin}} -type f ! -user root
+  script: sys_command_files_with_bad_owner.sh
+  become_user: root
   register: sys_commands_owner_audit
   always_run: yes
   changed_when: no
@@ -309,7 +314,7 @@
   file: 
       state: file
       owner: root
-  when: sys_commands_owner_audit.stdout != ''
+  when: sys_commands_owner_audit.stdout
   with_items: sys_commands_owner_audit.stdout_lines
   tags:
       - cat2
@@ -395,6 +400,7 @@
 
 - name: "MEDIUM | V-38481 | AUDIT | System security patches and updates must be installed and up-to-date."
   command: yum check-update
+  ignore_errors: yes
   changed_when: no
   register: yum_pkgs_update_audit
   tags:
@@ -594,7 +600,7 @@
       - audit_permissions
       - audit
 
-- name: "MEDIUM | V-38493 | patch | Audit log directories must have mode 0755 or less permissive."
+- name: "MEDIUM | V-38493 | PATCH | Audit log directories must have mode 0755 or less permissive."
   file:
       state: directory
       mode: "go-w"
@@ -670,6 +676,36 @@
       - accounts
       - system_accounts
 
+- name: "MEDIUM | V-38498 | AUDIT | Audit log files must have mode 0640 or less permissive."
+  shell: grep "^log_file" /etc/audit/auditd.conf|sed s/^[^\/]*//|xargs stat -c %n | xargs -I % find % -perm /137
+  register: audit_log_file_perms_audit
+  changed_when: no
+  always_run: yes
+  tags:
+      - medium
+      - cat2
+      - auditd
+      - audit
+      - logs
+      - file_perms
+
+- name: "MEDIUM | V-38498 | PATCH | Audit log files must have mode 0640 or less permissive."
+  file:
+      state: file
+      path: "{{ item }}"
+      mode: "u-x,g-wx,o-rwx"
+  with_items: audit_log_file_perms_audit.stdout_lines
+  tags:
+      - medium
+      - cat2
+      - auditd
+      - patch
+      - logs
+      - file_perms
+
+# V-38499 is checked but not automatically patched, please see not_automated.yml 
+# V-38500 is checked but not automatically patched, please see not_automated.yml 
+
 # Search for world writable files and print them out if any are found
 - name: Looking for world-writable files on the system
   command: find / -xdev -type f -perm -002
@@ -686,24 +722,6 @@
   pause: prompt="World writable files are present on the system. This is a finding. Press Enter to continue"
   when: world_writable_files.stdout_lines and not rhel6stig_fullauto
   tags: [ 'cat2' , 'V-38643', 'file_perms' ]
-
-# Look in /etc/password for hashes and print them out if any are found
-- name: V-38499 Medium  The /etc/passwd file must not contain password hashes
-  shell: "awk -F: '($2 != \"x\") {print}' /etc/passwd"
-  changed_when: false
-  register: etc_password_hash_check
-  tags: [ 'cat2' , 'V-38499' , 'passwords' ]
-
-- name: The following password hashes were found in /etc/passwd. This is a finding.
-  debug: var=etc_password_hash_check.stdout_lines
-  when: etc_password_hash_check.stdout
-  tags: [ 'cat2' , 'V-38499' , 'passwords' ]
-
-- name: V-38499 Medium  The /etc/passwd file must not contain password hashes
-  pause: prompt="Password hashes were found in /etc/passwd. This is a finding. Press Enter to continue"
-  when: etc_password_hash_check.stdout and not rhel6stig_fullauto
-  tags: [ 'cat2' , 'V-38499' , 'passwords' ]
-
 
 - name: "V-38579 V-38581 Medium  The system boot loader configuration file(s) must be owned and group-owned by root    V-38583 Medium  The system boot loader configuration file(s) must have mode 0600 or less permissive"
   file: path=/etc/grub.conf owner=root group=root mode=u-x,go-rwx follow=yes
@@ -890,7 +908,7 @@
   tags:
       - cat2
       - V-38671
-      - PATCH
+      - patch
 
 - name: "MEDIUM | V-38671 | PATCH | The sendmail package must be removed"
   yum:
@@ -899,7 +917,7 @@
   tags:
       - cat2
       - V-38671
-      - PATCH
+      - patch
       - sendmail
       - unauthorized_packages
 
@@ -1194,23 +1212,6 @@
 - name: "V-38504 Medium  The /etc/shadow file must have mode 0000\n    V-38502 V-38503 Medium  The /etc/shadow file must be owned and group-owned by root"
   file: dest=/etc/shadow owner=root group=root mode=0000
   tags: [ 'cat2' , 'V-38504' , 'V-38502' , 'V-38503' , 'file_perms' ]
-
-- name: List accounst with UID 0
-  shell: "awk -F: '($3 == \"0\") {print}' /etc/passwd | grep -v root"
-  changed_when: false
-  register: users_uid_0
-  failed_when: users_uid_0.stderr
-  tags: [ 'cat2' , 'V-38500' , 'accounts' ]
-
-- name: The accounts have a UID of 0. This is a finding.
-  debug: var=users_uid_0.stdout_lines
-  when: users_uid_0.stdout_lines
-  tags: [ 'cat2' , 'V-38500' , 'accounts' ]
-
-- name: V-38500 Medium  The root account must be the only account having a UID of 0
-  pause: prompt="Accounts with UID 0 other than root were found. This is a finding. Press Enter to continue"
-  when: users_uid_0.stdout and not rhel6stig_fullauto
-  tags: [ 'cat2' , 'V-38500' , 'accounts' ]
 
 - name: Installing NTP for V-38620 Medium/V-38621 Medium
   yum: name=ntp state=installed
