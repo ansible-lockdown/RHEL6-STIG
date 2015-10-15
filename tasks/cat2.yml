@@ -1,9 +1,8 @@
 ---
 # This audit.rules file is from https://github.com/RedHatGov/stig-fix-el6/tree/master/config
 
-# V-38439 The system must provide automated support for account management functions.
-- name: "| MEDIUM | V-38443, V-38448, V-38449 | AUDIT |\n
-         The /etc/gshadow file must be owned by root. The /etc/gshadow file must be group-owned by root. The /etc/gshadow file must have mode 0000"
+# Not automated V-38439 The system must provide automated support for account management functions.
+- name: "MEDIUM | V-38443, V-38448, V-38449 | AUDIT | The /etc/gshadow file must be owned by root. The /etc/gshadow file must be group-owned by root. The /etc/gshadow file must have mode 0000"
   stat:
       path: /etc/gshadow
   register: gshadow_stat
@@ -16,8 +15,7 @@
     - V-38443
     - file_perms
 
-- name: "| MEDIUM | V-38443 | PATCH |\n
-         The /etc/gshadow file must be owned by root."
+- name: "MEDIUM | V-38443 | PATCH | The /etc/gshadow file must be owned by root."
   file:
       path: /etc/gshadow
       owner: root
@@ -29,8 +27,7 @@
     - V-38443
     - file_perms
 
-- name: "| MEDIUM | V-38448 | PATCH |\n
-         The /etc/gshadow file must be group-owned by root."
+- name: "MEDIUM | V-38448 | PATCH | The /etc/gshadow file must be group-owned by root."
   file:
       path: /etc/gshadow
       group: root
@@ -42,8 +39,7 @@
     - V-38448
     - file_perms
 
-- name: "| MEDIUM | V-38449 | PATCH |\n
-         The /etc/gshadow file must have mode 0000"
+- name: "MEDIUM | V-38449 | PATCH | The /etc/gshadow file must have mode 0000"
   file:
       path: /etc/gshadow
       mode: "0000"
@@ -55,8 +51,7 @@
     - V-38449
     - file_perms
 
-- name: "| MEDIUM | V-38450, V-38451, V-38457 | AUDIT |\n
-        The /etc/passwd file must be owned by root. The /etc/passwd file must be group-owned by root.The /etc/passwd file must have mode 0644 or less permissive"
+- name: "MEDIUM | V-38450, V-38451, V-38457 | AUDIT | The /etc/passwd file must be owned by root. The /etc/passwd file must be group-owned by root.The /etc/passwd file must have mode 0644 or less permissive"
   stat:
       path: /etc/passwd
   register: /etc/passwd_stat
@@ -69,8 +64,7 @@
     - audit
     - file_perms
 
-- name: "| MEDIUM | V-38450 | PATCH |\n
-         The /etc/passwd file be owned by root"
+- name: "MEDIUM | V-38450 | PATCH | The /etc/passwd file be owned by root"
   file:
       path: /etc/passwd
       owner: root
@@ -81,8 +75,7 @@
     - V-38450
     - file_perms
 
-- name: "| MEDIUM | V-38451 | PATCH |\n
-         The /etc/passwd file be group-owned by root"
+- name: "MEDIUM | V-38451 | PATCH | The /etc/passwd file be group-owned by root"
   file:
       path: /etc/passwd
       group: root
@@ -93,8 +86,7 @@
     - V-38451
     - file_perms
 
-- name: "| MEDIUM | V-38457 | PATCH |\n
-         The /etc/passwd file must have mode 0644 or less permissive"
+- name: "MEDIUM | V-38457 | PATCH | The /etc/passwd file must have mode 0644 or less permissive"
   file:
       path: /etc/passwd
       mode: "u-x,g-wx,o-wx"
@@ -105,8 +97,7 @@
     - V-38457
     - file_perms
 
-- name: "| MEDIUM | V-38458, V-38459, V-38461 | AUDIT |\n
-        The /etc/group file must be owned by root. The /etc/group file must be group-owned by root.The /etc/group file must have mode 0644 or less permissive"
+- name: "MEDIUM | V-38458, V-38459, V-38461 | AUDIT | The /etc/group file must be owned by root. The /etc/group file must be group-owned by root.The /etc/group file must have mode 0644 or less permissive"
   stat:
       path: /etc/group
   register: /etc/group_stat
@@ -119,8 +110,7 @@
     - audit
     - file_perms
 
-- name: "| MEDIUM | V-38458 | PATCH |\n
-         The /etc/group file be owned by root"
+- name: "MEDIUM | V-38458 | PATCH | The /etc/group file be owned by root"
   file:
       path: /etc/group
       owner: root
@@ -131,8 +121,7 @@
     - V-38458
     - file_perms
 
-- name: "| MEDIUM | V-38459 | PATCH |\n
-         The /etc/group file be group-owned by root"
+- name: "MEDIUM | V-38459 | PATCH | The /etc/group file be group-owned by root"
   file:
       path: /etc/group
       group: root
@@ -143,28 +132,579 @@
     - V-38459
     - file_perms
 
-- name: "| MEDIUM | V-38461 | PATCH |\n
-         The /etc/group file must have mode 0644 or less permissive"
+- name: "MEDIUM | V-38461 | PATCH | The /etc/group file must have mode 0644 or less permissive"
   file:
       path: /etc/group
       mode: "u-x,g-wx,o-wx"
   tags:
-    - cat2
-    - patch
+      - cat2
+      - patch
+      - medium
+      - V-38461
+      - file_perms
+
+- name: "MEDIUM | V-38464 | AUDIT | The audit system must take appropriate action when there are disk errors on the audit storage volume."
+  shell: grep disk_error_action /etc/audit/auditd.conf | cut -d = -f 2 | xargs basename
+  register:  disk_err_action_audit
+  changed_when: no
+  always_run: yes
+  tags:
+      - cat2
+      - medium
+      - V-38464
+      - auditd
+      - audit
+
+- name: "MEDIUM | V-38464 | PATCH | The audit system must take appropriate action when there are disk errors on the audit storage volume."
+  lineinfile:
+      regexp: "(^disk_error_action\\s*=)(\\s*)"
+      line: "\\1 {{ rhel6stig_auditd_config['disk_full_action'] }}"
+      dest: /etc/audit/auditd.conf 
+      backrefs: yes
+  tags:
+      - cat2
+      - medium
+      - V-38464
+      - auditd
+      - patch
+
+- name: "MEDIUM | V-38465 | AUDIT | Library files must have mode 0755 or less permissive"
+  become_user: root
+  script: sys_libs_with_bad_perms.sh
+  register: library_perms_audit
+  changed_when: no
+  tags:
+      - cat2
+      - medium
+      - V-38465
+      - file_perms
+      - audit
+
+- name: "MEDIUM | V-38465 | PATCH | Library files must have mode 0755 or less permissive"
+  file: 
+      state: file
+      mode: "go-w"
+      path: "{{ item }}"
+  when: library_perms_audit.stdout
+  with_items: library_perms_audit.stdout_lines
+  tags:
+      - cat2
+      - medium
+      - V-38465
+      - file_perms
+      - patch
+
+- name: "MEDIUM | V-38466 | AUDIT | Library files must be owned by root"
+  become_user: root
+  script: sys_libs_with_bad_owner.sh
+  register: library_owner_audit
+  changed_when: no
+  tags:
+      - cat2
+      - medium
+      - V-38466
+      - file_perms
+      - audit
+
+- name: "MEDIUM | V-38466 | PATCH | Library files must be owned by root"
+  file: 
+      state: file
+      owner: "root"
+      path: "{{ item }}"
+  when: library_owner_audit.stdout 
+  with_items: library_owner_audit.stdout_lines
+  tags:
+      - cat2
+      - medium
+      - V-38466
+      - file_perms
+      - patch
+
+- name: "MEDIUM | V-384648 | AUDIT | The audit system must take appropriate action when the audit storage volume is full."
+  shell: grep disk_full_action /etc/audit/auditd.conf | cut -d = -f 2 | xargs basename
+  register:  disk_full_action_audit
+  changed_when: no
+  always_run: yes
+  tags:
+      - cat2
+      - medium
+      - V-38468
+      - auditd
+      - audit
+
+- name: "MEDIUM | V-38468 | PATCH | The audit system must take appropriate action when the audit storage volume is full."
+  lineinfile:
+      regexp: '(^disk_full_action\\s*=)(\\s*)' 
+      line: "\\1 {{ rhel6stig_auditd_config['disk_full_action'] }}" 
+      dest: /etc/audit/auditd.conf 
+      backrefs: yes
+  tags:
+      - cat2
+      - medium
+      - V-38468
+      - auditd
+      - patch
+
+- name: "MEDIUM | V-38469 | AUDIT | All system command files must have mode 755 or less permissive."
+  script: sys_command_files_with_bad_perms.sh
+  become_user: root
+  register: system_files_perms_audit
+  changed_when: no
+  always_run: yes
+  tags:
+      - cat2
+      - medium
+      - V-38469
+      - file_perms
+      - audit
+
+- name: "MEDIUM | V-38469 | PATCH | All system command files must have mode 755 or less permissive"
+  file: 
+      state: file
+      mode: "og-w"
+      path: "{{ item }}"
+  when: system_files_perms_audit.stdout
+  with_items: system_files_perms_audit.stdout_lines
+  tags:
+      - cat2
+      - medium
+      - V-38469
+      - file_perms
+      - patch
+
+- name: "MEDIUM | V-38470 | AUDIT | The audit system must alert designated staff members when the audit storage volume approaches capacity.."
+  shell: grep space_left_action /etc/audit/auditd.conf | cut -d = -f 2 | xargs basename
+  register:  space_left_action_audit
+  changed_when: no
+  always_run: yes
+  tags:
+      - cat2
+      - medium
+      - V-38470
+      - auditd
+      - audit
+
+- name: "MEDIUM | V-38470 | PATCH | The audit system must alert designated staff members when the audit storage volume approaches capacity.."
+  lineinfile:
+      regexp: '(^space_left_action\\s*=)(\\s*)' 
+      line: "\\1 {{ rhel6stig_auditd_config['space_left_action'] }}"
+      dest: /etc/audit/auditd.conf 
+      backrefs: yes
+  tags:
+      - cat2
+      - medium
+      - V-38470
+      - auditd
+      - patch
+
+- name: "MEDIUM | V-38472 | Audit | All system command files must be owned by root"
+  script: sys_command_files_with_bad_owner.sh
+  become_user: root
+  register: sys_commands_owner_audit
+  always_run: yes
+  changed_when: no
+  tags:
+      - cat2
+      - medium
+      - V-38472
+      - file_perms
+      - audit
+
+- name: "MEDIUM | V-38472 | PATCH | All system command files must be owned by root"
+  file: 
+      state: file
+      owner: root
+  when: sys_commands_owner_audit.stdout
+  with_items: sys_commands_owner_audit.stdout_lines
+  tags:
+      - cat2
+      - medium
+      - V-38472
+      - file_perms
+      - patch
+
+- name: "MEDIUM | V-38475 | AUDIT | The system must require passwords to contain a minimum of 14 characters."
+  shell: grep -E '^PASS_MIN_LEN' /etc/login.defs | awk '{print $2}'
+  register: min_pwd_len_audit
+  changed_when: no
+  always_run: yes
+  tags:
+      - cat2
+      - medium
+      - V-38475
+      - passwords
+      - audit
+
+- name: "MEDIUM | V-38475 | PATCH | The system must require passwords to contain a minimum of 14 characters."
+  lineinfile:
+      regexp: '(^PASS_MIN_LEN)\s*(\d*)' 
+      line: '\1 {{ rhel6stig_pass_min_length }}' 
+      dest: /etc/login.defs 
+      backrefs: yes
+  tags:
+      - cat2
+      - medium
+      - V-38475
+      - passwords
+      - patch
+
+- name: "MEDIUM | V-38477 | AUDIT | Users must not be able to change passwords more than once every 24 hours."
+  shell: grep -E '^PASS_MIN_DAYS' /etc/login.defs | awk '{print $2}'
+  register: pwd_min_days_audit
+  changed_when: no
+  always_run: yes
+  tags:
+      - cat2
+      - medium
+      - V-38477
+      - passwords
+      - audit
+
+- name: "MEDIUM | V-38477 | PATCH | The system must require passwords to contain a minimum of 14 characters."
+  lineinfile:
+      regexp: '(^PASS_MIN_DAYS)\s*(\d*)' 
+      line: '\1 {{ rhel6stig_pass_min_days }}' 
+      dest: /etc/login.defs 
+      backrefs: yes
+  tags:
+      - cat2
+      - medium
+      - V-38477
+      - passwords
+      - patch
+
+- name: "MEDIUM | V-38479 | AUDIT | User passwords must be changed at least every 60 days."
+  shell: grep -E '^PASS_MAX_DAYS' /etc/login.defs | awk '{print $2}'
+  register: pwd_max_days_audit
+  changed_when: no
+  always_run: yes
+  tags:
+      - cat2
+      - medium
+      - V-38479
+      - passwords
+      - audit
+
+- name: "MEDIUM | V-38479 | PATCH | User passwords must be changed at least every 60 days."
+  lineinfile:
+      regexp: '(^PASS_MAX_DAYS)\s*(\d*)' 
+      line: '\1 {{ rhel6stig_pass_max_days }}' 
+      dest: /etc/login.defs 
+      backrefs: yes
+  tags:
+      - cat2
+      - medium
+      - V-38479
+      - passwords
+      - patch
+
+- name: "MEDIUM | V-38481 | AUDIT | System security patches and updates must be installed and up-to-date."
+  command: yum check-update
+  ignore_errors: yes
+  changed_when: no
+  register: yum_pkgs_update_audit
+  tags:
+      - cat2
+      - medium
+      - V-38481
+      - yum
+      - updates
+      - audit
+
+- name: "MEDIUM | V-38481 | PATCH | System security patches and updates must be installed and up-to-date."
+  yum:
+      name: '*'
+      state: latest
+      update_cache: yes
+  tags:
+      - cat2
+      - medium
+      - V-38481
+      - yum
+      - updates
+      - patch
+
+- name: "MEDIUM | V-38483 | AUDIT | The system package management tool must cryptographically verify the authenticity of system software packages during installation."
+  shell: find /etc/yum{.conf,.repos.d/} -exec grep -ls '^gpgcheck=0' {} \;
+  changed_when: false
+  always_run: yes
+  register: repo_crypto_check_audit
+  tags:
+      - cat2
+      - medium
+      - V-38483
+      - rpm
+      - yum 
+      - audit
+      - gpgcheck
+
+- name: "MEDIUM | V-38483 | PATCH | The system package management tool must cryptographically verify the authenticity of system software packages during installation."
+  replace: 
+      backup: yes 
+      dest: '{{ item }}'
+      regexp: '^gpgcheck=0' 
+      replace: 'gpgcheck=1'
+  with_flattened:
+    - /etc/yum.conf
+    - repo_crypto_check_audit.stdout_lines
+  tags:
+      - cat2
+      - medium
+      - V-38483
+      - rpm
+      - gpgcheck
+      - patch
+
+- name: "MEDIUM | V-38484 | AUDIT | The operating system, upon successful logon, must display to the user the date and time of the last logon or access via ssh."
+  shell: grep -i "^PrintLastLog" /etc/ssh/sshd_config | awk '{ print $2 }'
+  register: last_log_audit
+  changed_when: no
+  always_run: yes
+  tags:
+      - medium
+      - cat2
+      - V-38484
+      - sshd
+      - audit
+
+- name: "MEDIUM | V-38484 | PATCH | The operating system, upon successful logon, must display to the user the date and time of the last logon or access via ssh."
+  lineinfile:
+      regexp: '(^PrintLastLog)\s*(\d*)' 
+      line: '\1 yes' 
+      dest: /etc/ssh/sshd_config
+      backrefs: yes
+
+  tags:
+      - medium
+      - cat2
+      - V-38484
+      - sshd
+      - patch
+
+- name: "MEDIUM | V-38484 | PATCH | The operating system, upon successful logon, must display to the user the date and time of the last logon or access via ssh."
+  lineinfile:
+      line: 'PrintLastLog yes' 
+      dest: /etc/ssh/sshd_config
+  tags:
+      - medium
+      - cat2
+      - V-38484
+      - sshd
+      - patch
+
+# V-38486 cannot be automated
+# V-38488 cannot be automated
+
+- name: "MEDIUM | V-38489 | AUDIT | A file integrity tool must be installed."
+  command: rpm -q aide
+  ignore_errors: yes
+  register: aide_installed_audit
+  changed_when: no
+  always_run: yes
+  tags:
+      - medium
+      - cat2
+      - V-38489
+      - audit
+      - aide
+      - integrity
+
+- name: "MEDIUM | V-38489 | PATCH | A file integrity tool must be installed."
+  yum:
+      name: aide
+      state: present
+  tags:
+      - medium
+      - cat2
+      - V-38489
+      - audit
+      - aide
+      - integrity
+
+- name: "MEDIUM | V-38490 | AUDIT | The operating system must enforce requirements for the connection of mobile devices to operating systems"
+  command: grep -rs usb-storage /etc/modprobe.conf /etc/modprobe.d
+  register: usb_reqs_audit
+  ignore_errors: yes
+  always_run: yes
+  changed_when: no
+  tags:
+      - medium
+      - cat2
+      - V-38490
+      - mobile_devices
+      - usb_devices
+      - kernel_modules
+      - audit
+
+- name: "MEDIUM | V-38490 | PATCH | The operating system must enforce requirements for the connection of mobile devices to operating systems"
+  copy: 
+      backup: no 
+      src: disable-usb.conf 
+      dest: /etc/modprobe.d/disable-usb.conf 
+      owner: root 
+      group: root 
+      mode: "0644"
+  tags: 
+      - medium
+      - cat2
+      - V-38490
+      - mobile_devices
+      - usb_devices
+      - kernel_modules
+      - patch
+
+- name: "MEDIUM | V-38492 | AUDIT | The system must prevent the root account from logging in from virtual consoles."
+  command: grep '^vc/[0-9]' /etc/securetty
+  register: vc_root_login_audit
+  ignore_errors: yes
+  always_run: yes
+  changed_when: no
+  tags:
     - medium
-    - V-38461
-    - file_perms
+    - cat2
+    - V-38492
+    - audit
+    - virtual_consoles
+    - logon_settings
+    - tty
+    - root_access
 
+- name: "MEDIUM | V-38492 | PATCH | The system must prevent the root account from logging in from virtual consoles"
+  lineinfile: 
+      state: absent 
+      dest: /etc/securetty 
+      regexp: '^.*vc/?\d' 
+      backup: yes
+  tags:
+      - cat2
+      - V-38492
+      - root_access
+      - logon_settings
+      - tty
+      - virtual_consoles
+      - medium
+      - patch
 
-- name: "Medium  Copy STIG compliant audit.rules\n    V-38580 Medium  The audit system must be configured to audit the loading and unloading of dynamic kernel modules\n    V-38527 Low     The audit system must be configured to audit all attempts to alter system time through clock_settime\n    V-38525 Low     The audit system must be configured to audit all attempts to alter system time through stime\n    V-38522 Low     The audit system must be configured to audit all attempts to alter system time through settimeofday\n    V-38552 Low     The audit system must be configured to audit all discretionary access control permission modifications using fchown\n    V-38550 Low     The audit system must be configured to audit all discretionary access control permission modifications using fchmodat\n    V-38557 Low     The audit system must be configured to audit all discretionary access control permission modifications using fsetxattr\n    V-38556 Low     The audit system must be configured to audit all discretionary access control permission modifications using fremovexattr\n    V-38554 Low     The audit system must be configured to audit all discretionary access control permission modifications using fchownat\n    V-38559 Low     The audit system must be configured to audit all discretionary access control permission modifications using lremovexattr\n    V-38558 Low     The audit system must be configured to audit all discretionary access control permission modifications using lchown\n    V-38536 Low     The operating system must automatically audit account disabling actions\n    V-38540 Low     The audit system must be configured to audit modifications to the systems network configuration\n    V-38541 Low     The audit system must be configured to audit modifications to the systems Mandatory Access Control (MAC) configuration (SELinux)\n    V-38543 Low     The audit system must be configured to audit all discretionary access control permission modifications using chmod\n    V-38547 Low     The audit system must be configured to audit all discretionary access control permission modifications using fchmod\n    V-38530 Low     The audit system must be configured to audit all attempts to alter system time through /etc/localtime\n    V-38578 Low     The audit system must be configured to audit changes to the /etc/sudoers file\n    V-38575 Low     The audit system must be configured to audit user deletions of files and programs"
-  template: src=audit.rules.j2 dest=/etc/audit/audit.rules owner=root group=root mode=0640 backup=yes
-  tags: [ 'cat2' , 'V-38580' , 'V-38527' , 'V-38525' , 'V-38522' , 'V-38552' , 'V-38550' , 'V-38557' , 'V-38556' , 'V-38554' , 'V-38559' , 'V-38558' , 'V-38536' , 'V-38540' , 'V-38541' , 'V-38543' , 'V-38547' , 'V-38530' , 'V-38578' , 'V-38575' , 'auditd' ]
-  notify: restart auditd
+- name: "MEDIUM | V-38493 | AUDIT | Audit log directories must have mode 0755 or less permissive."
+  shell: grep "^log_file" /etc/audit/auditd.conf|sed 's/^[^/]*//; s/[^/]*$//' | xargs -I % find % -type d -perm /022
+  changed_when: no
+  always_run: yes
+  ignore_errors: yes
+  register: audit_log_dir_perms_audit
+  tags:
+      - cat2
+      - V-38493
+      - medium
+      - file_perms
+      - auditd
+      - audit_permissions
+      - audit
 
-- name: "V-38461 Medium  The /etc/group file must have mode 0644 or less permissive\n    V-38458 V-38459 Medium  The /etc/group file must be owned and group-owned by root"
-  file: path=/etc/group owner=root group=root mode="u-x,g-wx,o-wx"
-  tags: [ 'cat2' , 'V-38458' , 'V-38459' , 'V-38461' , 'file_perms' ]
+- name: "MEDIUM | V-38493 | PATCH | Audit log directories must have mode 0755 or less permissive."
+  file:
+      state: directory
+      mode: "go-w"
+      path: "{{ item }}"
+  with_items: audit_log_dir_perms_audit.stdout_lines
+  when: audit_log_dir_perms_audit.stdout
+  tags:
+      - cat2
+      - V-38493
+      - medium
+      - file_perms
+      - auditd
+      - audit_permissions
+      - patch
 
+- name: "MEDIUM | V-38495 | AUDIT | Audit log files must be owned by root."
+  shell: grep "^log_file" /etc/audit/auditd.conf|sed 's/^[^/]*//; s/[^/]*$//' | xargs -I % find % -type f ! -user root
+  changed_when: no
+  always_run: yes
+  ignore_errors: yes
+  register: audit_log_dir_owner_audit
+  tags:
+      - cat2
+      - V-38495
+      - medium
+      - file_perms
+      - auditd
+      - audit_permissions
+      - audit
+
+- name: "MEDIUM | V-38495 | PATCH | Audit log files must be owned by root."
+  file:
+      state: file
+      owner: root
+      path: "{{ item }}"
+  with_items: audit_log_dir_owner_audit.stdout_lines
+  when: audit_log_dir_owner_audit.stdout
+  tags:
+      - cat2
+      - V-38495
+      - medium
+      - file_perms
+      - auditd
+      - audit_permissions
+      - patch
+
+- name: "MEDIUM | V-38496 | AUDIT | Default system accounts, other than root, must be locked"
+  shell: >
+   awk -F: '$1 !~ /^root$/ && $2 !~ /^[!*]/ {print $1}' /etc/shadow | xargs -I{} grep {} /etc/passwd | awk -F: '$3 < 500 {print $1}'
+  register: unlocked_sys_accounts_audit
+  changed_when: false
+  always_run: yes
+  tags: 
+      - cat2
+      - medium
+      - V-38496
+      - audit
+      - accounts
+      - system_accounts
+
+- name: "MEDIUM | V-38496 | PATCH | Default system accounts, other than root, must be locked"
+  user: 
+      name: "{{ item }}"
+      state: present
+      expires: 1412541480
+  with_items: unlocked_sys_accounts_audit.stdout_lines
+  when: unlocked_sys_accounts_audit.stdout
+  tags: 
+      - cat2
+      - medium
+      - V-38496
+      - patch
+      - accounts
+      - system_accounts
+
+- name: "MEDIUM | V-38498 | AUDIT | Audit log files must have mode 0640 or less permissive."
+  shell: grep "^log_file" /etc/audit/auditd.conf|sed s/^[^\/]*//|xargs stat -c %n | xargs -I % find % -perm /137
+  register: audit_log_file_perms_audit
+  changed_when: no
+  always_run: yes
+  tags:
+      - medium
+      - cat2
+      - auditd
+      - audit
+      - logs
+      - file_perms
+
+- name: "MEDIUM | V-38498 | PATCH | Audit log files must have mode 0640 or less permissive."
+  file:
+      state: file
+      path: "{{ item }}"
+      mode: "u-x,g-wx,o-rwx"
+  with_items: audit_log_file_perms_audit.stdout_lines
+  tags:
+      - medium
+      - cat2
+      - auditd
+      - patch
+      - logs
+      - file_perms
+
+# V-38499 is checked but not automatically patched, please see not_automated.yml 
+# V-38500 is checked but not automatically patched, please see not_automated.yml 
 
 # Search for world writable files and print them out if any are found
 - name: Looking for world-writable files on the system
@@ -183,25 +723,7 @@
   when: world_writable_files.stdout_lines and not rhel6stig_fullauto
   tags: [ 'cat2' , 'V-38643', 'file_perms' ]
 
-# Look in /etc/password for hashes and print them out if any are found
-- name: V-38499 Medium  The /etc/passwd file must not contain password hashes
-  shell: "awk -F: '($2 != \"x\") {print}' /etc/passwd"
-  changed_when: false
-  register: etc_password_hash_check
-  tags: [ 'cat2' , 'V-38499' , 'passwords' ]
-
-- name: The following password hashes were found in /etc/passwd. This is a finding.
-  debug: var=etc_password_hash_check.stdout_lines
-  when: etc_password_hash_check.stdout
-  tags: [ 'cat2' , 'V-38499' , 'passwords' ]
-
-- name: V-38499 Medium  The /etc/passwd file must not contain password hashes
-  pause: prompt="Password hashes were found in /etc/passwd. This is a finding. Press Enter to continue"
-  when: etc_password_hash_check.stdout and not rhel6stig_fullauto
-  tags: [ 'cat2' , 'V-38499' , 'passwords' ]
-
-
-- name: "V-38579 V-38581 Medium  The system boot loader configuration file(s) must be owned and group-owned by root\n    V-38583 Medium  The system boot loader configuration file(s) must have mode 0600 or less permissive"
+- name: "V-38579 V-38581 Medium  The system boot loader configuration file(s) must be owned and group-owned by root    V-38583 Medium  The system boot loader configuration file(s) must have mode 0600 or less permissive"
   file: path=/etc/grub.conf owner=root group=root mode=u-x,go-rwx follow=yes
   tags: [ 'cat2' , 'V-38581' , 'V-38583' , 'V-38579' , 'file_perms' ]
 
@@ -215,7 +737,7 @@
 
 - name: V-38582 Medium  The xinetd service must be disabled if no network services utilizing it are enabled
   service: name=xinetd enabled=no state=stopped
-  when: xinetd_services.stdout and xinetd_services.stdout.find('\ton\n') == -1
+  when: xinetd_services.stdout and xinetd_services.stdout.find('\ton') == -1
   tags: [ 'cat2' , 'V-38582' , 'xinetd' , 'services' ]
 
 # Insecure services and package removal
@@ -284,9 +806,7 @@
   when: nfs_mounts_missing_nosuid.stdout and not rhel6stig_fullauto
   tags: [ 'cat2' , 'V-38652' , 'nfs' ]
 
-- name: V-38490 Medium  The operating system must enforce requirements for the connection of mobile devices to operating systems
-  copy: backup=no src=disable-usb.conf dest=/etc/modprobe.d/disable-usb.conf owner=root group=root mode=0644
-  tags: [ 'cat2' , 'V-38490' , 'mobile_devices' , 'usb_devices' , 'kernel_modules' ]
+
 
 - name: Checking for remote log servers
   shell: grep -Er '(^[^#]?\*\.\*\s+@{1,2})|(\*\.\*\s+omrelp)' /etc/rsyslog.conf /etc/rsyslog.d/
@@ -327,7 +847,7 @@
   tags: [ 'cat2' , 'V-38481' , 'yum' , 'updates' ]
 
 
-- name: "V-38664 Medium  The system package management tool must verify ownership on all files and directories associated with the audit package\n
+- name: "V-38664 Medium  The system package management tool must verify ownership on all files and directories associated with the audit package
         \tV-38665 Medium  The system package management tool must verify group-ownership on all files and directories associated with the audit package"
   shell: "rpm -V audit | grep '^.....\\(U\\.\\|\\.G\\|UG\\)'"
   register: audit_ownership
@@ -373,63 +893,10 @@
   tags: [ 'cat2' , 'V-38446' , 'mail' , 'postfix' ]
 
 
-- name: "Copy STIG compliant auditd.conf\n    V-38464 V-38468 V-38470 V-38633 V-38634 V-38636 V-38678 V-38680 V-54381"
+- name: "Copy STIG compliant auditd.conf    V-38464 V-38468 V-38470 V-38633 V-38634 V-38636 V-38678 V-38680 V-54381"
   template: src=auditd.conf.j2 dest=/etc/audit/auditd.conf owner=root group=root mode=0640 backup=yes
   notify: restart auditd
   tags: [ 'cat2' , 'V-38464' , 'V-38468' , 'V-38470' , 'V-38633' , 'V-38634' , 'V-38636' , 'V-38678' , 'V-38680' , 'V-54381' , 'auditd' ]
-
-- name: V-38472 V-38466 Medium  All system command and library files must be owned by root
-  file: dest={{ item }} owner=root recurse=yes
-  with_items:
-    - /bin
-    - /usr/bin
-    - /usr/local/bin
-    - /sbin
-    - /usr/sbin
-    - /usr/local/sbin
-    - /lib
-    - /lib64
-    - /usr/lib
-    - /usr/lib64
-  tags: [ 'cat2' , 'V-38472' , 'V-38466' , 'file_perms' ]
-
-- name: V-38469 V-38465 Medium  All system command and library files must have mode 0755 or less permissive
-  shell: find {{ item }} -perm /022 -type f -exec chmod -c -f go-w {} +;
-  register: result
-  changed_when: result.stdout
-  with_items:
-    - /bin
-    - /usr/bin
-    - /usr/local/bin
-    - /sbin
-    - /usr/sbin
-    - /usr/local/sbin
-    - /lib
-    - /lib64
-    - /usr/lib
-    - /usr/lib64
-  tags: [ 'cat2' , 'V-38469' , 'V-38465' , 'file_perms' ]
-
-- name: "V-38445 V-38495 Medium  Audit log files must be owned and group-owned by root\n    V-38493 Medium  Audit log directories must have mode 0755 or less permissive"
-  shell: chown -c -f -R root:root /var/log/audit && chmod -c -f -R go-w /var/log/audit
-  register: result
-  changed_when: result.stdout
-  tags: [ 'cat2' , 'V-38493' , 'V-38445' , 'V-38495' , 'file_perms' , 'auditd' , 'audit_permissions']
-
-- name: V-38498 Medium  Audit log files must have mode 0640 or less permissive
-  shell: find /var/log/audit -type f -exec chmod -c -f -R g-wx,o-rwx {} +;
-  register: result
-  changed_when: result.stdout
-  tags: [ 'cat2' , 'V-38498' , 'auditd' , 'file_perms' , 'audit_permissions' ]
-
-- name: V-38492 Medium  The system must prevent the root account from logging in from virtual consoles
-  lineinfile: state=absent dest=/etc/securetty regexp='^.*vc/?\d' backup=yes
-  tags: [ 'cat2' , 'V-38492' , 'root_access' , 'tty' ]
-
-- name: "V-38496 Medium  Default system accounts, other than root, must be locked"
-  command: passwd -l {{ item }}
-  with_items: unlocked_sys_accounts.stdout_lines
-  tags: [ 'cat2' , 'V-38496' , 'accounts' ]
 
 # - name: V-38673 Medium  The operating system must ensure unauthorized, security-relevant configuration changes detected are tracked
 # - name: V-38670 Medium  The operating system must detect unauthorized changes to software and information
@@ -441,7 +908,7 @@
   tags:
       - cat2
       - V-38671
-      - PATCH
+      - patch
 
 - name: "MEDIUM | V-38671 | PATCH | The sendmail package must be removed"
   yum:
@@ -450,7 +917,7 @@
   tags:
       - cat2
       - V-38671
-      - PATCH
+      - patch
       - sendmail
       - unauthorized_packages
 
@@ -523,7 +990,7 @@
 
 # GUI logon settings
 - name: "V-38689 Medium  The Department of Defense (DoD) login banner must be displayed immediately prior to, or as part of, graphical desktop environment login prompts"
-  command: "gconftool-2 --direct --config-source xml:readwrite:/etc/gconf/gconf.xml.mandatory --type string --set /apps/gdm/simple-greeter/banner_message_text '  You are accessing a U.S. Government (USG) Information System (IS) that is provided for USG-authorized use only.\n  By using this IS (which includes any device attached to this IS), you consent to the following conditions:\n\n  The USG routinely intercepts and monitors communications on this IS for purposes including, but not limited to, penetration testing, COMSEC monitoring, network operations and defense, personnel misconduct (PM), law enforcement (LE), and counterintelligence (CI) investigations.\n  At any time, the USG may inspect and seize data stored on this IS.\n  Communications using, or data stored on, this IS are not private, are subject to routine monitoring, interception, and search, and may be disclosed or used for any USG-authorized purpose.\n  This IS includes security measures (e.g., authentication and access controls) to protect USG interests -- not for your personal benefit or privacy.\n  Notwithstanding the above, using this IS does not constitute consent to PM, LE or CI investigative searching or monitoring of the content of privileged communications, or work product, related to personal representation or services by attorneys, psychotherapists, or clergy, and their assistants. Such communications and work product are private and confidential. See User Agreement for details.'"
+  command: "gconftool-2 --direct --config-source xml:readwrite:/etc/gconf/gconf.xml.mandatory --type string --set /apps/gdm/simple-greeter/banner_message_text '  You are accessing a U.S. Government (USG) Information System (IS) that is provided for USG-authorized use only.  By using this IS (which includes any device attached to this IS), you consent to the following conditions:  The USG routinely intercepts and monitors communications on this IS for purposes including, but not limited to, penetration testing, COMSEC monitoring, network operations and defense, personnel misconduct (PM), law enforcement (LE), and counterintelligence (CI) investigations.  At any time, the USG may inspect and seize data stored on this IS.  Communications using, or data stored on, this IS are not private, are subject to routine monitoring, interception, and search, and may be disclosed or used for any USG-authorized purpose.  This IS includes security measures (e.g., authentication and access controls) to protect USG interests -- not for your personal benefit or privacy.  Notwithstanding the above, using this IS does not constitute consent to PM, LE or CI investigative searching or monitoring of the content of privileged communications, or work product, related to personal representation or services by attorneys, psychotherapists, or clergy, and their assistants. Such communications and work product are private and confidential. See User Agreement for details.'"
   when: rhel6stig_xwindows_required
   tags: [ 'cat2' , 'V-38689' , 'logon_settings' , 'xwindows' , 'gui' , 'dod_logon_banner' ]
   notify: restart gdm
@@ -560,7 +1027,6 @@
     - net-pf-31
   tags: [ 'cat2' , 'V-38682' , 'kernel_modules' , 'bluetooth' ]
 
-
 - name: V-38489 Medium  A file integrity tool must be installed
   yum: name=aide state=present
   tags: [ 'cat2' , 'V-38489' , 'file_integrity' , 'aide' ]
@@ -591,8 +1057,8 @@
     follow=yes owner=root group=root mode=0644
   tags: [ 'cat2' , 'V-51875' , 'logon_settings' ]
 
-- name: "V-38573 Medium  The system must disable accounts after three consecutive unsuccessful login attempts\n
-        \tV-38592 Medium  The system must require administrator action to unlock an account locked by excessive failed login attempts\n
+- name: "V-38573 Medium  The system must disable accounts after three consecutive unsuccessful login attempts
+        \tV-38592 Medium  The system must require administrator action to unlock an account locked by excessive failed login attempts
         \tV-38501 Medium  The system must disable accounts after excessive login failures within a 15-minute interval"
   lineinfile: >
     dest={{ item }}
@@ -605,8 +1071,8 @@
     - /etc/pam.d/password-auth
   tags: [ 'cat2' , 'V-38573' , 'V-38492' , 'V-38501', 'passwords' , 'failed_logins' ]
 
-- name: "V-38573 Medium  The system must disable accounts after three consecutive unsuccessful login attempts\n
-        \tV-38592 Medium  The system must require administrator action to unlock an account locked by excessive failed login attempts\n
+- name: "V-38573 Medium  The system must disable accounts after three consecutive unsuccessful login attempts
+        \tV-38592 Medium  The system must require administrator action to unlock an account locked by excessive failed login attempts
         \tV-38501 Medium  The system must disable accounts after excessive login failures within a 15-minute interval"
   lineinfile: >
     dest={{ item }}
@@ -619,8 +1085,8 @@
     - /etc/pam.d/password-auth
   tags: [ 'cat2' , 'V-38573' , 'V-38492' , 'V-38501', 'passwords' , 'failed_logins' ]
 
-- name: "V-38573 Medium  The system must disable accounts after three consecutive unsuccessful login attempts\n
-        \tV-38592 Medium  The system must require administrator action to unlock an account locked by excessive failed login attempts\n
+- name: "V-38573 Medium  The system must disable accounts after three consecutive unsuccessful login attempts
+        \tV-38592 Medium  The system must require administrator action to unlock an account locked by excessive failed login attempts
         \tV-38501 Medium  The system must disable accounts after excessive login failures within a 15-minute interval"
   lineinfile: >
     dest={{ item }}
@@ -633,8 +1099,8 @@
     - /etc/pam.d/password-auth
   tags: [ 'cat2' , 'V-38573' , 'V-38492' , 'V-38501', 'passwords' , 'failed_logins' ]
 
-- name: "V-38573 Medium  The system must disable accounts after three consecutive unsuccessful login attempts\n
-        \tV-38592 Medium  The system must require administrator action to unlock an account locked by excessive failed login attempts\n
+- name: "V-38573 Medium  The system must disable accounts after three consecutive unsuccessful login attempts
+        \tV-38592 Medium  The system must require administrator action to unlock an account locked by excessive failed login attempts
         \tV-38501 Medium  The system must disable accounts after excessive login failures within a 15-minute interval"
   lineinfile: >
     dest={{ item }}
@@ -647,8 +1113,8 @@
     - /etc/pam.d/password-auth
   tags: [ 'cat2' , 'V-38573' , 'V-38492' , 'V-38501', 'passwords' , 'failed_logins' ]
 
-- name: "V-38573 Medium  The system must disable accounts after three consecutive unsuccessful login attempts\n
-        \tV-38592 Medium  The system must require administrator action to unlock an account locked by excessive failed login attempts\n
+- name: "V-38573 Medium  The system must disable accounts after three consecutive unsuccessful login attempts
+        \tV-38592 Medium  The system must require administrator action to unlock an account locked by excessive failed login attempts
         \tV-38501 Medium  The system must disable accounts after excessive login failures within a 15-minute interval"
   lineinfile: >
     dest={{ item }}
@@ -673,7 +1139,7 @@
   register: log_files_st
   tags: [ 'cat2' , 'V-38519' , 'V-38518' , 'V-38623' , 'file_perms' ]
 
-- name: "V-38519 V-38518 Medium  All rsyslog-generated log files must be owned and group-owned by root\n    V-38623 Medium  All rsyslog-generated log files must have mode 0600 or less permissive"
+- name: "V-38519 V-38518 Medium  All rsyslog-generated log files must be owned and group-owned by root    V-38623 Medium  All rsyslog-generated log files must have mode 0600 or less permissive"
   file: path={{ item.item }} owner=root group=root mode=u-x,go-rwx follow=yes
   with_items: log_files_st.results
   when: item.stat.exists and item.stat.isreg and item.stat.nlink|int == 1
@@ -686,7 +1152,7 @@
   tags: [ 'cat2' , 'V-38519' , 'V-38623' , 'V-38518' , 'file_perms' ]
 
 - name: "V-38517 Medium  The Transparent Inter-Process Communication (TIPC) protocol must be disabled unless required
-         V-38515 Medium  The Stream Control Transmission Protocol (SCTP) must be disabled unless required\n
+         V-38515 Medium  The Stream Control Transmission Protocol (SCTP) must be disabled unless required
          V-38514 Medium  The Datagram Congestion Control Protocol (DCCP) must be disabled unless required"
   copy: backup=no src={{ item }} dest=/etc/modprobe.d/{{ item }} owner=root group=root mode=0644
   with_items:
@@ -747,23 +1213,6 @@
   file: dest=/etc/shadow owner=root group=root mode=0000
   tags: [ 'cat2' , 'V-38504' , 'V-38502' , 'V-38503' , 'file_perms' ]
 
-- name: List accounst with UID 0
-  shell: "awk -F: '($3 == \"0\") {print}' /etc/passwd | grep -v root"
-  changed_when: false
-  register: users_uid_0
-  failed_when: users_uid_0.stderr
-  tags: [ 'cat2' , 'V-38500' , 'accounts' ]
-
-- name: The accounts have a UID of 0. This is a finding.
-  debug: var=users_uid_0.stdout_lines
-  when: users_uid_0.stdout_lines
-  tags: [ 'cat2' , 'V-38500' , 'accounts' ]
-
-- name: V-38500 Medium  The root account must be the only account having a UID of 0
-  pause: prompt="Accounts with UID 0 other than root were found. This is a finding. Press Enter to continue"
-  when: users_uid_0.stdout and not rhel6stig_fullauto
-  tags: [ 'cat2' , 'V-38500' , 'accounts' ]
-
 - name: Installing NTP for V-38620 Medium/V-38621 Medium
   yum: name=ntp state=installed
   tags: [ 'cat2' , 'V-38620' , 'V-38621' , 'ntp' ]
@@ -798,8 +1247,8 @@
   when: rhel6stig_xwindows_required
   tags: [ 'cat2' , 'V-38629' , 'gui' , 'screen_lock' ]
 
-- name: "V-38628 Medium  The operating system must produce audit records containing sufficient information to establish the identity of any user/subject associated with the event\n
-        \tV-38631 Medium  The operating system must employ automated mechanisms to facilitate the monitoring and control of remote access methods\n
+- name: "V-38628 Medium  The operating system must produce audit records containing sufficient information to establish the identity of any user/subject associated with the event
+        \tV-38631 Medium  The operating system must employ automated mechanisms to facilitate the monitoring and control of remote access methods
         \tV-38632 Medium  The operating system must produce audit records containing sufficient information to establish what type of events occurred."
   service: name=auditd state=started enabled=yes
   tags: [ 'cat2' , 'V-38628' , 'V-38631' , 'V-38632' , 'auditd' ]
@@ -890,9 +1339,9 @@
 
 
 # /etc/ssh/sshd_config settings
-- name: "V-38617 Medium  The SSH daemon must be configured to use only FIPS 140-2 approved ciphers\n
-        \tV-38611 Medium  The SSH daemon must ignore .rhosts files\n
-        \tV-38612 Medium  The SSH daemon must not allow host-based authentication\n
+- name: "V-38617 Medium  The SSH daemon must be configured to use only FIPS 140-2 approved ciphers
+        \tV-38611 Medium  The SSH daemon must ignore .rhosts files
+        \tV-38612 Medium  The SSH daemon must not allow host-based authentication
         \tV-38613 Medium  The system must not permit root logins using remote access programs such as ssh"
   lineinfile: >
     state={{ item.st }}
@@ -931,16 +1380,16 @@
   when: not rhel6stig_ipv6_in_use
   tags: [ 'cat2' , 'V-38546' , 'ipv6' , 'network']
 
-- name: "V-38549 Medium  The system must employ a local IPv6 firewall\n
-        \tV-38551 Medium  The operating system must connect to external networks or information systems only through managed IPv6 interfaces consisting of boundary protection devices arranged in accordance with an organizational security architecture\n
+- name: "V-38549 Medium  The system must employ a local IPv6 firewall
+        \tV-38551 Medium  The operating system must connect to external networks or information systems only through managed IPv6 interfaces consisting of boundary protection devices arranged in accordance with an organizational security architecture
         \tV-38553 Medium  The operating system must prevent public IPv6 access into an organizations internal networks except as appropriately mediated by managed interfaces employing boundary protection devices"
   service: name=ip6tables enabled=yes state=started
   when: rhel6stig_ipv6_in_use
   tags: [ 'cat2' , 'V-38551' , 'V-38549' , 'V-38553' , 'ipv6' , 'firewall' , 'network']
 
 # IPv4 Firewall and Network Settings
-- name: "V-38555 Medium  The system must employ a local IPv4 firewall\n
-        \tV-38560 Medium  The operating system must connect to external networks or information systems only through managed IPv4 interfaces consisting of boundary protection devices arranged in accordance with an organizational security architecture\n
+- name: "V-38555 Medium  The system must employ a local IPv4 firewall
+        \tV-38560 Medium  The operating system must connect to external networks or information systems only through managed IPv4 interfaces consisting of boundary protection devices arranged in accordance with an organizational security architecture
         \tV-38512  Medium  The operating system must prevent public IPv4 access into an organizations internal networks except as appropriately mediated by managed interfaces employing boundary protection devices"
   service: name=iptables enabled=yes state=started
   tags: [ 'cat2' , 'V-38555' , 'V-38560' , 'V-38512' , 'ipv4' , 'network' , 'firewall' ]
