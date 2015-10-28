@@ -687,6 +687,7 @@
       - auditd
       - audit
       - logs
+      - V-38498
       - file_perms
 
 - name: "MEDIUM | V-38498 | PATCH | Audit log files must have mode 0640 or less permissive."
@@ -701,11 +702,814 @@
       - auditd
       - patch
       - logs
+      - V-38498
       - file_perms
 
 # V-38499 is checked but not automatically patched, please see not_automated.yml 
 # V-38500 is checked but not automatically patched, please see not_automated.yml 
 
+- name: "MEDIUM | V-38501 | AUDIT | The system must disable accounts after excessive login failures within a 15-minute interval."
+  shell: grep -h pam_faillock /etc/pam.d/system-auth /etc/pam.d/password-auth | grep fail_interval | awk -F'=' '{print $NF}'
+  changed_when: no
+  always_run: yes
+  register: login_failures_interval
+  tags:
+      - medium
+      - cat2
+      - logon_settings
+      - audit
+      - V-38501 
+
+- name: "MEDIUM | V-38501 | AUDIT | The system must disable accounts after excessive login failures within a 15-minute interval."
+  shell: grep -hG '^account\s*required\s*pam_faillock\.so' /etc/pam.d/system-auth /etc/pam.d/password-auth
+  lineinfile: >
+      dest: "{{ item }}""
+      insertbefore: '^auth\s+sufficient\s+pam_unix.so.*$'
+      regexp: '^auth\s+required\s+pam_faillock.so.*$'
+      line: "{{ item }}"
+      follow: yes 
+      owner: root 
+      group: root 
+      mode: 0644
+  with_items:
+    - before_account: account required pam_faillock.so
+      before_auth: auth required pam_faillock.so preauth silent deny=3 unlock_time=604800 fail_interval=900
+      after_auth: auth [default=die] pam_faillock.so authfail deny=3 unlock_time=604800 fail_interval=900
+
+    - path: /etc/pam.d/password-auth
+  changed_when: no
+  always_run: yes
+  register: login_failures_account_require
+  tags:
+      - medium
+      - cat2
+      - logon_settings
+      - audit
+      - V-38501
+
+- name: "MEDIUM | V-38501 | AUDIT | The system must disable accounts after excessive login failures within a 15-minute interval."
+  assert:
+      that: "{{ item | integer }} > 900"
+      that: "{{ login_failures_account_require.stdout_lines | length }} == 2"
+  with_items: login_failures_interval.stdout_lines
+  ignore_errors: yes
+  register: login_failures_interval_audit
+  tags:
+      - medium
+      - cat2
+      - logon_settings
+      - audit
+      - V-38501
+
+- name: "MEDIUM | V-38501 | PATCH | The system must disable accounts after excessive login failures within a 15-minute interval."
+  template:
+      src: "{{ item.src }}"
+      dest: "{{ item.dest }}"
+  with_items:
+      - src: system-auth.j2
+        dest: /etc/pam.d/system-auth
+      - src: password-auth.j2
+        dest: /etc/pam.d/password-auth
+  tags:
+      - medium
+      - cat2
+      - logon_settings
+      - patch
+      - V-38501
+
+- name: "MEDIUM | V-38502 | AUDIT | The /etc/shadow file must be owned by root.\n
+         MEDIUM | V-38503 | AUDIT | The /etc/shadow file must be group-owned by root.\n
+         MEDIUM | V-38504 | AUDIT | The /etc/shadow file must have mode 0000."
+  stat:
+      path: /etc/shadow
+  register: shadow_owner_audit
+  tags: 
+      - medium
+      - cat2
+      - V-38502
+      - shadow
+      - file_perms
+      - audit
+
+- name: "MEDIUM | V-38502 | PATCH | The /etc/shadow file must be owned by root."
+  file:
+      state: file
+      owner: root
+      path: /etc/shadow
+  tags: 
+      - medium
+      - cat2
+      - V-38502
+      - shadow
+      - file_perms
+      - patch
+
+- name: "MEDIUM | V-38503 | PATCH | The /etc/shadow file must be group-owned by root."
+  file:
+      state: file
+      group: root
+      path: /etc/shadow
+  tags: 
+      - medium
+      - cat2
+      - V-38503
+      - shadow
+      - file_perms
+      - patch
+
+- name: "MEDIUM | V-38504 | PATCH | The /etc/shadow file must have mode 0000."
+  file:
+      state: file
+      mode: "0000"
+      path: /etc/shadow
+  tags: 
+      - medium
+      - cat2
+      - V-38504
+      - shadow
+      - file_perms
+      - patch
+
+- name: "MEDIUM | V-38511 | AUDIT | IP forwarding for IPv4 must not be enabled, unless the system is a router."
+  shell: sysctl net.ipv4.ip_forward | awk '{print $3}'
+  changed_when: no
+  always_run: yes
+  register: ipv4_ip_forwarding_audit
+  tags:
+      - V-38511
+      - cat2
+      - medium
+      - ip_forward
+      - ipv4
+      - audit
+
+- name: "MEDIUM | V-38511 | AUDIT | IP forwarding for IPv4 must not be enabled, unless the system is a router."
+  shell: sysctl net.ipv4.ip_forward | awk '{print $3}'
+  changed_when: no
+  always_run: yes
+  register: ipv4_ip_forwarding_audit
+  tags:
+      - V-38511
+      - cat2
+      - medium
+      - ip_forward
+      - ipv4
+      - audit
+
+- name: "MEDIUM | V-38511 | PATCH | IP forwarding for IPv4 must not be enabled unless the system is a router"
+  sysctl:
+      name: net.ipv4.ip_forward 
+      value: 0 
+      state: present 
+      reload: yes 
+      ignoreerrors: yes
+  when: not rhel6stig_system_is_router
+  tags:
+      - cat2
+      - V-38511
+      - kernel_parameters
+      - network
+      - medium
+      - patch
+
+- name: "MEDIUM | V-38512 | AUDIT | The operating system must prevent public IPv4 access into an organizations internal networks except as appropriately mediated by managed interfaces employing boundary protection devices"
+  command: service iptables status
+  always_run: yes
+  changed_when: no
+  ignore_errors: yes
+  register: iptables_audit
+  tags: 
+      - V-38512
+      - ipv4
+      - network
+      - firewall
+      - medium
+      - cat2
+      - patch
+
+- name: "MEDIUM | V-38512 | PATCH | The operating system must prevent public IPv4 access into an organizations internal networks except as appropriately mediated by managed interfaces employing boundary protection devices"
+  service: 
+      name: iptables 
+      enabled: yes 
+      state: started
+  tags: 
+      - V-38512
+      - ipv4
+      - network
+      - firewall
+      - medium
+      - cat2
+      - patch
+
+- name: "MEDIUM | V-38513 | AUDIT | The systems local IPv4 firewall must implement a deny-all, allow-by-exception policy for inbound packets."
+  shell: grep ":INPUT" /etc/sysconfig/iptables | awk '{print $2}'
+  changed_when: no
+  always_run: yes
+  register: ipv4_fw_deny_all_audit
+  tags:
+      - V-38513
+      - ipv4
+      - network
+      - firewall
+      - medium
+      - cat2
+      - audit
+
+- name: "MEDIUM | V-38513 | PATCH | The systems local IPv4 firewall must implement a deny-all, allow-by-exception policy for inbound packets."
+  lineinfile:
+      state: present 
+      dest: /etc/sysconfig/iptables 
+      regexp: ':INPUT' 
+      line: ':INPUT DROP [0:0]'
+  notify: restart iptables
+  tags:
+      - cat2
+      - medium 
+      - V-38513
+      - ipv4
+      - firewall
+      - network
+      - patch
+
+- name: "MEDIUM | V-38514 | AUDIT | The Datagram Congestion Control Protocol (DCCP) must be disabled unless required."
+  command: grep -rse "^install\s*dccp\s*/bin/true$" /etc/modprobe.conf /etc/modprobe.d
+  changed_when: no
+  always_run: yes
+  ignore_errors: yes
+  register: dccp_audit
+  tags:
+      - V-38514
+      - cat2
+      - medium
+      - dccp
+      - transport
+      - audit
+
+- name: "MEDIUM | V-38514 | PATCH | The Datagram Congestion Control Protocol (DCCP) must be disabled unless required."
+  lineinfile:
+      state: present
+      create: yes
+      line: install dccp /bin/true
+      dest: /etc/modprobe.d/disable-dccp.conf
+      owner: root
+      group: root
+      mode: "0644"
+  tags:
+      - V-38514
+      - cat2
+      - medium
+      - dccp
+      - transport
+      - patch
+
+- name: "MEDIUM | V-38515 | AUDIT | The Stream Control Transmission Protocol (SCTP) must be disabled unless required."
+  command: grep -rse "^install\s*sctp\s*/bin/true$" /etc/modprobe.conf /etc/modprobe.d
+  changed_when: no
+  always_run: yes
+  ignore_errors: yes
+  register: sctp_audit
+  tags:
+      - V-38515
+      - cat2
+      - medium
+      - sctp
+      - transport
+      - audit
+
+- name: "MEDIUM | V-38515 | PATCH | The Stream Control Transmission Protocol (SCTP) must be disabled unless required."
+  lineinfile:
+      state: present
+      create: yes
+      line: install sctp /bin/true
+      dest: /etc/modprobe.d/disable-sctp.conf
+      owner: root
+      group: root
+      mode: "0644"
+  tags:
+      - V-38515
+      - cat2
+      - medium
+      - sctp
+      - transport
+      - patch
+
+- name: "MEDIUM | V-38516 | AUDIT | The Transparent Inter-Process Communication (TIPC) protocol must be disabled unless required."
+  command: grep -rse "^install\s*tipc\s*/bin/true$" /etc/modprobe.conf /etc/modprobe.d
+  changed_when: no
+  always_run: yes
+  ignore_errors: yes
+  register: tipc_audit
+  tags:
+      - V-38516
+      - cat2
+      - medium
+      - tipc
+      - transport
+      - audit
+
+- name: "MEDIUM | V-38516 | PATCH | The Transparent Inter-Process Communication (TIPC) protocol must be disabled unless required."
+  lineinfile:
+      state: present
+      create: yes
+      line: install tipc /bin/true
+      dest: /etc/modprobe.d/disable-tipc.conf
+      owner: root
+      group: root
+      mode: "0644"
+  tags:
+      - V-38516
+      - cat2
+      - medium
+      - tipc
+      - transport
+      - patch
+
+- name: "MEDIUM | V-38518 | AUDIT | All rsyslog-generated log files must be owned by root."
+  shell: grep -e "/" /etc/rsyslog.conf /etc/rsyslog.d/* | grep -v IncludeConfig | sed 's/-//'| awk 'NF==2 {print $2}'
+  changed_when: no
+  always_run: yes
+  register: rsyslog_logfiles
+  tags:
+      - cat2
+      - medium
+      - V-38518
+      - log_files
+      - rsyslog
+      - audit
+
+- name: "MEDIUM | V-38518 | AUDIT | All rsyslog-generated log files must be owned by root."
+  stat:
+      path: "{{ item }}"
+  with_items: rsyslog_logfiles.stdout_lines
+  register: rsyslog_logfiles_audit
+  tags:
+      - cat2
+      - medium
+      - V-38518
+      - log_files
+      - rsyslog
+      - audit
+
+- name: "MEDIUM | V-38518 | PATCH | All rsyslog-generated log files must be owned by root."
+  file:
+      path: "{{ item }}"
+      owner: root
+      follow: yes
+      state: file
+  with_items: rsyslog_logfiles.stdout_lines
+  tags:
+      - cat2
+      - medium
+      - V-38518
+      - log_files
+      - rsyslog
+      - patch
+
+- name: "MEDIUM | V-38519 | PATCH | All rsyslog-generated log files must be group-owned by root."
+  file:
+      dest: "{{ item }}"
+      group: root
+      state: file
+      follow: yes
+  with_items: rsyslog_logfiles.stdout_lines
+  tags:
+      - cat2
+      - medium
+      - V-38519
+      - log_files
+      - rsyslog
+      - patch
+
+# V-38520 not automatically remediated. See not_automated.yml
+# V-38521 not automatically remediated. See not_automated.yml
+
+- name: "MEDIUM | V-38523 | AUDIT | The system must not accept IPv4 source-routed packets on any interface."
+  shell: sysctl net.ipv4.conf.all.accept_source_route | awk '{print $3}'
+  changed_when: no
+  always_run: yes
+  register: ipv4_source_routed_packets_any_int_audit
+  tags:
+      - medium
+      - cat2
+      - V-38523
+      - audit
+      - ipv4
+      - sysctl
+      - kernel_parameters
+      - network
+
+- name: "MEDIUM | V-38523 | PATCH | The system must not accept IPv4 source-routed packets on any interface."
+  sysctl: 
+      name: net.ipv4.conf.all.accept_source_route 
+      value: 0 
+      state: present 
+      reload: yes 
+      ignoreerrors: yes
+  tags:
+      - medium
+      - cat2
+      - V-38523
+      - patch
+      - ipv4
+      - sysctl
+      - kernel_parameters
+      - network
+
+- name: "MEDIUM | V-38524 | AUDIT | The system must not accept ICMPv4 redirect packets on any interface."
+  shell: sysctl net.ipv4.conf.all.accept_redirects | awk '{print $3}'
+  changed_when: no
+  always_run: yes
+  register: icmpv4_redirect_packets_any_int_audit
+  tags:
+      - medium
+      - cat2
+      - V-38524
+      - audit
+      - ICMPv4
+      - sysctl
+      - kernel_parameters
+      - network
+
+- name: "MEDIUM | V-38524 | PATCH | The system must not accept ICMPv4 redirect packets on any interface."
+  sysctl: 
+      name: net.ipv4.conf.all.accept_redirects
+      value: 0 
+      state: present 
+      reload: yes 
+      ignoreerrors: yes
+  tags:
+      - medium
+      - cat2
+      - V-38524
+      - patch
+      - ICMPv4
+      - sysctl
+      - kernel_parameters
+      - network
+
+- name: "MEDIUM | V-38526 | AUDIT | The system must not accept ICMPv4 secure redirect packets on any interface."
+  shell: sysctl net.ipv4.conf.all.secure_redirects | awk '{print $3}'
+  changed_when: no
+  always_run: yes
+  register: icmpv4_secure_redirect_packets_any_int_audit
+  tags:
+      - medium
+      - cat2
+      - V-38526
+      - audit
+      - ICMPv4
+      - sysctl
+      - kernel_parameters
+      - network
+
+- name: "MEDIUM | V-38526 | PATCH | The system must not accept ICMPv4 secure redirect packets on any interface."
+  sysctl: 
+      name: net.ipv4.conf.all.secure_redirects
+      value: 0 
+      state: present 
+      reload: yes 
+      ignoreerrors: yes
+  tags:
+      - medium
+      - cat2
+      - V-38526
+      - patch
+      - ICMPv4
+      - sysctl
+      - kernel_parameters
+      - network
+
+- name: "MEDIUM | V-38529 | AUDIT | The system must not accept IPv4 source-routed packets by default."
+  shell: sysctl net.ipv4.conf.default.accept_source_route | awk '{print $3}'
+  changed_when: no
+  always_run: yes
+  register: ipv4_source_routed_packets_default_audit
+  tags:
+      - medium
+      - cat2
+      - V-38529
+      - audit
+      - ipv4
+      - sysctl
+      - kernel_parameters
+      - network
+
+- name: "MEDIUM | V-38529 | PATCH | The system must not accept IPv4 source-routed packets by default."
+  sysctl: 
+      name: net.ipv4.conf.default.accept_source_route
+      value: 0 
+      state: present 
+      reload: yes 
+      ignoreerrors: yes
+  tags:
+      - medium
+      - cat2
+      - V-38529
+      - patch
+      - ipv4
+      - sysctl
+      - kernel_parameters
+      - network
+
+- name: "MEDIUM | V-38532 | AUDIT | The system must not accept ICMPv4 secure redirect packets by default."
+  shell: sysctl net.ipv4.conf.default.secure_redirects | awk '{print $3}'
+  changed_when: no
+  always_run: yes
+  register: icmpv4_secure_redirects_default_audit
+  tags:
+      - medium
+      - cat2
+      - V-38532
+      - audit
+      - ICMPv4
+      - sysctl
+      - kernel_parameters
+      - network
+
+- name: "MEDIUM | V-38532 | PATCH | The system must not accept ICMPv4 secure redirect packets by default."
+  sysctl: 
+      name: net.ipv4.conf.default.secure_redirects
+      value: 0 
+      state: present 
+      reload: yes 
+      ignoreerrors: yes
+  tags:
+      - medium
+      - cat2
+      - V-38532
+      - patch
+      - ICMPv4
+      - sysctl
+      - kernel_parameters
+      - network
+
+- name: "MEDIUM | V-38539 | AUDIT | The system must be configured to use TCP syncookies when experiencing a TCP SYN flood."
+  shell: sysctl net.ipv4.tcp_syncookies | awk '{print $3}'
+  changed_when: no
+  always_run: yes
+  register: tcp_syncookies_audit
+  tags:
+      - medium
+      - cat2
+      - V-38539
+      - audit
+      - tcp
+      - sysctl
+      - kernel_parameters
+      - network
+
+- name: "MEDIUM | V-38539 | PATCH | The system must be configured to use TCP syncookies when experiencing a TCP SYN flood."
+  sysctl: 
+      name: net.ipv4.tcp_syncookies
+      value: 1
+      state: present 
+      reload: yes 
+      ignoreerrors: yes
+  tags:
+      - medium
+      - cat2
+      - V-38539
+      - patch
+      - tcp
+      - sysctl
+      - kernel_parameters
+      - network
+
+- name: "MEDIUM | V-38542 | AUDIT | The system must use a reverse-path filter for IPv4 network traffic when possible on all interfaces."
+  shell: sysctl net.ipv4.conf.all.rp_filter | awk '{print $3}'
+  changed_when: no
+  always_run: yes
+  register: ipv4_reverse_path_filter_all_int_audit
+  tags:
+      - medium
+      - cat2
+      - V-38542
+      - audit
+      - ipv4
+      - sysctl
+      - kernel_parameters
+      - network
+
+- name: "MEDIUM | V-38542 | PATCH | The system must use a reverse-path filter for IPv4 network traffic when possible on all interfaces."
+  sysctl: 
+      name: net.ipv4.conf.all.rp_filter
+      value: 1
+      state: present 
+      reload: yes 
+      ignoreerrors: yes
+  tags:
+      - medium
+      - cat2
+      - V-38542
+      - patch
+      - ipv4
+      - sysctl
+      - kernel_parameters
+      - network
+
+- name: "MEDIUM | V-38544 | AUDIT | The system must use a reverse-path filter for IPv4 network traffic when possible by default."
+  shell: sysctl net.ipv4.conf.default.rp_filter | awk '{print $3}'
+  changed_when: no
+  always_run: yes
+  register: ipv4_reverse_path_filter_default_audit
+  tags:
+      - medium
+      - cat2
+      - V-38544
+      - audit
+      - ipv4
+      - sysctl
+      - kernel_parameters
+      - network
+
+- name: "MEDIUM | V-38544 | PATCH | The system must use a reverse-path filter for IPv4 network traffic when possible by default."
+  sysctl: 
+      name: net.ipv4.conf.default.rp_filter
+      value: 1
+      state: present 
+      reload: yes 
+      ignoreerrors: yes
+  tags:
+      - medium
+      - cat2
+      - V-38544
+      - patch
+      - ipv4
+      - sysctl
+      - kernel_parameters
+      - network  
+
+- name: "MEDIUM | V-38546 | AUDIT | The IPv6 protocol handler must not be bound to the network stack unless needed."
+  shell: grep -rsE '^options\s*ipv6\s*disable=1' /etc/modprobe.conf /etc/modprobe.d | awk -F':' '{print $2}' | awk -F'=' '{print $2}'
+  register: ipv6_protocol_handler_bound_network_stack_audit
+  changed_when: no
+  always_run: yes
+  tags:
+      - V-38546
+      - cat2
+      - medium
+      - ipv6
+      - network
+      - audit
+
+- name: "MEDIUM | V-38546 | PATCH | The IPv6 protocol handler must not be bound to the network stack unless needed."
+  lineinfile:
+        state: present
+        create: yes
+        line: options ipv6 disable=1
+        dest: /etc/modprobe.d/disable-ipv6.conf
+  when: ipv6_protocol_handler_bound_network_stack_audit.stdout != 1
+  tags:
+      - V-38546
+      - cat2
+      - medium
+      - ipv6
+      - network
+      - audit
+
+- name: "MEDIUM | V-38548 | AUDIT | The system must ignore ICMPv6 redirects by default."
+  shell: sysctl net.ipv6.conf.default.accept_redirects | awk '{print $3}'
+  changed_when: no
+  always_run: yes
+  register: icmpv4_ignore_redirects_default_audit
+  tags:
+      - medium
+      - cat2
+      - V-38548
+      - audit
+      - ICMPv4
+      - sysctl
+      - kernel_parameters
+      - network
+
+- name: "MEDIUM | V-38548 | PATCH | The system must ignore ICMPv6 redirects by default."
+  sysctl: 
+      name: net.ipv6.conf.default.accept_redirects
+      value: 0
+      state: present 
+      reload: yes 
+      ignoreerrors: yes
+  tags:
+      - medium
+      - cat2
+      - V-38548
+      - patch
+      - ICMPv4
+      - sysctl
+      - kernel_parameters
+      - network  
+
+- name: "MEDIUM | V-38549 | AUDIT | The system must employ a local IPv6 firewall.\n
+         MEDIUM | V-38553 | PATCH | The operating system must prevent public IPv6 access into an organizations internal networks, except as appropriately mediated by managed interfaces employing boundary protection devices."
+  command: service ip6tables status
+  when: rhel6stig_ipv6_in_use
+  ignore_errors: yes
+  changed_when: no
+  always_run: yes
+  register: ip6tables_audit
+  tags:
+      - cat2
+      - medium
+      - iptables
+      - ip6tables
+      - V-38549
+      - V-38553
+      - audit
+
+- name: "MEDIUM | V-38549 | PATCH | The system must employ a local IPv6 firewall.\n
+         MEDIUM | V-38553 | PATCH | The operating system must prevent public IPv6 access into an organizations internal networks, except as appropriately mediated by managed interfaces employing boundary protection devices."
+  service:
+      name: ip6tables 
+      state: started
+      enabled: yes
+  when: rhel6stig_ipv6_in_use
+  tags:
+      - cat2
+      - medium
+      - iptables
+      - ip6tables
+      - V-38549
+      - V-38553
+      - patch
+
+- name: "MEDIUM | V-38555 | AUDIT | The system must employ a local IPv4 firewall.\n
+         MEDIUM | V-38560 | AUDIT | The operating system must connect to external networks or information systems only through managed IPv4 interfaces consisting of boundary protection devices arranged in accordance with an organizational security architecture."
+  command: service iptables status
+  ignore_errors: yes
+  changed_when: no
+  always_run: yes
+  register: iptables_audit
+  tags:
+      - cat2
+      - medium
+      - iptables
+      - V-38555
+      - V-38560
+      - audit
+
+- name: "MEDIUM | V-38555 | PATCH | The system must employ a local IPv4 firewall.\n
+         MEDIUM | V-38560 | PATCH | The operating system must connect to external networks or information systems only through managed IPv4 interfaces consisting of boundary protection devices arranged in accordance with an organizational security architecture."
+  service:
+      name: iptables 
+      state: started
+      enabled: yes
+  tags:
+      - cat2
+      - medium
+      - iptables
+      - V-38555
+      - V-38560
+      - patch
+
+- name: "MEDIUM | V-38573 | AUDIT | The system must disable accounts after three consecutive unsuccessful logon attempts."
+  shell: grep -h pam_faillock /etc/pam.d/system-auth /etc/pam.d/password-auth | grep deny=3
+  changed_when: no
+  always_run: yes
+  register: logon_attempts_audit
+  tags:
+      - medium
+      - cat2
+      - V-38573
+      - logon_settings
+      - accounts
+      - audit
+      - pam
+
+- name: "MEDIUM | V-38573 | PATCH | The system must disable accounts after three consecutive unsuccessful logon attempts."
+  template:
+      src: "{{ item.src }}"
+      dest: "{{ item.dest }}"
+  with_items:
+      - src: system-auth.j2
+        dest: /etc/pam.d/system-auth
+      - src: password-auth.j2
+        dest: /etc/pam.d/password-auth
+  tags:
+      - medium
+      - cat2
+      - V-38573
+      - logon_settings
+      - accounts
+      - patch
+      - pam
+
+- name: "MEDIUM | V-38574 | AUDIT | The system must use a FIPS 140-2 approved cryptographic hashing algorithm for generating account password hashes (system-auth)."
+  shell: grep password -h /etc/pam.d/* | grep pam_unix.so | awk '{print $4}'
+  changed_when: no
+  always_run: yes
+  register: pam_pwd_hash_audit
+  tags:
+      - medium
+      - cat2
+      - V-38574
+      - logon_settings
+      - accounts
+      - passwords
+      - patch
+      - pam
+
+- name: "MEDIUM | V-38574 | PATCH | The system must use a FIPS 140-2 approved cryptographic hashing algorithm for generating account password hashes (system-auth)."
+  
 # Search for world writable files and print them out if any are found
 - name: Looking for world-writable files on the system
   command: find / -xdev -type f -perm -002
@@ -1288,14 +2092,9 @@
 
 
 # sysctl network settings
-- name: V-38511 Medium  IP forwarding for IPv4 must not be enabled unless the system is a router
-  sysctl: name=net.ipv4.ip_forward value=0 state=present reload=yes ignoreerrors=yes
-  when: not rhel6stig_system_is_router
-  tags: [ 'cat2' , 'V-38511' , 'kernel_parameters' , 'network' ]
 
-- name: V-38523 Medium  The system must not accept IPv4 source-routed packets on any interface
-  sysctl: name=net.ipv4.conf.all.accept_source_route value=0 state=present reload=yes ignoreerrors=yes
-  tags: [ 'cat2' , 'V-38523' , 'kernel_parameters' , 'network' ]
+
+
 
 - name: V-38524 Medium  The system must not accept ICMPv4 redirect packets on any interface
   sysctl: name=net.ipv4.conf.all.accept_redirects value=0 state=present reload=yes ignoreerrors=yes
@@ -1394,10 +2193,7 @@
   service: name=iptables enabled=yes state=started
   tags: [ 'cat2' , 'V-38555' , 'V-38560' , 'V-38512' , 'ipv4' , 'network' , 'firewall' ]
 
-- name: V-38513 Medium  The systems local IPv4 firewall must implement a deny-all allow-by-exception policy for inbound packets
-  lineinfile: "state=present dest=/etc/sysconfig/iptables regexp=':INPUT' line=':INPUT DROP [0:0]'"
-  tags: [ 'cat2' , 'V-38513' , 'ipv4' , 'firewall' , 'network']
-  notify: restart iptables
+
 
 - name: V-38686 Medium  The system's local firewall must implement a deny-all, allow-by-exception policy for forwarded packets
   lineinfile: "state=present dest=/etc/sysconfig/iptables regexp=':FORWARD' line=':FORWARD DROP [0:0]'"
