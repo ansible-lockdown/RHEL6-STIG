@@ -21,6 +21,7 @@
 import os, re
 from os.path import isfile, join
 
+
 DOCUMENTATION = '''
 ---
 module: pam
@@ -74,7 +75,7 @@ options:
             - If supplied, it will place the desired PAM entry after the line specified here. Note that this is smart enough to ignore white and tab spaces when searching.
     state:
         description:
-            - Whether you want the PAM entry to be present or absent. Note that it will search for I(service), I(pam_module), and I(type) and if all three are in the entry, the entry will be removed.
+            - Whether you want the PAM entry to be present or absent. Note that it will search for I(service), I(pam_module), , I(control), and I(type). If all four are in the entry, the entry will be removed.
 
 '''
 
@@ -126,8 +127,14 @@ pam_entry:
 
 '''
 
+REGEX_PATTERN = '[\s\t\n]*(?![^\[\]]*\])'
+
 def pamd_in_use():
-    """ Checks if the system uses pam.d """
+    """
+    Checks if the system uses pam.d. This is important because when pamd
+    is in use then the service name takes the place of the file name;
+    without pamd the service names is placed on the left most column of pam.conf
+    """
     if os.path.exists('/etc/pam.d/'):
         return True
     else:
@@ -135,14 +142,17 @@ def pamd_in_use():
 
 
 def create_config(service):
-    '''Creates an empty config file in pam.d when the user specifies create_config=True'''
+    """
+    Creates an empty config file in pam.d when the user specifies
+    create_config=True and when the config does not already exist
+    """
     service_file = open('/etc/pam.d/%s' % service, 'a')
     service_file.close()
     return '/etc/pam.d/%s' % service
 
 
 def config_exists(service):
-    '''Checks for the existence of a pam.d config'''
+    """Checks for the existence of a pam.d config"""
     if os.path.exists('/etc/pam.d/%s' % service):
         return True
     else:
@@ -150,7 +160,10 @@ def config_exists(service):
 
 
 def is_valid_type(pam_type, **kwargs):
-    ''' Checks if the type supplied is valid'''
+    """
+    Checks if the type supplied is valid. Source referenced can be found at
+    http://www.linux-pam.org/Linux-PAM-html/sag-configuration-file.html
+    """
     if pam_type in kwargs['VALID_TYPES']:
         return True
     else:
@@ -158,11 +171,16 @@ def is_valid_type(pam_type, **kwargs):
 
 
 def check_if_valid_control(module, pam_control, **kwargs):
-    '''Checks if the control is valid. It also does a check of complex controls'''
+    '''
+    Checks if the control is valid. It also does a check of complex controls.
+    Source referenced can be found at
+    http://www.linux-pam.org/Linux-PAM-html/sag-configuration-file.html
+    '''
     if pam_control in kwargs['VALID_CONTROLS']:
         return True
     elif pam_control.startswith('['):
-        complex_controls = pam_control[1:-1].split(' ')
+        #Complex controls start with a bracket
+        complex_controls = pam_control[1:-1].split(' ') # When you have something like [default=die success=1] this makes it a proper list of control k/v pairs
         for control in complex_controls:
             control_key, control_value = control.split('=')
             if control_key in kwargs['VALID_COMPLEX_CONTROL_KEYS']:
@@ -178,6 +196,7 @@ def check_if_valid_control(module, pam_control, **kwargs):
 
 def get_config_lines(path):
     '''Returns a list in which every element is a line of the current config file'''
+    # Python 2.4 compatible file operations
     try:
         config = open(path, 'r')
     except IOError:
@@ -190,9 +209,10 @@ def get_config_lines(path):
 def is_full_line_present(lines, entry):
     '''Checks to see if the user supplied PAM config args are already present as a line'''
     is_present = False
-    entry_args = re.split(r'[\s\t\n]*(?![^\[\]]*\])', entry)
+    entry_args = re.split(REGEX_PATTERN, entry)
 
     for config_line in lines:
+        # This attempts to determine if the module supplied args are currently present in the config
         if all(pam_arg in config_line for pam_arg in entry_args):
             is_present = True
 
@@ -202,49 +222,68 @@ def is_full_line_present(lines, entry):
 def add_to_config(pam_entry, reference_line, config_lines, config_path, placement=None):
     '''Intelligently adds the params as a proper PAM config line'''
     changed = False
-    ref_line_args = re.split(r'[\s\t\n]*(?![^\[\]]*\])', reference_line)
-    entry_args = re.split(r'[\s\t\n]*(?![^\[\]]*\])', pam_entry)
+    ref_line_args = re.split(REGEX_PATTERN, reference_line)
+    len_limit = len(ref_line_args)
+    entry_args = re.split(REGEX_PATTERN, pam_entry)[:len_limit]
 
     for line in config_lines:
+        # Here we grab the index location of the reference line which will place the
+        # 'pam_entry' either before or after this line.
         if all(arg in line for arg in ref_line_args):
             ref_location = config_lines.index(line)
             break
 
     if placement == 'before':
-        if set( re.split(r'[\s\t\n]*(?![^\[\]]*\])', config_lines[ref_location - 1]) ) == set(entry_args):
+        if set( re.split(REGEX_PATTERN, config_lines[ref_location - 1]) ) == set(entry_args):
             changed = False
         else:
-            config_lines.insert(ref_location - 1, pam_entry + '\n')
+            config_lines.insert(ref_location, pam_entry + '\n')
             changed = True
     elif placement == 'after':
         try:
-            if set( re.split(r'[\s\t\n]*(?![^\[\]]*\])', config_lines[ref_location + 1]) ) == set(entry_args):
+            if set( re.split(REGEX_PATTERN, config_lines[ref_location + 1]) ) == set(entry_args):
                 changed = False
             else:
                 config_lines.insert(ref_location + 1, pam_entry + '\n')
                 changed = True
         except IndexError:
+            # This occurs when using after_line in the module args and the after_line is the last line
+            # of the file. When this happens, we simply append instead of insert.
             config_lines.append(pam_entry + '\n')
             changed = True
-
-    with open(config_path, 'w') as conf:
+    # Python 2.4 compatible file operations
+    conf = open(config_path, 'w')
+    try:
         for line in config_lines:
             conf.write(line)
+    finally:
+        conf.close()
 
     return changed
 
 
-def rule_already_defined(service, pam_type, pam_module, config_lines):
-    '''Checks if the rule is already defined. It keys off the service, type, and module.'''
+def rule_already_defined(service, pam_type, pam_module, pam_control, config_lines):
+    '''
+    Checks if the rule is already defined. It keys off the service, type, control, and module.
+    Makes the most sense when wanting to modify PAM arguments.
+    '''
     if pamd_in_use():
         for line in config_lines:
-            cline = filter(None, re.split(r'[\s\t\n]*(?![^\[\]]*\])', line))
+            # Here we simply extract all the relevant portions of each PAM rule
+            if not line.startswith('#'):
+                cline = filter(None, re.split(REGEX_PATTERN, line))
+                if len(cline) > 0:
+                    l_type = str(cline[0])
+                    l_control = str(cline[1])
+                    l_module = str(cline[2])
 
-            l_type = str(cline[0])
-            l_module = str(cline[2])
+                    if pam_type == l_type and l_module == pam_module and l_control == pam_control:
+                        # If all the sections match with what the user via the Ansible task then we
+                        # return the index of the rule
+                        return config_lines.index(line)
+                else:
+                    continue
 
-            if pam_type == l_type and l_module == pam_module:
-                return config_lines.index(line)
             else:
                 continue
 
@@ -252,12 +291,13 @@ def rule_already_defined(service, pam_type, pam_module, config_lines):
 
     else:
         for line in config_lines:
-            cline       = filter(None, re.split(r'[\s\t\n]*(?![^\[\]]*\])', line))
+            cline       = filter(None, re.split(REGEX_PATTERN, line))
             l_service   = cline[0]
             l_type      = cline[1]
+            l_control =   str(cline[2])
             l_module    = cline[3]
 
-            if pam_type == l_type and l_module == pam_module and service == l_service:
+            if pam_type == l_type and l_module == pam_module and service == l_service and l_control == pam_control:
                 return config_lines.index(line)
             else:
                 continue
@@ -265,47 +305,44 @@ def rule_already_defined(service, pam_type, pam_module, config_lines):
         return False
 
 
-def modify_rule(config_path, rule_index, config_lines, **kwargs):
-    '''Used when the rule already exists and a modification needs to be made'''
-    rule_string = config_lines[rule_index]
-    rule_split = re.split(r'[\s\t\n]*(?![^\[\]]*\])', rule_string)
+def modify_rule(module, config_path, rule_index, config_lines, **kwargs):
+    '''
+    Used when the rule already exists and a modification needs to PAM module arguments.
+    '''
+    rule_string = config_lines[rule_index] # rule_index is grabbed from the call to rule_already_defined()
+    rule_split = re.split(REGEX_PATTERN, rule_string)
 
     if pamd_in_use():
-        control_index = 1
+        # These values are static
         args_index = 3
     else:
-        control_index = 2
         args_index = 4
 
-    if kwargs['control']:
-        if kwargs['control'] != rule_split[control_index]:
-            rule_split[control_index] = kwargs['control']
-            config_lines[rule_index] = '\t'.join(rule_split) + '\n'
-            with open(config_path, 'w') as pam_conf:
+    if kwargs['arguments']:
+        if not set(kwargs['arguments'].split()).issuperset(filter(None, set(rule_split[args_index:]))):
+            rule_split[args_index] = kwargs['arguments']
+            pam_conf = open(config_path, 'w')
+            try:
                 for rule in config_lines:
                     pam_conf.write(rule)
+            finally:
+                pam_conf.close()
+
             return True
         else:
+            # print 'yay'
             return False
 
-    if kwargs['arguments']:
-        if kwargs['arguments'] != config_lines[args_index]:
-            rule_split[control_index] = kwargs['arguments']
-            config_lines[rule_index] = '\t'.join(rule_split) + '\n'
-            with open(config_path, 'w') as pam_conf:
-                for rule in config_lines:
-                    pam_conf.write(rule)
-            return True
-        else:
-            return False
 
 def placed_correctly(config_lines, current_location, ref_line=None, placement=None):
     '''Checks to see if the generated line is in the proper spot as dictated by before_line and after_line'''
-    ref_line = re.split(r'[\s\t\n]*(?![^\[\]]*\])', ref_line)
+    ref_line = re.split(REGEX_PATTERN, ref_line)
+    len_limit = len(ref_line) #This is done b/c we only want to compare to first 3 or 4 columns depending on pamd usage.
 
     if placement == 'after':
+
         if current_location - 1 >= 0:
-            line_before_entry = filter(None, re.split(r'[\s\t\n]*(?![^\[\]]*\])', config_lines[current_location - 1]))
+            line_before_entry = filter(None, re.split(REGEX_PATTERN, config_lines[current_location - 1]))[:len_limit]
         else:
             return False
 
@@ -315,8 +352,9 @@ def placed_correctly(config_lines, current_location, ref_line=None, placement=No
             return False
 
     elif placement == 'before':
+
         try:
-            line_after_entry = filter(None, re.split(r'[\s\t\n]*(?![^\[\]]*\])', config_lines[current_location + 1]))
+            line_after_entry = filter(None, re.split(REGEX_PATTERN, config_lines[current_location + 1]))[:len_limit]
         except Exception:
             line_after_entry = []
 
@@ -325,16 +363,23 @@ def placed_correctly(config_lines, current_location, ref_line=None, placement=No
         else:
             return False
 
+
 def move_line(path=None, content=None, pam_entry=None, pam_entry_index=None, ref_line=None, placement=None):
     '''Used when the generated line is not in its proper spot. This function moves it to the proper location'''
-    del content[pam_entry_index]
+    # Since this only gets called when placed_correctly() returns False we just delete the offending line from the list then
+    # we add it back into the correct spot later.
+
     content = filter(None, content)
-    ref_line = re.split(r'[\s\t\n]*(?![^\[\]]*\])', ref_line)
+    ref_line = re.split(REGEX_PATTERN, ref_line)
     pam_entry += '\n'
+    len_limit = len(ref_line)
 
     for line in content:
-        c_line = filter(None, re.split(r'[\s\t\n]*(?![^\[\]]*\])', line))
+        c_line = filter(None, re.split(REGEX_PATTERN, line))[:len_limit]
+
         if set(c_line) == set(ref_line):
+            del content[pam_entry_index]
+            content = filter(None, content)
             ref_index = content.index(line) + 1
             break
 
@@ -344,27 +389,38 @@ def move_line(path=None, content=None, pam_entry=None, pam_entry_index=None, ref
         except IndexError:
             content.append(pam_entry)
 
-        with open(path, 'w') as config:
+        config = open(path, 'w')
+        try:
             for line in content:
                 config.write(line)
+        finally:
+            config.close()
 
     elif placement == 'before':
-        if ref_index - 1 >= 0:
-            content.insert(ref_index - 1, pam_entry)
+        if ref_index - 1 > 0:
+            content.insert(ref_index, pam_entry)
         else:
             content.insert(0, pam_entry)
-        with open(path, 'w') as config:
+        config = open(path, 'w')
+        try:
             for line in content:
                 config.write(line)
+        finally:
+            config.close()
     return
+
 
 def delete_rule(path, index, original_lines):
     ''' Deletes a rule'''
     del original_lines[index]
-    with open(path, 'w') as config:
+    config = open(path, 'w')
+    try:
         for line in original_lines:
             config.write(line)
+    finally:
+        config.close()
     return
+
 
 def pam_manager(**kwargs):
     '''
@@ -391,9 +447,10 @@ def pam_manager(**kwargs):
     backup_file         = kwargs['backup_file']
 
     if pamd_in_use():
-        pam_entry = "%s\t\t%s\t%s\t%s" % (pam_type, control, pam_module, arguments)
+        # Attempted to use \t characters to make it more uniform but the behavior was inconsistent
+        pam_entry = "%s      %s      %s      %s" % (pam_type, control, pam_module, arguments)
     else:
-        pam_entry = "%s\t\t%s\t%s\t%s\t%s" % (service, pam_type, control, pam_module, arguments)
+        pam_entry = "%s      %s      %s      %s      %s" % (service, pam_type, control, pam_module, arguments)
 
     if state == 'present':
         if pamd_in_use():
@@ -411,8 +468,8 @@ def pam_manager(**kwargs):
             module.exit_json(changed=changed, config_path=config_path, pam_entry=pam_entry.rstrip().expandtabs(), backup_file=backup_file, line=401)
 
         elif before_line:
-            if isinstance(current_rule_index, int) and not isinstance(current_rule_index, bool):
-                changed = modify_rule(config_path, current_rule_index, config_lines, **mod_args)
+            if isinstance(current_rule_index, int) and not isinstance(current_rule_index, bool): #Here when the index of the line was 0 or 1 it was getting translated into boolean value.
+                changed = modify_rule(module, config_path, current_rule_index, config_lines, **mod_args)
 
             if not is_full_line_present(config_lines, pam_entry):
                 if is_full_line_present(config_lines, before_line):
@@ -430,7 +487,7 @@ def pam_manager(**kwargs):
 
         elif after_line:
             if isinstance(current_rule_index, int) and not isinstance(current_rule_index, bool):
-                changed = modify_rule(config_path, current_rule_index, config_lines, **mod_args)
+                changed = modify_rule(module, config_path, current_rule_index, config_lines, **mod_args)
 
             if not is_full_line_present(config_lines, pam_entry) and not changed:
                 if is_full_line_present(config_lines, after_line):
@@ -448,7 +505,7 @@ def pam_manager(**kwargs):
 
         else:
             if isinstance(current_rule_index, int) and not isinstance(current_rule_index, bool):
-                changed = modify_rule(config_path, current_rule_index, config_lines, **mod_args)
+                changed = modify_rule(module, config_path, current_rule_index, config_lines, **mod_args)
                 module.exit_json(changed=changed, config_path=config_path, pam_entry=pam_entry.rstrip().expandtabs(), backup_file=backup_file, line=401)
 
             else:
@@ -509,7 +566,7 @@ def main():
         config_path     = '/etc/pam.conf'
 
     config_lines        = get_config_lines(config_path)
-    current_rule_index  = rule_already_defined(service, pam_type, pam_module, config_lines)
+    current_rule_index  = rule_already_defined(service, pam_type, pam_module, control, config_lines)
     mod_args            = dict(control=control, arguments=arguments)
 
     if backup:
