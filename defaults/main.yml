@@ -63,18 +63,15 @@ rhel6stig_system_is_router: false
 # This will disable the postfix settings V-38622
 rhel6stig_is_mail_relay: false
 
-# Force the grub password to be updated
-# If a password entry is found in grub.conf, the password will not be changed
-# unless this variable is set to 'true'
-rhel6stig_change_grub_password: false
-
-# The new grub password to insert if  rhel6stig_change_grub_password is TRUE
-# This should be a pre-encrypted string created with
-# grub-crypt --sha-512
-# a completely random 40 character password has been generated for you
-# ONLY USE IF YOU DON'T EVER WANT TO ACCESS THE BOOTLOADER
-# i.e. If this system is running in AWS
-rhel6stig_bootloader_password: $6$t8wbzLbzO0qLbSP8$imtV5DYW43wF4sLhTV.xrwY4.OZnT17ZQSzN.p6P.4bTRTdW0/P9CnpdaHSgVGliP7tvzf3bLWkaTKbhRwOOo0
+# By default will create a random password with the same grub-crypt --sha-512
+# mechanism rebuilt as an Ansible module.
+# The system will make a call to python to generate a random salt 
+# and a random string and generate the sha512 hash.
+# Change this to something other than 'random' if you want to 
+# define the password and be able to access the bootloader
+# KEEP AS 'random' ONLY IF YOU DON'T EVER WANT TO ACCESS THE BOOTLOADER
+# i.e. If this system is running in a public cloud 
+rhel6stig_bootloader_password: random
 
 # NTP configuration used in ntp.conf
 # These should be set to DoD authoritative time source
