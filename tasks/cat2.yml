@@ -297,7 +297,7 @@
       - auditd
       - patch
 
-- name: "MEDIUM | V-38472 | Audit | All system command files must be owned by root"
+- name: "MEDIUM | V-38472 | AUDIT | All system command files must be owned by root"
   script: sys_command_files_with_bad_owner.sh
   become_user: root
   register: sys_commands_owner_audit
@@ -789,9 +789,10 @@
       - V-38501
       - pam
 
-- name: "MEDIUM | V-38502 | AUDIT | The /etc/shadow file must be owned by root.\n
-         MEDIUM | V-38503 | AUDIT | The /etc/shadow file must be group-owned by root.\n
-         MEDIUM | V-38504 | AUDIT | The /etc/shadow file must have mode 0000."
+- name: |
+         MEDIUM | V-38502 | AUDIT | The /etc/shadow file must be owned by root.
+         MEDIUM | V-38503 | AUDIT | The /etc/shadow file must be group-owned by root.
+         MEDIUM | V-38504 | AUDIT | The /etc/shadow file must have mode 0000.
   stat:
       path: /etc/shadow
   register: shadow_owner_audit
@@ -1411,8 +1412,9 @@
       - kernel_parameters
       - network
 
-- name: "MEDIUM | V-38549 | AUDIT | The system must employ a local IPv6 firewall.\n
-         MEDIUM | V-38553 | PATCH | The operating system must prevent public IPv6 access into an organizations internal networks, except as appropriately mediated by managed interfaces employing boundary protection devices."
+- name: |
+         MEDIUM | V-38549 | AUDIT | The system must employ a local IPv6 firewall.
+         MEDIUM | V-38553 | PATCH | The operating system must prevent public IPv6 access into an organizations internal networks, except as appropriately mediated by managed interfaces employing boundary protection devices.
   command: service ip6tables status
   when: rhel6stig_ipv6_in_use
   ignore_errors: yes
@@ -1428,8 +1430,9 @@
       - V-38553
       - audit
 
-- name: "MEDIUM | V-38549 | PATCH | The system must employ a local IPv6 firewall.\n
-         MEDIUM | V-38553 | PATCH | The operating system must prevent public IPv6 access into an organizations internal networks, except as appropriately mediated by managed interfaces employing boundary protection devices."
+- name: |
+         MEDIUM | V-38549 | PATCH | The system must employ a local IPv6 firewall.
+         MEDIUM | V-38553 | PATCH | The operating system must prevent public IPv6 access into an organizations internal networks, except as appropriately mediated by managed interfaces employing boundary protection devices.
   service:
       name: ip6tables
       state: started
@@ -1444,8 +1447,9 @@
       - V-38553
       - patch
 
-- name: "MEDIUM | V-38555 | AUDIT | The system must employ a local IPv4 firewall.\n
-         MEDIUM | V-38560 | AUDIT | The operating system must connect to external networks or information systems only through managed IPv4 interfaces consisting of boundary protection devices arranged in accordance with an organizational security architecture."
+- name: | 
+         MEDIUM | V-38555 | AUDIT | The system must employ a local IPv4 firewall.
+         MEDIUM | V-38560 | AUDIT | The operating system must connect to external networks or information systems only through managed IPv4 interfaces consisting of boundary protection devices arranged in accordance with an organizational security architecture.
   command: service iptables status
   ignore_errors: yes
   changed_when: no
@@ -1459,8 +1463,9 @@
       - V-38560
       - audit
 
-- name: "MEDIUM | V-38555 | PATCH | The system must employ a local IPv4 firewall.\n
-         MEDIUM | V-38560 | PATCH | The operating system must connect to external networks or information systems only through managed IPv4 interfaces consisting of boundary protection devices arranged in accordance with an organizational security architecture."
+- name: | 
+         MEDIUM | V-38555 | PATCH | The system must employ a local IPv4 firewall.
+         MEDIUM | V-38560 | PATCH | The operating system must connect to external networks or information systems only through managed IPv4 interfaces consisting of boundary protection devices arranged in accordance with an organizational security architecture.
   service:
       name: iptables
       state: started
@@ -1488,14 +1493,58 @@
       - pam
 
 - name: "MEDIUM | V-38573 | PATCH | The system must disable accounts after three consecutive unsuccessful logon attempts."
-  template:
-      src: "{{ item.src }}"
-      dest: "{{ item.dest }}"
+  pam:
+      service: "{{ item }}"
+      type: auth
+      control: required
+      pam_module: pam_faillock.so
+      arguments: preauth silent deny=3 unlock_time=604800 fail_interval=900
+      before_line: auth sufficient pam_unix.so
+      state: present 
   with_items:
-      - src: system-auth.j2
-        dest: /etc/pam.d/system-auth
-      - src: password-auth.j2
-        dest: /etc/pam.d/password-auth
+      - system-auth
+      - password-auth
+  tags:
+      - medium
+      - cat2
+      - V-38573
+      - logon_settings
+      - accounts
+      - patch
+      - pam
+
+- name: "MEDIUM | V-38573 | PATCH | The system must disable accounts after three consecutive unsuccessful logon attempts."
+  pam:
+      service: "{{ item }}"
+      type: auth
+      control: '[default=die]' 
+      pam_module: pam_faillock.so
+      arguments: authfail deny=3 unlock_time=604800 fail_interval=900 
+      after_line: auth sufficient pam_unix.so
+      state: present 
+  with_items:
+      - system-auth
+      - password-auth
+  tags:
+      - medium
+      - cat2
+      - V-38573
+      - logon_settings
+      - accounts
+      - patch
+      - pam
+
+- name: "MEDIUM | V-38573 | PATCH | The system must disable accounts after three consecutive unsuccessful logon attempts."
+  pam:
+      service: "{{ item }}"
+      type: account
+      control: required 
+      pam_module: pam_faillock.so
+      before_line: account required pam_unix.so     
+      state: present 
+  with_items:
+      - system-auth
+      - password-auth
   tags:
       - medium
       - cat2
@@ -1506,7 +1555,7 @@
       - pam
 
 - name: "MEDIUM | V-38574 | AUDIT | The system must use a FIPS 140-2 approved cryptographic hashing algorithm for generating account password hashes (system-auth)."
-  command: find /etc/pam.d/ -type f
+  shell: find /etc/pam.d/ -type f -not -name '*.*' 
   changed_when: no
   register: pamd_files
   ignore_errors: yes
@@ -1539,11 +1588,11 @@
   lineinfile:
       dest: "{{ item }}"
       backrefs: yes
-      regexp: (^password\s*.*pam_unix.so.*)(md5)(.*)
+      regexp: (^password\s*.*pam_unix.so.*)(md5|sha256|blowfish|bigcrypt)(.*) 
       line: \1sha512\3
       backup: yes
-    with_items: pamd_files.stdout_lines
-    tags:
+  with_items: pamd_files.stdout_lines
+  tags:
       - medium
       - cat2
       - V-38574
@@ -1551,6 +1600,702 @@
       - accounts
       - passwords
       - audit
+
+- name: "MEDIUM | V-38576 | AUDIT | The system must use a FIPS 140-2 approved cryptographic hashing algorithm for generating account password hashes (login.defs)"
+  shell: grep ENCRYPT_METHOD /etc/login.defs | awk '{print $2}'
+  always_run: yes
+  changed_when: no
+  register: login_defs_audit
+  tags:
+      - audit
+      - medium
+      - cat2
+      - V-38576
+      - passwords
+
+- name: "MEDIUM | V-38576 | PATCH | The system must use a FIPS 140-2 approved cryptographic hashing algorithm for generating account password hashes (login.defs)"
+  lineinfile: 
+      state: present
+      backup: yes 
+      dest: /etc/login.defs 
+      regexp: '^ENCRYPT_METHOD' 
+      line: 'ENCRYPT_METHOD SHA512'
+  tags:
+      - cat2
+      - medium
+      - patch
+      - V-38576
+      - passwords
+
+- name: "MEDIUM | V-38577 | AUDIT | The system must use a FIPS 140-2 approved cryptographic hashing algorithm for generating account password hashes (libuser.conf)"
+  shell: grep crypt_style /etc/libuser.conf | awk '{print $3}'
+  always_run: yes
+  changed_when: no
+  register: libuser_audit
+  tags:
+      - cat2
+      - medium
+      - audit
+      - V-38577
+      - passwords
+
+- name: "MEDIUM | V-38577 | PATCH | The system must use a FIPS 140-2 approved cryptographic hashing algorithm for generating account password hashes (libuser.conf)"
+  ini_file:
+      state: present 
+      backup: yes 
+      dest: /etc/libuser.conf 
+      section: defaults
+      option: crypt_style
+      value: sha512 
+  tags:
+      - cat2
+      - medium
+      - audit
+      - V-38577
+      - passwords
+
+- name: |
+         MEDIUM | V-38579 | AUDIT | The system boot loader configuration file(s) must be owned by root.
+         MEDIUM | V-38581 | AUDIT | The system boot loader configuration file(s) must be group-owned by root.
+         MEDIUM | V-38583 | AUDIT | The system boot loader configuration file(s) must have mode 0600 or less permissive.
+  stat: 
+      path: /etc/grub.conf
+  register: grub_conf_audit
+  always_run: yes
+  tags:
+      - cat2
+      - medium
+      - V-38579
+      - V-38581
+      - V-38583
+      - file_perms
+      - grub
+      - audit  
+
+- name: "MEDIUM | V-38579 | PATCH | The system boot loader configuration file(s) must be owned by root."
+  file: 
+      dest: /etc/grub.conf
+      owner: root
+      state: file
+      follow: yes
+  tags:
+      - cat2
+      - medium
+      - V-38579
+      - file_perms
+      - grub
+      - patch 
+
+- name: "MEDIUM | V-38580 | AUDIT | The audit system must be configured to audit the loading and unloading of dynamic kernel modules."
+  shell: egrep -e "(-w |-F path=)/sbin/insmod" /etc/audit/audit.rules; egrep -e "(-w |-F path=)/sbin/modprobe" /etc/audit/audit.rules; egrep -e "(-w |-F path=)/sbin/rmmod" /etc/audit/audit.rules;grep -w "init_module" /etc/audit/audit.rules; grep -w "init_module" /etc/audit/audit.rules
+  always_run: yes
+  changed_when: false
+  register: dynamic_kernel_loading_audit
+  tags:
+    - cat2
+    - medium
+    - audit
+    - kernel
+    - auditd
+    - V-38580
+
+- name: "MEDIUM | V-38580 | PATCH | The audit system must be configured to audit the loading and unloading of dynamic kernel modules."
+  lineinfile:
+      backup: yes
+      line: "{{ item }}"
+      dest: /etc/audit/audit.rules
+      state: present 
+  with_items:
+      - -w /sbin/insmod -p x -k modules
+      - -w /sbin/rmmod -p x -k modules
+      - -w /sbin/modprobe -p x -k modules
+      - -a always,exit -F arch=b{{ansible_architecture | regex_replace('.*_(\\d*)','\\\\1')}} -S init_module -S delete_module -k modules
+  tags:
+    - cat2
+    - medium
+    - patch 
+    - kernel
+    - auditd
+    - V-38580
+
+- name: "MEDIUM | V-38581 | PATCH | The system boot loader configuration file(s) must be group-owned by root"
+  file: 
+      path: /etc/grub.conf 
+      group: root
+      follow: yes
+  tags:
+      - cat2
+      - V-38583
+      - file_perms
+      - medium
+      - patch
+      - grub
+
+# List all xinetd services then look for 'on' in the output
+# If any xinted service is found to be on, skip these tasks since xinetd can be on if a service is using it
+- name: "MEDIUM | V-38582 | AUDIT | The xinetd service must be disabled if no network services utilizing it are enabled"
+  shell: "chkconfig --list | sed -n '/xinetd based services/,$p'"
+  changed_when: no
+  always_run: yes
+  register: xinetd_services
+  tags:
+      - cat2
+      - V-38582
+      - medium 
+      - xinetd
+      - services
+      - audit
+
+- name: "MEDIUM | V-38582 | AUDIT | The xinetd service must be disabled if no network services utilizing it are enabled"
+  command: chkconfig "xinetd" --list
+  always_run: yes
+  ignore_errors: yes
+  changed_when: no
+  register: xinetd_audit
+  tags: 
+      - cat2
+      - medium 
+      - V-38582
+      - xinetd
+      - services
+      - audit 
+
+- name: "MEDIUM | V-38582 | PATCH | The xinetd service must be disabled if no network services utilizing it are enabled" 
+  service: 
+      name: xinetd 
+      enabled: no 
+      state: stopped
+  when: xinetd_audit.rc == 0 or (xinetd_services.stdout and xinetd_services.stdout.find('\ton\n') == -1)
+  tags: 
+      - cat2
+      - medium 
+      - V-38582
+      - xinetd
+      - services
+      - patch
+
+- name: "MEDIUM | V-38583| PATCH | The system boot loader configuration file(s) must have mode 0600 or less permissive." 
+  file: 
+      path: /etc/grub.conf 
+      mode: u-x,go-rwx 
+      follow: yes
+  tags:
+      - cat2
+      - V-38583
+      - file_perms
+      - medium
+      - patch
+      - grub
+
+- name: "MEDIUM | V-38585 | AUDIT | The system boot loader must require authentication."
+  command: grep password /etc/grub.conf
+  always_run: yes
+  ignore_errors: yes
+  changed_when: no
+  register: grub_auth_audit
+  tags:
+      - cat2
+      - medium
+      - V-38585
+      - grub
+      - passwords
+      - audit
+
+- name: "MEDIUM | V-38585 | PATCH | The system boot loader must require authentication."
+  grub_crypt:
+      password: "{{ rhel6stig_bootloader_password }}"
+  register: grub_pass
+  when: grub_auth_audit|failed
+  tags:
+      - cat2
+      - medium
+      - V-38585
+      - grub
+      - passwords
+      - patch 
+
+- name: "MEDIUM | V-38585 | PATCH | The system boot loader must require authentication."
+  lineinfile:
+      state: present
+      line: password --encrypted {{ grub_pass.passhash }} 
+      dest: /etc/grub.conf
+      follow: yes
+      insertafter: '^#\\s'
+      regexp: password
+  when: grub_auth_audit|failed
+  tags:
+      - cat2
+      - medium
+      - V-38585
+      - grub
+      - passwords
+      - patch 
+
+- name: "MEDIUM | V-38586 | AUDIT | The system must require authentication upon booting into single-user and maintenance modes."
+  command: grep SINGLE /etc/sysconfig/init
+  changed_when: no
+  always_run: yes
+  register: single_user_mode_auth_audit
+  tags:
+      - cat2
+      - medium
+      - V-38585
+      - root_access 
+      - audit
+
+- name: "MEDIUM | V-38586 | PATCH | The system must require authentication upon booting into single-user and maintenance modes."
+  lineinfile: 
+      state: present 
+      backup: yes 
+      dest: /etc/sysconfig/init 
+      regexp: '^(#)?SINGLE' 
+      line: 'SINGLE=/sbin/sulogin'
+  tags:
+      - cat2
+      - medium
+      - V-38585
+      - root_access 
+      - patch 
+
+- name: "MEDIUM | V-38588 | AUDIT | The system must not permit interactive boot."
+  command: grep PROMPT /etc/sysconfig/init
+  always_run: yes
+  changed_when: no
+  ignore_errors: yes
+  register: interactive_boot_audit
+  tags:
+      - cat2
+      - medium
+      - V-38588
+      - interactive_boot
+      - audit
+
+- name: "MEDIUM | V-38588 | PATCH | The system must not permit interactive boot."
+  lineinfile:
+      state: present 
+      backup: yes 
+      dest: /etc/sysconfig/init 
+      regexp: '^PROMPT=' 
+      line: 'PROMPT=no'
+  tags:
+      - cat2
+      - medium
+      - V-38588
+      - interactive_boot
+      - patch
+
+- name: "MEDIUM | V-38592 | AUDIT | The system must require administrator action to unlock an account locked by excessive failed login attempts." 
+  shell: grep -h pam_faillock /etc/pam.d/system-auth /etc/pam.d/password-auth | grep unlock_time
+  changed_when: no
+  always_run: yes
+  register: admin_unlock_audit
+  tags:
+      - medium
+      - cat2
+      - V-38592
+      - logon_settings
+      - accounts
+      - audit
+      - pam
+
+- name: "MEDIUM | V-38592 | PATCH | The system must require administrator action to unlock an account locked by excessive failed login attempts." 
+  pam:
+      service: "{{ item }}"
+      type: auth
+      control: required
+      pam_module: pam_faillock.so
+      arguments: preauth silent deny=3 unlock_time=604800 fail_interval=900
+      before_line: auth sufficient pam_unix.so
+      state: present 
+  with_items:
+      - system-auth
+      - password-auth
+  tags:
+      - medium
+      - cat2
+      - V-38573
+      - logon_settings
+      - accounts
+      - patch
+      - pam
+
+- name: "MEDIUM | V-38592 | PATCH | The system must require administrator action to unlock an account locked by excessive failed login attempts." 
+  pam:
+      service: "{{ item }}"
+      type: auth
+      control: '[default=die]' 
+      pam_module: pam_faillock.so
+      arguments: authfail deny=3 unlock_time=604800 fail_interval=900 
+      after_line: auth sufficient pam_unix.so
+      state: present 
+  with_items:
+      - system-auth
+      - password-auth
+  tags:
+      - medium
+      - cat2
+      - V-38573
+      - logon_settings
+      - accounts
+      - patch
+      - pam
+
+- name: "MEDIUM | V-38592 | PATCH | The system must require administrator action to unlock an account locked by excessive failed login attempts." 
+  pam:
+      service: "{{ item }}"
+      type: account
+      control: required 
+      pam_module: pam_faillock.so
+      before_line: account required pam_unix.so     
+      state: present 
+  with_items:
+      - system-auth
+      - password-auth
+  tags:
+      - medium
+      - cat2
+      - V-38573
+      - logon_settings
+      - accounts
+      - patch
+      - pam
+
+- name: "MEDIUM | V-38593 | AUDIT |  The Department of Defense (DoD) login banner must be displayed immediately prior to or as part of console login prompts"
+  command: cat /etc/issue
+  changed_when: no
+  always_run: yes
+  register: login_banner_audit
+  tags: 
+      - cat2
+      - medium
+      - V-38593
+      - logon_settings
+      - dod_logon_banner
+      - audit 
+
+- name: "MEDIUM | V-38593 | PATCH |  The Department of Defense (DoD) login banner must be displayed immediately prior to or as part of console login prompts"
+  copy: 
+      src: issue 
+      dest: /etc/{{ item }} 
+      owner: root 
+      group: root 
+      mode: "0644" 
+      backup: yes
+  with_items:
+    - issue
+    - issue.net
+  tags: 
+      - cat2
+      - medium
+      - V-38593
+      - logon_settings
+      - dod_logon_banner
+      - patch
+
+# Not automated:  V-38595 | The system must be configured to require the use of a CAC, PIV compliant hardware token, or Alternate Logon Token (ALT) for authentication. 
+
+- name: "MEDIUM | V-38596 | AUDIT | The system must implement virtual address space randomization."
+  shell: sysctl kernel.randomize_va_space | awk '{print $3}'
+  changed_when: no
+  always_run: yes
+  register: virt_addr_space_randomization_audit
+  tags: 
+      - cat2
+      - audit
+      - medium
+      - sysctl
+      - kernel
+      - V-38596
+
+- name: "MEDIUM | V-38596 | PATCH | The system must implement virtual address space randomization."
+  sysctl:
+      name: kernel.randomize_va_space
+      value: 2
+      state: present
+      reload: yes
+  tags: 
+      - cat2
+      - patch
+      - medium
+      - sysctl
+      - kernel
+      - V-38596
+
+- name: "MEDIUM | V-38597 | AUDIT | The system must limit the ability of processes to have simultaneous write and execute access to memory."
+  shell: sysctl kernel.exec-shield | awk '{print $3}'
+  changed_when: no
+  always_run: yes
+  register: simultaneous_wr_memory_audit
+  tags:
+      - cat2
+      - audit
+      - medium
+      - sysctl
+      - kernel
+      - V-38597
+
+- name: "MEDIUM | V-38597 | PATCH | The system must limit the ability of processes to have simultaneous write and execute access to memory."
+  sysctl:
+      name: kernel.exec-shield
+      value: 1
+      state: present
+      reload: yes
+  tags: 
+      - cat2
+      - patch 
+      - medium
+      - sysctl
+      - kernel
+      - V-38597
+
+- name: "MEDIUM | V-38599 | AUDIT | The FTPS/FTP service on the system must be configured with the Department of Defense (DoD) login banner"
+  shell: grep banner_file /etc/vsftpd/vsftpd.conf | cut -f2- -d'=' | xargs cat
+  ignore_errors: yes
+  changed_when: no
+  always_run: yes
+  register: vsftpd_banner_audit
+  tags:
+      - cat2
+      - medium 
+      - V-38599
+      - vsftp
+      - dod_logon_banner
+      - logon_settings
+      - audit 
+
+- name: "MEDIUM | V-38599 | PATCH | The FTPS/FTP service on the system must be configured with the Department of Defense (DoD) login banner"
+  lineinfile: 
+      state: present 
+      backup: yes 
+      dest: /etc/vsftpd/vsftpd.conf 
+      regexp: '^#?banner_file' 
+      line: 'banner_file=/etc/issue'
+  ignore_errors: yes
+  notify: restart vsftpd
+  tags: 
+      - cat2
+      - medium 
+      - V-38599
+      - vsftp
+      - dod_logon_banner
+      - logon_settings
+      - patch
+
+
+- name: "MEDIUM | V-38600 | AUDIT | The system must not send ICMPv4 redirects by default."
+  shell: sysctl net.ipv4.conf.default.send_redirects | awk '{print $3}'
+  changed_when: no
+  always_run: yes
+  register: icmpv4_redirects_audit
+  tags:
+      - medium
+      - cat2
+      - V-38600
+      - icmp
+      - sysctl
+      - audit
+
+- name: "MEDIUM | V-38600 | PATCH | The system must not send ICMPv4 redirects by default."
+  sysctl:
+      name: net.ipv4.conf.default.send_redirects
+      value: 0
+      reload: yes
+   tags:
+      - medium
+      - cat2
+      - V-38600
+      - icmp
+      - sysctl
+      - patch 
+
+- name: "MEDIUM | V-38601 | AUDIT | The system must not send ICMPv4 redirects from any interface."
+  shell: sysctl net.ipv4.conf.all.send_redirects | awk '{print $3}'
+  changed_when: no
+  always_run: yes
+  register: any_iface_icmp_redirect_audit
+  tags:
+      - medium
+      - cat2
+      - V-38601
+      - icmp
+      - sysctl
+      - audit 
+
+- name: "MEDIUM | V-38601 | PATCH | The system must not send ICMPv4 redirects from any interface."
+  sysctl:
+      name: sysctl net.ipv4.conf.all.send_redirects
+      value: 0
+      reload: yes
+  tags:
+      - medium
+      - cat2
+      - V-38601
+      - icmp
+      - sysctl
+      - patch
+
+- name: "MEDIUM | V-38603 | AUDIT | The ypserv package must not be installed."
+  command: rpm -q ypserv
+  always_run: yes
+  changed_when: no
+  register: ypserv_audit
+  ignore_errors: yes
+  tags:
+      - medium
+      - V-38603
+      - audit
+      - cat2
+      - ypserv
+      - packages
+
+- name: "MEDIUM | V-38603 | PATCH | The ypserv package must not be installed."
+  yum:
+      name: ypserv
+      state: absent
+  tags:
+      - medium
+      - V-38603
+      - patch 
+      - cat2
+      - ypserv
+      - packages
+
+- name: "MEDIUM | V-38604 | AUDIT | The ypbind service must not be running."
+  command: chkconfig "ypbind" --list
+  changed_when: no 
+  ignore_errors: yes
+  always_run: yes
+  register: ypbind_service_audit
+  tags:
+      - medium
+      - V-38604
+      - patch
+      - cat2
+      - ypbind
+      - services
+
+- name: "MEDIUM | V-38604 | PATCH | The ypbind service must not be running."
+  service:
+      name: ypbind
+      state: stopped
+      enabled: no
+  tags:
+      - medium
+      - V-38604
+      - patch
+      - cat2
+      - ypbind
+      - services
+
+- name: "MEDIUM | V-38605 | AUDIT | The cron service must be running"
+  command: service crond status
+  changed_when: no
+  always_run: yes
+  ignore_errors: yes
+  register: crond_status_audit
+  tags:
+      - medium
+      - cat2
+      - cron
+      - audit
+      - V-38605
+      - services
+
+- name: "MEDIUM | V-38605 | PATCH | The cron service must be running"
+  service:
+      name: crond
+      state: started
+      enabled: yes
+  tags:
+      - medium
+      - cat2
+      - cron
+      - patch 
+      - V-38605
+      - services
+
+- name: "MEDIUM | V-38606 | AUDIT | The tftp-server package must not be installed unless required."
+  command: rpm -q tftp-server
+  ignore_errors: yes
+  always_run: yes
+  changed_when: no
+  register: tftp_server_install_audit
+  when: not rhel6stig_tftp_required
+  tags:
+      - medium
+      - cat2
+      - V-38606
+      - tftp
+      - packages
+      - audit
+
+- name: "MEDIUM | V-38606 | PATCH | The tftp-server packages must not be intalled unless required."
+  yum:
+      name: tftp-server
+      state: absent
+  when: not rhel6stig_tftp_required
+  tags:
+      - medium
+      - cat2
+      - V-38606
+      - tftp
+      - packages
+      - patch
+
+- name: "MEDIUM | V-38609 | AUDIT | The TFTP service must not be running."
+  command: chkconfig "tftp" --list
+  ignore_errors: yes
+  always_run: yes
+  changed_when: no
+  tags:
+      - medium
+      - cat2
+      - V-38609
+      - audit
+      - tftp
+      - services
+ 
+- name: "MEDIUM | V-38609 | PATCH | The TFTP service must not be running."
+  service:
+      name: tftp
+      state: stopped
+      enabled: no
+  tags:
+      - medium
+      - cat2
+      - V-38609
+      - tftp
+      - services
+      - patch
+
+- name: "MEDIUM | V-38611 | AUDIT | The SSH daemon must ignore .rhosts files."
+  command: grep -i IgnoreRhosts /etc/ssh/sshd_config
+  always_run: yes
+  ignore_errors: yes
+  changed_when: no
+  register: sshd_rhosts_ignore_audit
+  tags:
+      - medium
+      - cat2
+      - V-38611
+      - ssh
+      - rhosts
+      - sshd
+      - audit
+
+- name: "MEDIUM | V-38611 | PATCH | The SSH daemon must ignore .rhosts files."
+  lineinfile:
+      state: present
+      regexp: '^#?IgnoreRhosts'
+      line: IgnoreRhosts yes
+      dest: /etc/ssh/sshd_config
+  tags:
+      - cat2
+      - medium
+      - V-38611
+      - rhosts
+      - sshd
+      - patch
 
 # Search for world writable files and print them out if any are found
 - name: Looking for world-writable files on the system
@@ -1568,45 +2313,6 @@
   pause: prompt="World writable files are present on the system. This is a finding. Press Enter to continue"
   when: world_writable_files.stdout_lines and not rhel6stig_fullauto
   tags: [ 'cat2' , 'V-38643', 'file_perms' ]
-
-- name: "V-38579 V-38581 Medium  The system boot loader configuration file(s) must be owned and group-owned by root    V-38583 Medium  The system boot loader configuration file(s) must have mode 0600 or less permissive"
-  file: path=/etc/grub.conf owner=root group=root mode=u-x,go-rwx follow=yes
-  tags: [ 'cat2' , 'V-38581' , 'V-38583' , 'V-38579' , 'file_perms' ]
-
-# List all xinetd services then look for 'on' in the output
-# If any xinted service is found to be on, skip these tasks since xinetd can be on if a service is using it
-- name: Checking if any xinetd services are enabled
-  shell: "chkconfig --list | sed -n '/xinetd based services/,$p'"
-  changed_when: false
-  register: xinetd_services
-  tags: [ 'cat2' , 'V-38582' , 'xinetd' , 'services' ]
-
-- name: V-38582 Medium  The xinetd service must be disabled if no network services utilizing it are enabled
-  service: name=xinetd enabled=no state=stopped
-  when: xinetd_services.stdout and xinetd_services.stdout.find('\ton') == -1
-  tags: [ 'cat2' , 'V-38582' , 'xinetd' , 'services' ]
-
-# Insecure services and package removal
-- name: V-38603 Medium  The ypserv package must not be installed
-  yum: name=ypserv state=absent
-  tags: [ 'cat2' , 'V-38603' , 'unauthorized_packages' , 'ypserv' ]
-
-- name: V-38604 Medium  The ypbind service must not be running
-  service: name=ypbind state=stopped enabled=no
-  register: ypbind_test
-  when: ypbind_test.msg is defined and "'FAIL' not in ypbind_test.msg"
-  tags: [ 'cat2' , 'V-38604' , 'insecure_services' , 'ypbind' ]
-
-- name: V-38606 Medium  The tftp-server package must not be installed
-  yum: name=tftp-server state=absent
-  when: not rhel6stig_tftp_required
-  tags: [ 'cat2' , 'V-38606' , 'tftp' , 'tftp-server' , 'unauthorized_packages' ]
-
-- name: V-38609 Medium  The TFTP service must not be running
-  command: chkconfig tftp off
-  when: "not rhel6stig_tftp_required and 'tftp' in xinetd_services.stdout_lines"
-  tags: [ 'cat2' , 'V-38609' , 'tftp' , 'tftp-server' , 'insecure_services' ]
-  notify: reload xinetd
 
 # Required packages
 - name: V-38605 Medium  The cron service must be running
@@ -1632,7 +2338,6 @@
   when: nfs_mounts_missing_nodev.stdout and not rhel6stig_fullauto
   tags: [ 'cat2' , 'V-38652' , 'nfs' ]
 
-
 # List nfs mounts that are missing the 'nosuid' option and ask the sys admin to correct this in /etc/fstab
 # This would be a bit tricky to automatically fix in /etc/fstab.
 - name: Checking for nfs mounts missing the 'nosuid' option
@@ -1652,47 +2357,6 @@
   when: nfs_mounts_missing_nosuid.stdout and not rhel6stig_fullauto
   tags: [ 'cat2' , 'V-38652' , 'nfs' ]
 
-
-
-- name: Checking for remote log servers
-  shell: grep -Er '(^[^#]?\*\.\*\s+@{1,2})|(\*\.\*\s+omrelp)' /etc/rsyslog.conf /etc/rsyslog.d/
-  changed_when: false
-  register: remote_logging_servers
-  failed_when: remote_logging_servers.stderr
-  tags: [ 'cat2' , 'V-38520' ,  'auditd' , 'logging' ]
-
-- name: V-38520 Medium  The operating system must back up audit records on an organization defined frequency onto a different system or media than the system being audited
-  pause: prompt="No remote logging server is configured. Press Enter to continue"
-  when: not remote_logging_servers.stdout and not rhel6stig_fullauto
-  tags: [ 'cat2' , 'V-38520' , 'auditd' , 'logging' ]
-
-- name: V-38521 Medium  The operating system must support the requirement to centrally manage the content of audit records generated by organization defined information system components
-  pause: prompt="No remote logging server is configured. Press Enter to continue"
-  when: not remote_logging_servers.stdout and not rhel6stig_fullauto
-  tags: [ 'cat2' , 'V-38521' , 'auditd' , 'logging' ]
-
-- name: "V-38485 Medium  The operating system, upon successful logon, must display to the user the date and time of the last logon or access via a local console or tty"
-  file: path={{ item }} state=absent
-  with_flattened:
-    - /etc/hushlogins
-    - users.stdout_lines
-  tags: [ 'cat2' , 'V-38485' , 'logon_settings' , 'tty' ]
-
-- name: Checking for updates
-  command: yum check-update
-  changed_when: result.rc == 100
-  failed_when: result.rc == 1
-  register: result
-  tags: [ 'cat2' , 'V-38481' , 'yum' , 'updates' ]
-
-- name: V-38481 Medium  System security patches and updates must be installed and up-to-date
-  yum:
-      name: '*'
-      state: latest
-  when: rhel6stig_update_packages
-  tags: [ 'cat2' , 'V-38481' , 'yum' , 'updates' ]
-
-
 - name: "V-38664 Medium  The system package management tool must verify ownership on all files and directories associated with the audit package
         \tV-38665 Medium  The system package management tool must verify group-ownership on all files and directories associated with the audit package"
   shell: "rpm -V audit | grep '^.....\\(U\\.\\|\\.G\\|UG\\)'"
@@ -1710,8 +2374,12 @@
   notify: reset audit pkg perms
   tags: [ 'cat2' , 'V-38663' , 'file_perms' , 'auditd' , 'rpm' ]
 
-
 # Look for prior versions of SNMP in use and disable them if found
+- name: Check for SNMP config
+  stat:
+      path: /etc/snmp/snmpd.conf
+  register: snmpconf_test
+
 - name: Checking SNMP versions in use
   shell: "grep -E 'v1|v2c|com2sec' /etc/snmp/snmpd.conf | grep -v '^#'"
   changed_when: false
@@ -1730,19 +2398,6 @@
   pause: prompt="Versions of SNMP prior to version 3 were found and disabled. More work must be done to fully convert to SNMPv3. Press Enter to continue"
   when: snmp_version_check.stdout is defined and snmpconf_test.stat.exists and not rhel6stig_fullauto
   tags: [ 'cat2' , 'V-38660' , 'snmp' ]
-
-
-- name: V-38446 Medium  The mail system must forward all mail for root to one or more system administrators
-  lineinfile: "state=present backup=yes dest=/etc/aliases regexp='^root:' line='root:        {{ rhel6stig_root_email_address }}'"
-  when: rhel6stig_root_email_address is defined
-  notify: update postfix aliases.db
-  tags: [ 'cat2' , 'V-38446' , 'mail' , 'postfix' ]
-
-
-- name: "Copy STIG compliant auditd.conf    V-38464 V-38468 V-38470 V-38633 V-38634 V-38636 V-38678 V-38680 V-54381"
-  template: src=auditd.conf.j2 dest=/etc/audit/auditd.conf owner=root group=root mode=0640 backup=yes
-  notify: restart auditd
-  tags: [ 'cat2' , 'V-38464' , 'V-38468' , 'V-38470' , 'V-38633' , 'V-38634' , 'V-38636' , 'V-38678' , 'V-38680' , 'V-54381' , 'auditd' ]
 
 # - name: V-38673 Medium  The operating system must ensure unauthorized, security-relevant configuration changes detected are tracked
 # - name: V-38670 Medium  The operating system must detect unauthorized changes to software and information
@@ -1777,7 +2432,6 @@
   when: rhel6stig_xwindows_required
   tags: [ 'cat2' , 'V-38630' , 'gui' , 'screen_lock' ]
 
-
 # Get a list of interface config files. Exclude those with the current year in the name.
 # This prevents Ansible from continually changing the backup files it creates since they
 # are named like 'ifcfg-eth0.2014-07-18@13:19~' and will match the glob.
@@ -1793,46 +2447,6 @@
   register: dhcp_change
   when: interface_config_files.stdout and not rhel6stig_use_dhcp
   tags: [ 'cat2' , 'V-38679' , 'network' , 'dhcp' ]
-
-
-# default user and password settings
-- name: V-38475 Medium  The system must require passwords to contain a minimum of 14 characters
-  lineinfile: "state=present dest=/etc/login.defs regexp='^PASS_MIN_LEN' line='PASS_MIN_LEN    {{ rhel6stig_pass_min_length }}' backup=yes"
-  tags: [ 'cat2' , 'V-38475' , 'passwords' ]
-
-- name: V-38477 Medium  Users must not be able to change passwords more than once every 24 hours
-  lineinfile: "state=present dest=/etc/login.defs regexp='^PASS_MIN_DAYS' line='PASS_MIN_DAYS   {{ rhel6stig_pass_min_days }}' backup=yes"
-  tags: [ 'cat2' , 'V-38477' , 'passwords' ]
-
-- name: V-38479 Medium  User passwords must be changed at least every 60 days
-  lineinfile: "state=present dest=/etc/login.defs regexp='^PASS_MAX_DAYS' line='PASS_MAX_DAYS   {{ rhel6stig_pass_max_days }}' backup=yes"
-  tags: [ 'cat2' , 'V-38479' , 'passwords' ]
-
-- name: V-38576 Medium  The system must use a FIPS 140-2 approved cryptographic hashing algorithm for generating account password hashes (login.defs)
-  lineinfile: "state=present backup=yes dest=/etc/login.defs regexp='^ENCRYPT_METHOD' line='ENCRYPT_METHOD SHA512'"
-  tags: [ 'cat2' , 'V-38576' , 'passwords' ]
-
-- name: V-38577 Medium  The system must use a FIPS 140-2 approved cryptographic hashing algorithm for generating account password hashes (libuser.conf)
-  lineinfile: "state=present backup=yes dest=/etc/libuser.conf regexp='^crypt_style' line='crypt_style = sha512'"
-  tags: [ 'cat2' , 'V-38577' , 'passwords' ]
-
-
-# Get a list of all repo files on remote system
-# Ideally, this would be done using with_fileglobs instead of two separate actions,
-# but with_fileglobs only operates on the host filesystem, not the remote.
-- name: List yum repository files
-  shell: ls /etc/yum.repos.d/*.repo
-  changed_when: false
-  register: yum_repos
-  failed_when: "'FAIL' in yum_repos.stdout"
-  tags: [ 'cat2' , 'V-38483' , 'V-38487' , 'rpm' , 'gpgcheck' ]
-
-- name: "V-38483 Medium  The system package management tool must cryptographically verify the authenticity of system software packages during installation\n     V-38487  Low     The system package management tool must cryptographically verify the authenticity of all software packages during installation"
-  replace: backup=yes dest={{ item }} regexp='^gpgcheck=0' replace='gpgcheck=1'
-  tags: [ 'cat2' , 'V-38483' , 'V-38487' , 'rpm' , 'gpgcheck' ]
-  with_flattened:
-    - /etc/yum.conf
-    - yum_repos.stdout_lines
 
 # GUI logon settings
 - name: "V-38689 Medium  The Department of Defense (DoD) login banner must be displayed immediately prior to, or as part of, graphical desktop environment login prompts"
@@ -1865,18 +2479,12 @@
   tags: [ 'cat2' , 'V-43150' , 'logon_settings' , 'xwindows' , 'gui' , 'dod_logon_banner' ]
   notify: restart gdm
 
-
 - name: V-38682 Medium  The Bluetooth kernel module must be disabled
   kernel_blacklist: name={{ item }}
   with_items:
     - bluetooth
     - net-pf-31
   tags: [ 'cat2' , 'V-38682' , 'kernel_modules' , 'bluetooth' ]
-
-- name: V-38489 Medium  A file integrity tool must be installed
-  yum: name=aide state=present
-  tags: [ 'cat2' , 'V-38489' , 'file_integrity' , 'aide' ]
-  notify: init aide
 
 - name: "V-38670 Medium   The operating system must detect unauthorized changes to software and information.\n
          \tV-38673 Medium  The operating system must ensure unauthorized, security-relevant configuration changes detected are tracked.\n
@@ -1894,170 +2502,21 @@
     job="{{ rhel6stig_aide_cron["aide_job"] }}"
   tags: [ 'cat2' , 'V-38670' , 'V-38673' , 'V-38695' , 'V-38696' , 'V-38698' , 'V-38700' , 'file_integrity' , 'aide' ]
 
-
-- name: "V-51875 Medium  The operating system, upon successful logon/access, must display to the user the number of unsuccessful logon/access attempts since the last successful logon/access."
-  lineinfile: >
-    dest='/etc/pam.d/system-auth'
-    insertafter='^session\s+required\s+pam_limits.so\s.*$'
-    line='session     required      pam_lastlog.so showfailed'
-    follow=yes owner=root group=root mode=0644
-  tags: [ 'cat2' , 'V-51875' , 'logon_settings' ]
-
-- name: "V-38573 Medium  The system must disable accounts after three consecutive unsuccessful login attempts
-        \tV-38592 Medium  The system must require administrator action to unlock an account locked by excessive failed login attempts
-        \tV-38501 Medium  The system must disable accounts after excessive login failures within a 15-minute interval"
-  lineinfile: >
-    dest={{ item }}
-    insertbefore='^auth\s+sufficient\s+pam_unix.so.*$'
-    regexp='^auth\s+required\s+pam_faillock.so.*$'
-    line="{{ rhel6stig_pam_faillock_params[2] }}"
-    follow=yes owner=root group=root mode=0644
-  with_items:
-    - /etc/pam.d/system-auth
-    - /etc/pam.d/password-auth
-  tags: [ 'cat2' , 'V-38573' , 'V-38492' , 'V-38501', 'passwords' , 'failed_logins' ]
-
-- name: "V-38573 Medium  The system must disable accounts after three consecutive unsuccessful login attempts
-        \tV-38592 Medium  The system must require administrator action to unlock an account locked by excessive failed login attempts
-        \tV-38501 Medium  The system must disable accounts after excessive login failures within a 15-minute interval"
-  lineinfile: >
-    dest={{ item }}
-    insertbefore='^account\s+required\s+pam_unix.so.*$'
-    regexp='^account\s+required\s+pam_faillock.so.*$'
-    line="account     required      pam_faillock.so"
-    follow=yes owner=root group=root mode=0644
-  with_items:
-    - /etc/pam.d/system-auth
-    - /etc/pam.d/password-auth
-  tags: [ 'cat2' , 'V-38573' , 'V-38492' , 'V-38501', 'passwords' , 'failed_logins' ]
-
-- name: "V-38573 Medium  The system must disable accounts after three consecutive unsuccessful login attempts
-        \tV-38592 Medium  The system must require administrator action to unlock an account locked by excessive failed login attempts
-        \tV-38501 Medium  The system must disable accounts after excessive login failures within a 15-minute interval"
-  lineinfile: >
-    dest={{ item }}
-    insertafter='^auth\s+sufficient\s+pam_unix.so\s.*$'
-    regexp="^auth\s+\[default=die\]\s+pam_faillock.so.*$"
-    line="{{ rhel6stig_pam_faillock_params[0] }}"
-    follow=yes owner=root group=root mode=0644
-  with_items:
-    - /etc/pam.d/system-auth
-    - /etc/pam.d/password-auth
-  tags: [ 'cat2' , 'V-38573' , 'V-38492' , 'V-38501', 'passwords' , 'failed_logins' ]
-
-- name: "V-38573 Medium  The system must disable accounts after three consecutive unsuccessful login attempts
-        \tV-38592 Medium  The system must require administrator action to unlock an account locked by excessive failed login attempts
-        \tV-38501 Medium  The system must disable accounts after excessive login failures within a 15-minute interval"
-  lineinfile: >
-    dest={{ item }}
-    insertafter='^auth\s+\[default=die\]\s+pam_faillock.so.*$'
-    regexp='^auth\s+required\s+pam_faillock.so.*$'
-    line="{{ rhel6stig_pam_faillock_params[1] }}"
-    follow=yes owner=root group=root mode=0644
-  with_items:
-    - /etc/pam.d/system-auth
-    - /etc/pam.d/password-auth
-  tags: [ 'cat2' , 'V-38573' , 'V-38492' , 'V-38501', 'passwords' , 'failed_logins' ]
-
-- name: "V-38573 Medium  The system must disable accounts after three consecutive unsuccessful login attempts
-        \tV-38592 Medium  The system must require administrator action to unlock an account locked by excessive failed login attempts
-        \tV-38501 Medium  The system must disable accounts after excessive login failures within a 15-minute interval"
-  lineinfile: >
-    dest={{ item }}
-    insertbefore='^auth\s+sufficient\s+pam_unix.so.*$'
-    regexp='^auth\s+required\s+pam_faillock.so.*$'
-    line="{{ rhel6stig_pam_faillock_params[2] }}"
-    follow=yes owner=root group=root mode=0644
-  with_items:
-    - /etc/pam.d/system-auth
-    - /etc/pam.d/password-auth
-  tags: [ 'cat2' , 'V-38573' , 'V-38492' , 'V-38501', 'passwords' , 'failed_logins' ]
-
-- name: List all log files in /etc/rsyslog.conf
-  shell: "grep /var/log/ /etc/rsyslog.conf | awk '{print $2}' | sed 's/-//'"
-  register: rsyslog_log_files
-  changed_when: false
-  tags: [ 'cat2' , 'V-38519' , 'V-38518' , 'V-38623' , 'file_perms' ]
-
 - name: Check file state and type to avoid hard link failures
   stat: path={{ item }}
   with_items: rsyslog_log_files.stdout_lines
   register: log_files_st
   tags: [ 'cat2' , 'V-38519' , 'V-38518' , 'V-38623' , 'file_perms' ]
 
-- name: "V-38519 V-38518 Medium  All rsyslog-generated log files must be owned and group-owned by root    V-38623 Medium  All rsyslog-generated log files must have mode 0600 or less permissive"
-  file: path={{ item.item }} owner=root group=root mode=u-x,go-rwx follow=yes
-  with_items: log_files_st.results
-  when: item.stat.exists and item.stat.isreg and item.stat.nlink|int == 1
-  tags: [ 'cat2' , 'V-38519' , 'V-38623' , 'V-38518' , 'file_perms' ]
-
-- name: V-38623 Medium  All rsyslog-generated log files must have mode 0600 or less permissive HARD LINKED FILES
-  shell: chown root:root {{ item.item }} && chmod u-x,go-rwx {{ item.item }}
-  with_items: log_files_st.results
-  when: item.stat.exists and item.stat.isreg and item.stat.nlink|int > 1
-  tags: [ 'cat2' , 'V-38519' , 'V-38623' , 'V-38518' , 'file_perms' ]
-
-- name: "V-38517 Medium  The Transparent Inter-Process Communication (TIPC) protocol must be disabled unless required
-         V-38515 Medium  The Stream Control Transmission Protocol (SCTP) must be disabled unless required
-         V-38514 Medium  The Datagram Congestion Control Protocol (DCCP) must be disabled unless required"
-  copy: backup=no src={{ item }} dest=/etc/modprobe.d/{{ item }} owner=root group=root mode=0644
-  with_items:
-    - disable-tipc.conf
-    - disable-sctp.conf
-    - disable-dccp.conf
-  tags: [ 'cat2' , 'V-38517' , 'V-38515' , 'V-38514' , 'tipc' , 'sctp' , 'dccp' , 'kernel_modules' ]
-
 - name: V-38691 Medium  The Bluetooth service must be disabled
   service: name=bluetooth state=stopped enabled=no
-  when: "'bluetooth' in sysv_services.stdout_lines"
+  ignore_errors: yes
   tags: [ 'cat2' , 'V-38691' , 'bluetooth' ]
-
-- name: V-38593 Medium  The Department of Defense (DoD) login banner must be displayed immediately prior to or as part of console login prompts
-  copy: src=issue dest=/etc/{{ item }} owner=root group=root mode=0644 backup=yes
-  with_items:
-    - issue
-    - issue.net
-  tags: [ 'cat2' , 'V-38593' , 'logon_settings' , 'dod_logon_banner' ]
 
 - name: V-38619 Medium  There must be no .netrc files on the system
   file: state=absent dest=~{{ item }}/.netrc
   with_items: users.stdout_lines
   tags: [ 'cat2' , 'V-38619' , 'netrc' ]
-
-- name: V-38599 Medium  The FTPS/FTP service on the system must be configured with the Department of Defense (DoD) login banner
-  lineinfile: "state=present backup=yes dest=/etc/vsftpd/vsftpd.conf regexp='^#?banner_file' line='banner_file=/etc/issue'"
-  when: "'vsftpd' in sysv_services.stdout"
-  tags: [ 'cat2' , 'V-38599' , 'vsftp' , 'dod_logon_banner' , 'logon_settings' ]
-  notify: restart vsftpd
-
-
-# Check for the presence of a bootloader password.
-# If one is not found, add it to grub.conf
-- name: Check for password in grub.conf
-  command: grep password /etc/grub.conf
-  register: grub_password_check
-  changed_when: false
-  failed_when: grub_password_check.stderr
-  tags: [ 'cat2' , 'V-38585' , 'grub_password' ]
-
-- name: V-38585 Medium  The system boot loader must require authentication
-  lineinfile: "state=present backup=yes dest=/etc/grub.conf regexp='password' line='password --encrypted {{ rhel6stig_bootloader_password }}' insertafter='^#\\s'"
-  when: grub_password_check.rc != 0 or rhel6stig_change_grub_password
-  tags: [ 'cat2' , 'V-38585' , 'grub_password' ]
-
-
-- name: V-38586 Medium  The system must require authentication upon booting into single-user and maintenance modes.
-  lineinfile: state=present backup=yes dest=/etc/sysconfig/init regexp='^(#)?SINGLE' line='SINGLE=/sbin/sulogin'
-  tags: [ 'cat2' , 'V-38586' , 'root_access' ]
-
-- name: V-38588 Medium  The system must not permit interactive boot
-  lineinfile: "state=present backup=yes dest=/etc/sysconfig/init regexp='^PROMPT=' line='PROMPT=no'"
-  tags: [ 'cat2' , 'V-38588' , 'interactive_boot' ]
-
-
-- name: "V-38504 Medium  The /etc/shadow file must have mode 0000\n    V-38502 V-38503 Medium  The /etc/shadow file must be owned and group-owned by root"
-  file: dest=/etc/shadow owner=root group=root mode=0000
-  tags: [ 'cat2' , 'V-38504' , 'V-38502' , 'V-38503' , 'file_perms' ]
 
 - name: Installing NTP for V-38620 Medium/V-38621 Medium
   yum: name=ntp state=installed
@@ -2071,7 +2530,6 @@
 - name: V-38620 Medium  The system clock must be synchronized continuously or at least daily
   service: name=ntpd state=started enabled=yes
   tags: [ 'cat2' , 'V-38620' , 'ntp' ]
-
 
 - name: Check for LDAP
   stat: path=/etc/pam_ldap.conf
@@ -2104,7 +2562,6 @@
   when: rhel6stig_xwindows_required
   tags: [ 'cat2' , 'V-38638' , 'gui' , 'screen_lock' ]
 
-
 - name: Check for auditd files that have a different hash than rpm expects
   shell: "rpm -V audit | awk '$1 ~ /..5/ && $2 != \"c\"'"
   changed_when: false
@@ -2124,62 +2581,7 @@
   tags: [ 'cat2' , 'V-38622' , 'postfix' ]
 
 # sysctl kernel settings
-- name: V-38597 Medium  The system must limit the ability of processes to have simultaneous write and execute access to memory
-  sysctl: name=kernel.exec-shield value=1 state=present reload=yes ignoreerrors=yes
-  tags: [ 'cat2' , 'V-38597' , 'kernel_parameters' ]
 
-- name: V-38596 Medium  The system must implement virtual address space randomization
-  sysctl: name=kernel.randomize_va_space state=present reload=yes ignoreerrors=yes
-  tags: [ 'cat2' , 'V-38596' , 'kernel_parameters' ]
-
-
-# sysctl network settings
-
-
-
-
-- name: V-38524 Medium  The system must not accept ICMPv4 redirect packets on any interface
-  sysctl: name=net.ipv4.conf.all.accept_redirects value=0 state=present reload=yes ignoreerrors=yes
-  tags: [ 'cat2' , 'V-38524' , 'kernel_parameters' , 'network' ]
-
-- name: V-38526 Medium  The system must not accept ICMPv4 secure redirect packets on any interface
-  sysctl: name=net.ipv4.conf.all.secure_redirects value=0 state=present reload=yes ignoreerrors=yes
-  tags: [ 'cat2' , 'V-38526' , 'kernel_parameters' , 'network' ]
-
-- name: V-38529 Medium  The system must not accept IPv4 source-routed packets by default
-  sysctl: name=net.ipv4.conf.default.accept_source_route value=0 state=present reload=yes ignoreerrors=yes
-  tags: [ 'cat2' , 'V-38529' , 'kernel_parameters' , 'network' ]
-
-- name: V-38532 Medium  The system must not accept ICMPv4 secure redirect packets by default.
-  sysctl: name=net.ipv4.conf.default.secure_redirects value=0 state=present reload=yes ignoreerrors=yes
-  tags: [ 'cat2' , 'V-38532' , 'kernel_parameters' , 'network' ]
-
-- name: V-38539 Medium  The system must be configured to use TCP syncookies
-  sysctl: name=net.ipv4.tcp_syncookies value=1 state=present reload=yes ignoreerrors=yes
-  tags: [ 'cat2' , 'V-38539' , 'kernel_parameters' , 'network' ]
-
-- name: V-38542 Medium  The system must use a reverse-path filter for IPv4 network traffic when possible on all interfaces
-  sysctl: name=net.ipv4.conf.all.rp_filter value=1 state=present reload=yes ignoreerrors=yes
-  tags: [ 'cat2' , 'V-38542' , 'kernel_parameters' , 'network' ]
-
-- name: V-38544 Medium  The system must use a reverse-path filter for IPv4 network traffic when possible by default.
-  sysctl: name=net.ipv4.conf.default.rp_filter value=1 state=present reload=yes ignoreerrors=yes
-  tags: [ 'cat2' , 'V-38544' , 'kernel_parameters' , 'network' ]
-
-- name: V-38548 Medium  The system must ignore ICMPv6 redirects by default
-  sysctl: name=net.ipv6.conf.default.accept_redirects value=0 state=present reload=yes ignoreerrors=yes
-  tags: [ 'cat2' , 'V-38548' , 'kernel_parameters' , 'network' ]
-
-- name: V-38600 Medium  The system must not send ICMPv4 redirects by default
-  sysctl: name=net.ipv4.conf.default.send_redirects value=0 state=present reload=yes ignoreerrors=yes
-  tags: [ 'cat2' , 'V-38600' , 'kernel_parameters' , 'network' ]
-
-- name: V-38601 Medium  The system must not send ICMPv4 redirects from any interface
-  sysctl: name=net.ipv4.conf.all.send_redirects value=0 state=present reload=yes ignoreerrors=yes
-  tags: [ 'cat2' , 'V-38544' , 'kernel_parameters' , 'network' ]
-
-
-# /etc/ssh/sshd_config settings
 - name: "V-38617 Medium  The SSH daemon must be configured to use only FIPS 140-2 approved ciphers
         \tV-38611 Medium  The SSH daemon must ignore .rhosts files
         \tV-38612 Medium  The SSH daemon must not allow host-based authentication
@@ -2191,7 +2593,6 @@
     line={{ item.ln }}
   with_items:
     - { st: 'present', rx: "'^#?Ciphers'", ln: "'Ciphers aes128-ctr,aes192-ctr,aes256-ctr,aes128-cbc,3des-cbc,aes192-cbc,aes256-cbc'" }
-    - { st: 'present', rx: "'^#?IgnoreRhosts'", ln: "'IgnoreRhosts yes'" }
     - { st: 'present', rx: "'^#?HostbasedAuthentication'", ln: "'HostbasedAuthentication no'" }
     - { st: 'present', rx: "'^#?PermitRootLogin'", ln: "'PermitRootLogin no'" }
   tags: [ 'cat2' , 'V-38617' , 'V-38611' , 'V-38612' , 'V-38613', 'ssh' ]
@@ -2208,40 +2609,6 @@
     - { st: 'present', rx: "'^(#)?PrintLastLog'", ln: "'PrintLastLog yes'" }
   tags: [ 'cat2' , 'V-38615' , 'V-38484' , 'ssh' , 'logon_settings' , 'dod_logon_banner' ]
   notify: restart ssh
-
-# IPv6 Firewall and Network settings
-- name: V-38444 Medium  The systems local IPv6 firewall must implement a deny-all allow-by-exception policy for inbound packets
-  lineinfile: "state=present backup=yes dest=/etc/sysconfig/ip6tables regexp=':FORWARD' line=':FORWARD DROP [0:0]'"
-  when: rhel6stig_ipv6_in_use
-  tags: [ 'cat2' , 'V-38444' , 'firewall' , 'ipv6' , 'network']
-  notify: restart ip6tables
-
-- name: V-38546 Medium  The IPv6 protocol handler must not be bound to the network stack unless needed
-  copy: backup=yes src=disable-ipv6.conf dest=/etc/modprobe.d/disable-ipv6.conf owner=root group=root mode=0644
-  when: not rhel6stig_ipv6_in_use
-  tags: [ 'cat2' , 'V-38546' , 'ipv6' , 'network']
-
-- name: "V-38549 Medium  The system must employ a local IPv6 firewall
-        \tV-38551 Medium  The operating system must connect to external networks or information systems only through managed IPv6 interfaces consisting of boundary protection devices arranged in accordance with an organizational security architecture
-        \tV-38553 Medium  The operating system must prevent public IPv6 access into an organizations internal networks except as appropriately mediated by managed interfaces employing boundary protection devices"
-  service: name=ip6tables enabled=yes state=started
-  when: rhel6stig_ipv6_in_use
-  tags: [ 'cat2' , 'V-38551' , 'V-38549' , 'V-38553' , 'ipv6' , 'firewall' , 'network']
-
-# IPv4 Firewall and Network Settings
-- name: "V-38555 Medium  The system must employ a local IPv4 firewall
-        \tV-38560 Medium  The operating system must connect to external networks or information systems only through managed IPv4 interfaces consisting of boundary protection devices arranged in accordance with an organizational security architecture
-        \tV-38512  Medium  The operating system must prevent public IPv4 access into an organizations internal networks except as appropriately mediated by managed interfaces employing boundary protection devices"
-  service: name=iptables enabled=yes state=started
-  tags: [ 'cat2' , 'V-38555' , 'V-38560' , 'V-38512' , 'ipv4' , 'network' , 'firewall' ]
-
-
-
-- name: V-38686 Medium  The system's local firewall must implement a deny-all, allow-by-exception policy for forwarded packets
-  lineinfile: "state=present dest=/etc/sysconfig/iptables regexp=':FORWARD' line=':FORWARD DROP [0:0]'"
-  tags: [ 'cat2' , 'V-38686' , 'firewall' , 'network']
-  notify: restart iptables
-
 
 # SELinux settings
 - name: V-51337 Medium  The system must use a Linux Security Module at boot time.
