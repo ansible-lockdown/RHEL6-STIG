@@ -2100,7 +2100,7 @@
       name: net.ipv4.conf.default.send_redirects
       value: 0
       reload: yes
-   tags:
+  tags:
       - medium
       - cat2
       - V-38600
