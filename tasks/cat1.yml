@@ -13,7 +13,7 @@
 
 - name: V-38491 High  There must be no .rhosts files on the system
   file: state=absent dest=~{{ item }}/.rhosts
-  with_items: users.stdout_lines
+  with_items: '{{users.stdout_lines}}'
   tags: [ 'cat1' , 'V-38491' , 'rhosts' ]
 
 

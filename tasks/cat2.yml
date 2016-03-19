@@ -159,10 +159,9 @@
   tags: [ 'cat2' , 'V-38521' , 'auditd' , 'logging' ]
 
 - name: "V-38485 Medium  The operating system, upon successful logon, must display to the user the date and time of the last logon or access via a local console or tty"
-  file: path={{ item }} state=absent
-  with_flattened:
-    - /etc/hushlogins
-    - users.stdout_lines
+  file: path='{{ item }}/.hushlogin' state=absent
+  with_items:
+    - '{{ users.stdout_lines }}'
   tags: [ 'cat2' , 'V-38485' , 'logon_settings' , 'tty' ]
 
 - name: Checking for updates
@@ -176,7 +175,6 @@
   yum: name=* state=latest
   when: rhel6stig_update_packages
   tags: [ 'cat2' , 'V-38481' , 'yum' , 'updates' ]
-
 
 - name: "V-38664 Medium  The system package management tool must verify ownership on all files and directories associated with the audit package\n
         \tV-38665 Medium  The system package management tool must verify group-ownership on all files and directories associated with the audit package"
@@ -279,7 +277,7 @@
 
 - name: "V-38496 Medium  Default system accounts, other than root, must be locked"
   command: passwd -l {{ item }}
-  with_items: unlocked_sys_accounts.stdout_lines
+  with_items: '{{ unlocked_sys_accounts.stdout_lines }}'
   tags: [ 'cat2' , 'V-38496' , 'accounts' ]
 
 # - name: V-38673 Medium  The operating system must ensure unauthorized, security-relevant configuration changes detected are tracked
@@ -311,7 +309,7 @@
 
 - name: V-38679 Medium  The DHCP client must be disabled if not needed
   lineinfile: "state=present dest={{ item }} regexp='^BOOTPROTO=' line='BOOTPROTO=\"none\"' backup=no"
-  with_items: interface_config_files.stdout_lines
+  with_items: '{{ interface_config_files.stdout_lines }}'
   register: dhcp_change
   when: interface_config_files.stdout and not rhel6stig_use_dhcp
   tags: [ 'cat2' , 'V-38679' , 'network' , 'dhcp' ]
@@ -354,7 +352,7 @@
   tags: [ 'cat2' , 'V-38483' , 'V-38487' , 'rpm' , 'gpgcheck' ]
   with_flattened:
     - /etc/yum.conf
-    - yum_repos.stdout_lines
+    - '{{ yum_repos.stdout_lines }}'
 
 # GUI logon settings
 - name: "V-38689 Medium  The Department of Defense (DoD) login banner must be displayed immediately prior to, or as part of, graphical desktop environment login prompts"
@@ -504,19 +502,19 @@
 
 - name: Check file state and type to avoid hard link failures
   stat: path={{ item }}
-  with_items: rsyslog_log_files.stdout_lines
+  with_items: '{{ rsyslog_log_files.stdout_lines }}'
   register: log_files_st
   tags: [ 'cat2' , 'V-38519' , 'V-38518' , 'V-38623' , 'file_perms' ]
 
 - name: "V-38519 V-38518 Medium  All rsyslog-generated log files must be owned and group-owned by root\n    V-38623 Medium  All rsyslog-generated log files must have mode 0600 or less permissive"
   file: path={{ item.item }} owner=root group=root mode=u-x,go-rwx follow=yes
-  with_items: log_files_st.results
+  with_items: '{{ log_files_st.results }}'
   when: item.stat.exists and item.stat.isreg and item.stat.nlink|int == 1
   tags: [ 'cat2' , 'V-38519' , 'V-38623' , 'V-38518' , 'file_perms' ]
 
 - name: V-38623 Medium  All rsyslog-generated log files must have mode 0600 or less permissive HARD LINKED FILES
   shell: chown root:root {{ item.item }} && chmod u-x,go-rwx {{ item.item }}
-  with_items: log_files_st.results
+  with_items: '{{ log_files_st.results }}'
   when: item.stat.exists and item.stat.isreg and item.stat.nlink|int > 1
   tags: [ 'cat2' , 'V-38519' , 'V-38623' , 'V-38518' , 'file_perms' ]
 
@@ -544,7 +542,7 @@
 
 - name: V-38619 Medium  There must be no .netrc files on the system
   file: state=absent dest=~{{ item }}/.netrc
-  with_items: users.stdout_lines
+  with_items: '{{ users.stdout_lines }}'
   tags: [ 'cat2' , 'V-38619' , 'netrc' ]
 
 - name: V-38599 Medium  The FTPS/FTP service on the system must be configured with the Department of Defense (DoD) login banner
