@@ -1728,7 +1728,8 @@
 - name: "MEDIUM | V-38580 | AUDIT | The audit system must be configured to audit the loading and unloading of dynamic kernel modules."
   shell: egrep -e "(-w |-F path=)/sbin/insmod" /etc/audit/audit.rules; egrep -e "(-w |-F path=)/sbin/modprobe" /etc/audit/audit.rules; egrep -e "(-w |-F path=)/sbin/rmmod" /etc/audit/audit.rules;grep -w "init_module" /etc/audit/audit.rules; grep -w "init_module" /etc/audit/audit.rules
   always_run: yes
-  changed_when: false
+  changed_when: False
+  ignore_errors: yes
   register: dynamic_kernel_loading_audit
   tags:
     - cat2
@@ -1936,17 +1937,6 @@
       - accounts
       - logon_settings
       - audit
-
-- name: Check for LDAP
-  stat: path=/etc/pam_ldap.conf
-  register: ldap_test
-  tags:
-      - cat2
-      - V-38592
-      - logon_settings
-      - accounts
-      - audit
-      - pam
 
 - name: "MEDIUM | V-38592 | PATCH | The system must require administrator action to unlock an account locked by excessive failed login attempts."
   pam:
