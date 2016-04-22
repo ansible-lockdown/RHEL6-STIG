@@ -713,10 +713,10 @@
 # V-38500 is checked but not automatically patched, please see not_automated.yml
 
 - name: "MEDIUM | V-38501 | AUDIT | The system must disable accounts after excessive login failures within a 15-minute interval."
-  shell: grep -h pam_faillock /etc/pam.d/system-auth /etc/pam.d/password-auth | grep fail_interval | awk -F'=' '{print $NF}'
+  shell: "grep -h pam_faillock /etc/pam.d/system-auth /etc/pam.d/password-auth | grep fail_interval | awk -F'=' '{print $NF}'"
   changed_when: no
   always_run: yes
-  register: login_failures_interval
+  register: login_failures_interval_audit
   tags:
       - medium
       - cat2
@@ -726,9 +726,10 @@
       - pam
 
 - name: "MEDIUM | V-38501 | AUDIT | The system must disable accounts after excessive login failures within a 15-minute interval."
-  shell: grep -hG '^account\s*required\s*pam_faillock\.so' /etc/pam.d/system-auth /etc/pam.d/password-auth
+  shell: grep -h '^account\s*required\s*pam_faillock\.so' /etc/pam.d/system-auth /etc/pam.d/password-auth
   changed_when: no
   always_run: yes
+  ignore_errors: yes
   register: login_failures_account_require
   tags:
       - medium
@@ -740,9 +741,10 @@
 
 - name: "MEDIUM | V-38501 | AUDIT | The system must disable accounts after excessive login failures within a 15-minute interval."
   assert:
-      that: "{{ login_failures_account_require.stdout_lines | length }} == 2"
-  with_items: login_failures_interval.stdout_lines
+      that:
           - "{{ item | int }} >= 900"
+          - "{{ login_failures_account_require.stdout_lines | length }} == 2"
+  with_items: login_failures_interval_audit.stdout_lines
   ignore_errors: yes
   register: login_failures_interval_audit
   tags:
@@ -753,7 +755,7 @@
       - V-38501
       - pam
 
-- name: "MEDIUM | V-38501 | PATCH | 4 The system must disable accounts after excessive login failures within a 15-minute interval."
+- name: "MEDIUM | V-38501 | PATCH | The system must disable accounts after excessive login failures within a 15-minute interval."
   pam:
       service: "{{ item }}"
       type: auth
@@ -773,7 +775,7 @@
       - V-38501
       - pam
 
-- name: "MEDIUM | V-38501 | PATCH | 5 The system must disable accounts after excessive login failures within a 15-minute interval."
+- name: "MEDIUM | V-38501 | PATCH | The system must disable accounts after excessive login failures within a 15-minute interval."
   pam:
       service: "{{ item }}"
       type: auth
