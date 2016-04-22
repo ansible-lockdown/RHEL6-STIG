@@ -2164,7 +2164,7 @@
 
 - name: "MEDIUM | V-38601 | PATCH | The system must not send ICMPv4 redirects from any interface."
   sysctl:
-      name: sysctl net.ipv4.conf.all.send_redirects
+      name: net.ipv4.conf.all.send_redirects
       value: 0
       reload: yes
   tags:
