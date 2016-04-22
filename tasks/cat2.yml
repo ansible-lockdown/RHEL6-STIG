@@ -1443,8 +1443,9 @@
       - network
 
 - name: |
+
          MEDIUM | V-38549 | AUDIT | The system must employ a local IPv6 firewall.
-         MEDIUM | V-38553 | PATCH | The operating system must prevent public IPv6 access into an organizations internal networks, except as appropriately mediated by managed interfaces employing boundary protection devices.
+         MEDIUM | V-38553 | AUDIT | The operating system must prevent public IPv6 access into an organizations internal networks, except as appropriately mediated by managed interfaces employing boundary protection devices.
   command: service ip6tables status
   when: rhel6stig_ipv6_in_use
   ignore_errors: yes
@@ -1461,6 +1462,7 @@
       - audit
 
 - name: |
+
          MEDIUM | V-38549 | PATCH | The system must employ a local IPv6 firewall.
          MEDIUM | V-38553 | PATCH | The operating system must prevent public IPv6 access into an organizations internal networks, except as appropriately mediated by managed interfaces employing boundary protection devices.
   service:
@@ -1478,6 +1480,7 @@
       - patch
 
 - name: |
+
          MEDIUM | V-38555 | AUDIT | The system must employ a local IPv4 firewall.
          MEDIUM | V-38560 | AUDIT | The operating system must connect to external networks or information systems only through managed IPv4 interfaces consisting of boundary protection devices arranged in accordance with an organizational security architecture.
   command: service iptables status
@@ -1495,6 +1498,7 @@
       - audit
 
 - name: |
+
          MEDIUM | V-38555 | PATCH | The system must employ a local IPv4 firewall.
          MEDIUM | V-38560 | PATCH | The operating system must connect to external networks or information systems only through managed IPv4 interfaces consisting of boundary protection devices arranged in accordance with an organizational security architecture.
   service:
@@ -1689,6 +1693,7 @@
       - passwords
 
 - name: |
+
          MEDIUM | V-38579 | AUDIT | The system boot loader configuration file(s) must be owned by root.
          MEDIUM | V-38581 | AUDIT | The system boot loader configuration file(s) must be group-owned by root.
          MEDIUM | V-38583 | AUDIT | The system boot loader configuration file(s) must have mode 0600 or less permissive.
