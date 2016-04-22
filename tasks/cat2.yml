@@ -753,7 +753,7 @@
       - V-38501
       - pam
 
-- name: "MEDIUM | V-38501 | PATCH | The system must disable accounts after excessive login failures within a 15-minute interval."
+- name: "MEDIUM | V-38501 | PATCH | 4 The system must disable accounts after excessive login failures within a 15-minute interval."
   pam:
       service: "{{ item }}"
       type: auth
@@ -773,7 +773,7 @@
       - V-38501
       - pam
 
-- name: "MEDIUM | V-38501 | PATCH | The system must disable accounts after excessive login failures within a 15-minute interval."
+- name: "MEDIUM | V-38501 | PATCH | 5 The system must disable accounts after excessive login failures within a 15-minute interval."
   pam:
       service: "{{ item }}"
       type: auth
@@ -1453,7 +1453,7 @@
       - V-38553
       - patch
 
-- name: | 
+- name: |
          MEDIUM | V-38555 | AUDIT | The system must employ a local IPv4 firewall.
          MEDIUM | V-38560 | AUDIT | The operating system must connect to external networks or information systems only through managed IPv4 interfaces consisting of boundary protection devices arranged in accordance with an organizational security architecture.
   command: service iptables status
@@ -1470,7 +1470,7 @@
       - V-38560
       - audit
 
-- name: | 
+- name: |
          MEDIUM | V-38555 | PATCH | The system must employ a local IPv4 firewall.
          MEDIUM | V-38560 | PATCH | The operating system must connect to external networks or information systems only through managed IPv4 interfaces consisting of boundary protection devices arranged in accordance with an organizational security architecture.
   service:
@@ -1509,7 +1509,7 @@
       pam_module: pam_faillock.so
       arguments: preauth silent deny=3 unlock_time=604800 fail_interval=900
       before_line: auth sufficient pam_unix.so
-      state: present 
+      state: present
   with_items:
       - system-auth
       - password-auth
@@ -1526,11 +1526,11 @@
   pam:
       service: "{{ item }}"
       type: auth
-      control: '[default=die]' 
+      control: '[default=die]'
       pam_module: pam_faillock.so
-      arguments: authfail deny=3 unlock_time=604800 fail_interval=900 
+      arguments: authfail deny=3 unlock_time=604800 fail_interval=900
       after_line: auth sufficient pam_unix.so
-      state: present 
+      state: present
   with_items:
       - system-auth
       - password-auth
@@ -1547,10 +1547,10 @@
   pam:
       service: "{{ item }}"
       type: account
-      control: required 
+      control: required
       pam_module: pam_faillock.so
-      before_line: account required pam_unix.so     
-      state: present 
+      before_line: account required pam_unix.so
+      state: present
   with_items:
       - system-auth
       - password-auth
@@ -1564,7 +1564,7 @@
       - pam
 
 - name: "MEDIUM | V-38574 | AUDIT | The system must use a FIPS 140-2 approved cryptographic hashing algorithm for generating account password hashes (system-auth)."
-  shell: find /etc/pam.d/ -type f -not -name '*.*' 
+  shell: find /etc/pam.d/ -type f -not -name '*.*'
   changed_when: no
   register: pamd_files
   ignore_errors: yes
@@ -1597,7 +1597,7 @@
   lineinfile:
       dest: "{{ item }}"
       backrefs: yes
-      regexp: (^password\s*.*pam_unix.so.*)(md5|sha256|blowfish|bigcrypt)(.*) 
+      regexp: (^password\s*.*pam_unix.so.*)(md5|sha256|blowfish|bigcrypt)(.*)
       line: \1sha512\3
       backup: yes
   with_items: pamd_files.stdout_lines
@@ -1623,11 +1623,11 @@
       - passwords
 
 - name: "MEDIUM | V-38576 | PATCH | The system must use a FIPS 140-2 approved cryptographic hashing algorithm for generating account password hashes (login.defs)"
-  lineinfile: 
+  lineinfile:
       state: present
-      backup: yes 
-      dest: /etc/login.defs 
-      regexp: '^ENCRYPT_METHOD' 
+      backup: yes
+      dest: /etc/login.defs
+      regexp: '^ENCRYPT_METHOD'
       line: 'ENCRYPT_METHOD SHA512'
   tags:
       - cat2
@@ -1650,12 +1650,12 @@
 
 - name: "MEDIUM | V-38577 | PATCH | The system must use a FIPS 140-2 approved cryptographic hashing algorithm for generating account password hashes (libuser.conf)"
   ini_file:
-      state: present 
-      backup: yes 
-      dest: /etc/libuser.conf 
+      state: present
+      backup: yes
+      dest: /etc/libuser.conf
       section: defaults
       option: crypt_style
-      value: sha512 
+      value: sha512
   tags:
       - cat2
       - medium
@@ -1668,7 +1668,7 @@
          MEDIUM | V-38579 | AUDIT | The system boot loader configuration file(s) must be owned by root.
          MEDIUM | V-38581 | AUDIT | The system boot loader configuration file(s) must be group-owned by root.
          MEDIUM | V-38583 | AUDIT | The system boot loader configuration file(s) must have mode 0600 or less permissive.
-  stat: 
+  stat:
       path: /etc/grub.conf
   register: grub_conf_audit
   always_run: yes
@@ -1680,10 +1680,10 @@
       - V-38583
       - file_perms
       - grub
-      - audit  
+      - audit
 
 - name: "MEDIUM | V-38579 | PATCH | The system boot loader configuration file(s) must be owned by root."
-  file: 
+  file:
       dest: /etc/grub.conf
       owner: root
       state: file
@@ -1714,7 +1714,7 @@
       backup: yes
       line: "{{ item }}"
       dest: /etc/audit/audit.rules
-      state: present 
+      state: present
   with_items:
       - -w /sbin/insmod -p x -k modules
       - -w /sbin/rmmod -p x -k modules
@@ -1723,14 +1723,14 @@
   tags:
     - cat2
     - medium
-    - patch 
+    - patch
     - kernel
     - auditd
     - V-38580
 
 - name: "MEDIUM | V-38581 | PATCH | The system boot loader configuration file(s) must be group-owned by root"
-  file: 
-      path: /etc/grub.conf 
+  file:
+      path: /etc/grub.conf
       group: root
       follow: yes
   tags:
@@ -1751,7 +1751,7 @@
   tags:
       - cat2
       - V-38582
-      - medium 
+      - medium
       - xinetd
       - services
       - audit
@@ -1762,32 +1762,32 @@
   ignore_errors: yes
   changed_when: no
   register: xinetd_audit
-  tags: 
+  tags:
       - cat2
-      - medium 
+      - medium
       - V-38582
       - xinetd
       - services
-      - audit 
+      - audit
 
-- name: "MEDIUM | V-38582 | PATCH | The xinetd service must be disabled if no network services utilizing it are enabled" 
-  service: 
-      name: xinetd 
-      enabled: no 
+- name: "MEDIUM | V-38582 | PATCH | The xinetd service must be disabled if no network services utilizing it are enabled"
+  service:
+      name: xinetd
+      enabled: no
       state: stopped
   when: xinetd_audit.rc == 0 or (xinetd_services.stdout and xinetd_services.stdout.find('\ton\n') == -1)
-  tags: 
+  tags:
       - cat2
-      - medium 
+      - medium
       - V-38582
       - xinetd
       - services
       - patch
 
-- name: "MEDIUM | V-38583| PATCH | The system boot loader configuration file(s) must have mode 0600 or less permissive." 
-  file: 
-      path: /etc/grub.conf 
-      mode: u-x,go-rwx 
+- name: "MEDIUM | V-38583| PATCH | The system boot loader configuration file(s) must have mode 0600 or less permissive."
+  file:
+      path: /etc/grub.conf
+      mode: u-x,go-rwx
       follow: yes
   tags:
       - cat2
@@ -1822,12 +1822,12 @@
       - V-38585
       - grub
       - passwords
-      - patch 
+      - patch
 
 - name: "MEDIUM | V-38585 | PATCH | The system boot loader must require authentication."
   lineinfile:
       state: present
-      line: password --encrypted {{ grub_pass.passhash }} 
+      line: password --encrypted {{ grub_pass.passhash }}
       dest: /etc/grub.conf
       follow: yes
       insertafter: '^#\\s'
@@ -1839,7 +1839,7 @@
       - V-38585
       - grub
       - passwords
-      - patch 
+      - patch
 
 - name: "MEDIUM | V-38586 | AUDIT | The system must require authentication upon booting into single-user and maintenance modes."
   command: grep SINGLE /etc/sysconfig/init
@@ -1850,23 +1850,23 @@
       - cat2
       - medium
       - V-38586
-      - root_access 
+      - root_access
       - audit
 
 - name: "MEDIUM | V-38586 | PATCH | The system must require authentication upon booting into single-user and maintenance modes."
-  lineinfile: 
-      state: present 
-      backup: yes 
-      dest: /etc/sysconfig/init 
-      regexp: '^(#)?SINGLE' 
+  lineinfile:
+      state: present
+      backup: yes
+      dest: /etc/sysconfig/init
+      regexp: '^(#)?SINGLE'
       line: 'SINGLE=/sbin/sulogin'
   tags:
       - cat2
       - medium
       - V-38586
-      - root_access 
+      - root_access
       - V-38503
-      - patch 
+      - patch
 
 - name: "MEDIUM | V-38588 | AUDIT | The system must not permit interactive boot."
   command: grep PROMPT /etc/sysconfig/init
@@ -1883,10 +1883,10 @@
 
 - name: "MEDIUM | V-38588 | PATCH | The system must not permit interactive boot."
   lineinfile:
-      state: present 
-      backup: yes 
-      dest: /etc/sysconfig/init 
-      regexp: '^PROMPT=' 
+      state: present
+      backup: yes
+      dest: /etc/sysconfig/init
+      regexp: '^PROMPT='
       line: 'PROMPT=no'
   tags:
       - cat2
@@ -1895,7 +1895,7 @@
       - interactive_boot
       - patch
 
-- name: "MEDIUM | V-38592 | AUDIT | The system must require administrator action to unlock an account locked by excessive failed login attempts." 
+- name: "MEDIUM | V-38592 | AUDIT | The system must require administrator action to unlock an account locked by excessive failed login attempts."
   shell: grep -h pam_faillock /etc/pam.d/system-auth /etc/pam.d/password-auth | grep unlock_time
   changed_when: no
   always_run: yes
@@ -1919,7 +1919,7 @@
       - audit
       - pam
 
-- name: "MEDIUM | V-38592 | PATCH | The system must require administrator action to unlock an account locked by excessive failed login attempts." 
+- name: "MEDIUM | V-38592 | PATCH | The system must require administrator action to unlock an account locked by excessive failed login attempts."
   pam:
       service: "{{ item }}"
       type: auth
@@ -1927,7 +1927,7 @@
       pam_module: pam_faillock.so
       arguments: preauth silent deny=3 unlock_time=604800 fail_interval=900
       before_line: auth sufficient pam_unix.so
-      state: present 
+      state: present
   with_items:
       - system-auth
       - password-auth
@@ -1940,15 +1940,15 @@
       - patch
       - pam
 
-- name: "MEDIUM | V-38592 | PATCH | The system must require administrator action to unlock an account locked by excessive failed login attempts." 
+- name: "MEDIUM | V-38592 | PATCH | The system must require administrator action to unlock an account locked by excessive failed login attempts."
   pam:
       service: "{{ item }}"
       type: auth
-      control: '[default=die]' 
+      control: '[default=die]'
       pam_module: pam_faillock.so
-      arguments: authfail deny=3 unlock_time=604800 fail_interval=900 
+      arguments: authfail deny=3 unlock_time=604800 fail_interval=900
       after_line: auth sufficient pam_unix.so
-      state: present 
+      state: present
   with_items:
       - system-auth
       - password-auth
@@ -1961,14 +1961,14 @@
       - patch
       - pam
 
-- name: "MEDIUM | V-38592 | PATCH | The system must require administrator action to unlock an account locked by excessive failed login attempts." 
+- name: "MEDIUM | V-38592 | PATCH | The system must require administrator action to unlock an account locked by excessive failed login attempts."
   pam:
       service: "{{ item }}"
       type: account
-      control: required 
+      control: required
       pam_module: pam_faillock.so
-      before_line: account required pam_unix.so     
-      state: present 
+      before_line: account required pam_unix.so
+      state: present
   with_items:
       - system-auth
       - password-auth
@@ -1986,26 +1986,26 @@
   changed_when: no
   always_run: yes
   register: login_banner_audit
-  tags: 
+  tags:
       - cat2
       - medium
       - V-38593
       - logon_settings
       - dod_logon_banner
-      - audit 
+      - audit
 
 - name: "MEDIUM | V-38593 | PATCH |  The Department of Defense (DoD) login banner must be displayed immediately prior to or as part of console login prompts"
-  copy: 
-      src: issue 
-      dest: /etc/{{ item }} 
-      owner: root 
-      group: root 
-      mode: "0644" 
+  copy:
+      src: issue
+      dest: /etc/{{ item }}
+      owner: root
+      group: root
+      mode: "0644"
       backup: yes
   with_items:
     - issue
     - issue.net
-  tags: 
+  tags:
       - cat2
       - medium
       - V-38593
@@ -2013,14 +2013,14 @@
       - dod_logon_banner
       - patch
 
-# Not automated:  V-38595 | The system must be configured to require the use of a CAC, PIV compliant hardware token, or Alternate Logon Token (ALT) for authentication. 
+# Not automated:  V-38595 | The system must be configured to require the use of a CAC, PIV compliant hardware token, or Alternate Logon Token (ALT) for authentication.
 
 - name: "MEDIUM | V-38596 | AUDIT | The system must implement virtual address space randomization."
   shell: sysctl kernel.randomize_va_space | awk '{print $3}'
   changed_when: no
   always_run: yes
   register: virt_addr_space_randomization_audit
-  tags: 
+  tags:
       - cat2
       - audit
       - medium
@@ -2034,7 +2034,7 @@
       value: 2
       state: present
       reload: yes
-  tags: 
+  tags:
       - cat2
       - patch
       - medium
@@ -2061,9 +2061,9 @@
       value: 1
       state: present
       reload: yes
-  tags: 
+  tags:
       - cat2
-      - patch 
+      - patch
       - medium
       - sysctl
       - kernel
@@ -2078,25 +2078,25 @@
   register: vsftpd_banner_audit
   tags:
       - cat2
-      - medium 
+      - medium
       - V-38599
       - vsftp
       - dod_logon_banner
       - logon_settings
-      - audit 
+      - audit
 
 - name: "MEDIUM | V-38599 | PATCH | The FTPS/FTP service on the system must be configured with the Department of Defense (DoD) login banner"
-  lineinfile: 
-      state: present 
-      backup: yes 
-      dest: /etc/vsftpd/vsftpd.conf 
-      regexp: '^#?banner_file' 
+  lineinfile:
+      state: present
+      backup: yes
+      dest: /etc/vsftpd/vsftpd.conf
+      regexp: '^#?banner_file'
       line: 'banner_file=/etc/issue'
   ignore_errors: yes
   notify: restart vsftpd
-  tags: 
+  tags:
       - cat2
-      - medium 
+      - medium
       - V-38599
       - vsftp
       - dod_logon_banner
@@ -2128,7 +2128,7 @@
       - V-38600
       - icmp
       - sysctl
-      - patch 
+      - patch
 
 - name: "MEDIUM | V-38601 | AUDIT | The system must not send ICMPv4 redirects from any interface."
   shell: sysctl net.ipv4.conf.all.send_redirects | awk '{print $3}'
@@ -2141,7 +2141,7 @@
       - V-38601
       - icmp
       - sysctl
-      - audit 
+      - audit
 
 - name: "MEDIUM | V-38601 | PATCH | The system must not send ICMPv4 redirects from any interface."
   sysctl:
@@ -2177,14 +2177,14 @@
   tags:
       - medium
       - V-38603
-      - patch 
+      - patch
       - cat2
       - ypserv
       - packages
 
 - name: "MEDIUM | V-38604 | AUDIT | The ypbind service must not be running."
   command: chkconfig "ypbind" --list
-  changed_when: no 
+  changed_when: no
   ignore_errors: yes
   always_run: yes
   register: ypbind_service_audit
@@ -2233,7 +2233,7 @@
       - medium
       - cat2
       - cron
-      - patch 
+      - patch
       - V-38605
       - services
 
@@ -2277,7 +2277,7 @@
       - audit
       - tftp
       - services
- 
+
 - name: "MEDIUM | V-38609 | PATCH | The TFTP service must not be running."
   service:
       name: tftp
