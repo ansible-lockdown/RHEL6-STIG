@@ -795,6 +795,25 @@
       - V-38501
       - pam
 
+- name: "MEDIUM | V-38501 | PATCH | The system must disable accounts after excessive login failures within a 15-minute interval."
+  pam:
+      service: "{{ item }}"
+      type: account
+      control: required
+      pam_module: pam_faillock.so
+      before_line: account required pam_unix.so
+      state: present
+  with_items:
+      - password-auth
+      - system-auth
+  tags:
+      - medium
+      - cat2
+      - logon_settings
+      - patch
+      - V-38501
+      - pam
+
 - name: |
          MEDIUM | V-38502 | AUDIT | The /etc/shadow file must be owned by root.
          MEDIUM | V-38503 | AUDIT | The /etc/shadow file must be group-owned by root.
