@@ -2337,6 +2337,7 @@
       regexp: '^#?IgnoreRhosts'
       line: IgnoreRhosts yes
       dest: /etc/ssh/sshd_config
+      validate: sshd -t -f %s
   tags:
       - cat2
       - medium
