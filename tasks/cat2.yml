@@ -2289,10 +2289,12 @@
       - patch
 
 - name: "MEDIUM | V-38609 | AUDIT | The TFTP service must not be running."
-  command: chkconfig "tftp" --list
+  command: chkconfig tftp --list
   ignore_errors: yes
   always_run: yes
   changed_when: no
+  register: tftp_service_audit
+  when: not rhel6stig_tftp_required and 'tftp' in xinetd_services.stdout
   tags:
       - medium
       - cat2
@@ -2301,11 +2303,11 @@
       - tftp
       - services
 
+# Use command instead of service since the service module fails when trying
+# to manage xined services
 - name: "MEDIUM | V-38609 | PATCH | The TFTP service must not be running."
-  service:
-      name: tftp
-      state: stopped
-      enabled: no
+  command: chkconfig tftp off
+  when: not rhel6stig_tftp_required and 'tftp' in xinetd_services.stdout and 'on' in tftp_service_audit.stdout
   tags:
       - medium
       - cat2
