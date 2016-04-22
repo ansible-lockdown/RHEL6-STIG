@@ -374,7 +374,7 @@
       - passwords
 
 - name: "MEDIUM | V-38479 | AUDIT | User passwords must be changed at least every 60 days."
-  shell: grep -E '^PASS_MAX_DAYS' /etc/login.defs | awk '{print $2}'
+  shell: "grep -E '^PASS_MAX_DAYS' /etc/login.defs | awk '{print $2}'"
   register: pwd_max_days_audit
   changed_when: no
   always_run: yes
@@ -456,7 +456,7 @@
       - gpgcheck
 
 - name: "MEDIUM | V-38484 | AUDIT | The operating system, upon successful logon, must display to the user the date and time of the last logon or access via ssh."
-  shell: grep -i "^PrintLastLog" /etc/ssh/sshd_config | awk '{ print $2 }'
+  shell: "grep -i '^PrintLastLog' /etc/ssh/sshd_config | awk '{ print $2 }'"
   register: last_log_audit
   changed_when: no
   always_run: yes
@@ -873,7 +873,7 @@
       - patch
 
 - name: "MEDIUM | V-38511 | AUDIT | IP forwarding for IPv4 must not be enabled, unless the system is a router."
-  shell: sysctl net.ipv4.ip_forward | awk '{print $3}'
+  shell: "sysctl net.ipv4.ip_forward | awk '{print $3}'"
   changed_when: no
   always_run: yes
   register: ipv4_ip_forwarding_audit
@@ -886,7 +886,7 @@
       - audit
 
 - name: "MEDIUM | V-38511 | AUDIT | IP forwarding for IPv4 must not be enabled, unless the system is a router."
-  shell: sysctl net.ipv4.ip_forward | awk '{print $3}'
+  shell: "sysctl net.ipv4.ip_forward | awk '{print $3}'"
   changed_when: no
   always_run: yes
   register: ipv4_ip_forwarding_audit
@@ -944,7 +944,7 @@
       - patch
 
 - name: "MEDIUM | V-38513 | AUDIT | The systems local IPv4 firewall must implement a deny-all, allow-by-exception policy for inbound packets."
-  shell: grep ":INPUT" /etc/sysconfig/iptables | awk '{print $2}'
+  shell: "grep ':INPUT' /etc/sysconfig/iptables | awk '{print $2}'"
   changed_when: no
   always_run: yes
   register: ipv4_fw_deny_all_audit
@@ -1067,7 +1067,7 @@
       - patch
 
 - name: "MEDIUM | V-38518 | AUDIT | All rsyslog-generated log files must be owned by root."
-  shell: grep -e "/" /etc/rsyslog.conf /etc/rsyslog.d/* | grep -v IncludeConfig | sed 's/-//'| awk 'NF==2 {print $2}'
+  shell: "grep -e '/' /etc/rsyslog.conf /etc/rsyslog.d/* | grep -v IncludeConfig | sed 's/-//'| awk 'NF==2 {print $2}'"
   changed_when: no
   always_run: yes
   register: rsyslog_logfiles
@@ -1126,7 +1126,7 @@
 # V-38521 not automatically remediated. See not_automated.yml
 
 - name: "MEDIUM | V-38523 | AUDIT | The system must not accept IPv4 source-routed packets on any interface."
-  shell: sysctl net.ipv4.conf.all.accept_source_route | awk '{print $3}'
+  shell: "sysctl net.ipv4.conf.all.accept_source_route | awk '{print $3}'"
   changed_when: no
   always_run: yes
   register: ipv4_source_routed_packets_any_int_audit
@@ -1158,7 +1158,7 @@
       - network
 
 - name: "MEDIUM | V-38524 | AUDIT | The system must not accept ICMPv4 redirect packets on any interface."
-  shell: sysctl net.ipv4.conf.all.accept_redirects | awk '{print $3}'
+  shell: "sysctl net.ipv4.conf.all.accept_redirects | awk '{print $3}'"
   changed_when: no
   always_run: yes
   register: icmpv4_redirect_packets_any_int_audit
@@ -1190,7 +1190,7 @@
       - network
 
 - name: "MEDIUM | V-38526 | AUDIT | The system must not accept ICMPv4 secure redirect packets on any interface."
-  shell: sysctl net.ipv4.conf.all.secure_redirects | awk '{print $3}'
+  shell: "sysctl net.ipv4.conf.all.secure_redirects | awk '{print $3}'"
   changed_when: no
   always_run: yes
   register: icmpv4_secure_redirect_packets_any_int_audit
@@ -1222,7 +1222,7 @@
       - network
 
 - name: "MEDIUM | V-38529 | AUDIT | The system must not accept IPv4 source-routed packets by default."
-  shell: sysctl net.ipv4.conf.default.accept_source_route | awk '{print $3}'
+  shell: "sysctl net.ipv4.conf.default.accept_source_route | awk '{print $3}'"
   changed_when: no
   always_run: yes
   register: ipv4_source_routed_packets_default_audit
@@ -1254,7 +1254,7 @@
       - network
 
 - name: "MEDIUM | V-38532 | AUDIT | The system must not accept ICMPv4 secure redirect packets by default."
-  shell: sysctl net.ipv4.conf.default.secure_redirects | awk '{print $3}'
+  shell: "sysctl net.ipv4.conf.default.secure_redirects | awk '{print $3}'"
   changed_when: no
   always_run: yes
   register: icmpv4_secure_redirects_default_audit
@@ -1286,7 +1286,7 @@
       - network
 
 - name: "MEDIUM | V-38539 | AUDIT | The system must be configured to use TCP syncookies when experiencing a TCP SYN flood."
-  shell: sysctl net.ipv4.tcp_syncookies | awk '{print $3}'
+  shell: "sysctl net.ipv4.tcp_syncookies | awk '{print $3}'"
   changed_when: no
   always_run: yes
   register: tcp_syncookies_audit
@@ -1318,7 +1318,7 @@
       - network
 
 - name: "MEDIUM | V-38542 | AUDIT | The system must use a reverse-path filter for IPv4 network traffic when possible on all interfaces."
-  shell: sysctl net.ipv4.conf.all.rp_filter | awk '{print $3}'
+  shell: "sysctl net.ipv4.conf.all.rp_filter | awk '{print $3}'"
   changed_when: no
   always_run: yes
   register: ipv4_reverse_path_filter_all_int_audit
@@ -1351,7 +1351,7 @@
       - dhcp
 
 - name: "MEDIUM | V-38544 | AUDIT | The system must use a reverse-path filter for IPv4 network traffic when possible by default."
-  shell: sysctl net.ipv4.conf.default.rp_filter | awk '{print $3}'
+  shell: "sysctl net.ipv4.conf.default.rp_filter | awk '{print $3}'"
   changed_when: no
   always_run: yes
   register: ipv4_reverse_path_filter_default_audit
@@ -1383,7 +1383,7 @@
       - network
 
 - name: "MEDIUM | V-38546 | AUDIT | The IPv6 protocol handler must not be bound to the network stack unless needed."
-  shell: grep -rsE '^options\s*ipv6\s*disable=1' /etc/modprobe.conf /etc/modprobe.d | awk -F':' '{print $2}' | awk -F'=' '{print $2}'
+  shell: 'grep -rsE ''^options\s*ipv6\s*disable=1'' /etc/modprobe.conf /etc/modprobe.d | awk -F '':'' ''{print $2}'' | awk -F ''='' ''{print $2}'''
   register: ipv6_protocol_handler_bound_network_stack_audit
   changed_when: no
   always_run: yes
@@ -1411,7 +1411,7 @@
       - audit
 
 - name: "MEDIUM | V-38548 | AUDIT | The system must ignore ICMPv6 redirects by default."
-  shell: sysctl net.ipv6.conf.default.accept_redirects | awk '{print $3}'
+  shell: "sysctl net.ipv6.conf.default.accept_redirects | awk '{print $3}'"
   changed_when: no
   always_run: yes
   register: icmpv4_ignore_redirects_default_audit
@@ -1603,7 +1603,7 @@
       - pam
 
 - name: "MEDIUM | V-38574 | AUDIT | The system must use a FIPS 140-2 approved cryptographic hashing algorithm for generating account password hashes (system-auth)."
-  shell: grep password -h /etc/pam.d/* | grep pam_unix.so | awk '{print $4}'
+  shell: "grep password -h /etc/pam.d/* | grep pam_unix.so | awk '{print $4}'"
   changed_when: no
   always_run: yes
   register: pam_pwd_hash_audit
@@ -1635,7 +1635,7 @@
       - patch
 
 - name: "MEDIUM | V-38576 | AUDIT | The system must use a FIPS 140-2 approved cryptographic hashing algorithm for generating account password hashes (login.defs)"
-  shell: grep ENCRYPT_METHOD /etc/login.defs | awk '{print $2}'
+  shell: "grep ENCRYPT_METHOD /etc/login.defs | awk '{print $2}'"
   always_run: yes
   changed_when: no
   register: login_defs_audit
@@ -1661,7 +1661,7 @@
       - passwords
 
 - name: "MEDIUM | V-38577 | AUDIT | The system must use a FIPS 140-2 approved cryptographic hashing algorithm for generating account password hashes (libuser.conf)"
-  shell: grep crypt_style /etc/libuser.conf | awk '{print $3}'
+  shell: "grep crypt_style /etc/libuser.conf | awk '{print $3}'"
   always_run: yes
   changed_when: no
   register: libuser_audit
@@ -2040,7 +2040,7 @@
 # Not automated:  V-38595 | The system must be configured to require the use of a CAC, PIV compliant hardware token, or Alternate Logon Token (ALT) for authentication.
 
 - name: "MEDIUM | V-38596 | AUDIT | The system must implement virtual address space randomization."
-  shell: sysctl kernel.randomize_va_space | awk '{print $3}'
+  shell: "sysctl kernel.randomize_va_space | awk '{print $3}'"
   changed_when: no
   always_run: yes
   register: virt_addr_space_randomization_audit
@@ -2067,7 +2067,7 @@
       - V-38596
 
 - name: "MEDIUM | V-38597 | AUDIT | The system must limit the ability of processes to have simultaneous write and execute access to memory."
-  shell: sysctl kernel.exec-shield | awk '{print $3}'
+  shell: "sysctl kernel.exec-shield | awk '{print $3}'"
   changed_when: no
   always_run: yes
   register: simultaneous_wr_memory_audit
@@ -2129,7 +2129,7 @@
 
 
 - name: "MEDIUM | V-38600 | AUDIT | The system must not send ICMPv4 redirects by default."
-  shell: sysctl net.ipv4.conf.default.send_redirects | awk '{print $3}'
+  shell: "sysctl net.ipv4.conf.default.send_redirects | awk '{print $3}'"
   changed_when: no
   always_run: yes
   register: icmpv4_redirects_audit
@@ -2155,7 +2155,7 @@
       - patch
 
 - name: "MEDIUM | V-38601 | AUDIT | The system must not send ICMPv4 redirects from any interface."
-  shell: sysctl net.ipv4.conf.all.send_redirects | awk '{print $3}'
+  shell: "sysctl net.ipv4.conf.all.send_redirects | awk '{print $3}'"
   changed_when: no
   always_run: yes
   register: any_iface_icmp_redirect_audit
