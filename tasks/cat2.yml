@@ -740,9 +740,9 @@
 
 - name: "MEDIUM | V-38501 | AUDIT | The system must disable accounts after excessive login failures within a 15-minute interval."
   assert:
-      that: "{{ item | integer }} > 900"
       that: "{{ login_failures_account_require.stdout_lines | length }} == 2"
   with_items: login_failures_interval.stdout_lines
+          - "{{ item | int }} >= 900"
   ignore_errors: yes
   register: login_failures_interval_audit
   tags:
