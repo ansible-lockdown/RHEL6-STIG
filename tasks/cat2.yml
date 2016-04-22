@@ -2202,11 +2202,12 @@
       - packages
 
 - name: "MEDIUM | V-38604 | AUDIT | The ypbind service must not be running."
-  command: chkconfig "ypbind" --list
+  command: chkconfig ypbind --list
   changed_when: no
   ignore_errors: yes
   always_run: yes
   register: ypbind_service_audit
+  when: "'ypbind' in sysv_services.stdout"
   tags:
       - medium
       - V-38604
@@ -2220,6 +2221,7 @@
       name: ypbind
       state: stopped
       enabled: no
+  when: "'ypbind' in sysv_services.stdout"
   tags:
       - medium
       - V-38604
@@ -2234,6 +2236,7 @@
   always_run: yes
   ignore_errors: yes
   register: crond_status_audit
+  when: "'crond' in sysv_services.stdout"
   tags:
       - medium
       - cat2
@@ -2248,6 +2251,7 @@
       name: crond
       state: started
       enabled: yes
+  when: "'crond' in sysv_services.stdout"
   tags:
       - medium
       - cat2
