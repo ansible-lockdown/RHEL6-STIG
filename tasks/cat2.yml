@@ -2338,13 +2338,70 @@
       line: IgnoreRhosts yes
       dest: /etc/ssh/sshd_config
       validate: sshd -t -f %s
+  notify: restart ssh
   tags:
       - cat2
       - medium
+      - patch
       - V-38611
       - rhosts
       - sshd
+
+- name: "MEDIUM | V-38612 | AUDIT | The SSH daemon must not allow host-based authentication."
+  command: grep -i HostbasedAuthentication /etc/ssh/sshd_config
+  register: sshd_host_based_authentication_audit
+  ignore_errors: yes
+  changed_when: no
+  tags:
+      - cat2
+      - medium
+      - audit
+      - V-38612
+      - sshd
+
+- name: "MEDIUM | V-38612 | PATCH | The SSH daemon must not allow host-based authentication."
+  lineinfile:
+      state: present
+      regexp: '^#?HostbasedAuthentication'
+      line: HostbasedAuthentication no
+      dest: /etc/ssh/sshd_config
+      validate: sshd -t -f %s
+  notify: restart ssh
+  tags:
+      - cat2
+      - medium
       - patch
+      - V-38612
+      - sshd
+
+
+- name: "MEDIUM | V-38613 | AUDIT | The system must not permit root logins using remote access programs such as ssh."
+  command: grep -i PermitRootLogin /etc/ssh/sshd_config
+  ignore_errors: yes
+  changed_when: no
+  register: sshd_root_login_audit
+  tags:
+      - cat2
+      - MEDIUM
+      - audit
+      - V-38613
+      - sshd
+
+- name: "MEDIUM | V-38613 | PATCH | The system must not permit root logins using remote access programs such as ssh."
+  lineinfile:
+      state: present
+      backup: yes
+      dest: /etc/ssh/sshd_config
+      regexp: '^#?PermitRootLogin'
+      line: 'PermitRootLogin no'
+      validate: sshd -t -f %s
+  notify: restart ssh
+  tags:
+      - cat2
+      - MEDIUM
+      - patch
+      - V-38613
+      - sshd
 
 # Search for world writable files and print them out if any are found
 - name: Looking for world-writable files on the system
@@ -2362,11 +2419,6 @@
   pause: prompt="World writable files are present on the system. This is a finding. Press Enter to continue"
   when: world_writable_files.stdout_lines and not rhel6stig_fullauto
   tags: [ 'cat2' , 'V-38643', 'file_perms' ]
-
-# Required packages
-- name: V-38605 Medium  The cron service must be running
-  service: name=crond state=started enabled=yes
-  tags: [ 'cat2' , 'V-38605' , 'cron' , 'mandatory_services' ]
 
 # List nfs mounts that are missing the nodev option and ask the sys admin to correct this in /etc/fstab
 # This would be a bit tricky to automatically fix in /etc/fstab.
@@ -2629,32 +2681,6 @@
   when: not rhel6stig_is_mail_relay
   notify: restart postfix
   tags: [ 'cat2' , 'V-38622' , 'postfix' ]
-
-# sysctl kernel settings
-
-- name: "V-38617 Medium  The SSH daemon must be configured to use only FIPS 140-2 approved ciphers
-        \tV-38611 Medium  The SSH daemon must ignore .rhosts files
-        \tV-38612 Medium  The SSH daemon must not allow host-based authentication
-        \tV-38613 Medium  The system must not permit root logins using remote access programs such as ssh"
-  lineinfile: >
-    state={{ item.st }}
-    backup=yes dest=/etc/ssh/sshd_config
-    regexp={{ item.rx }}
-    line={{ item.ln }}
-  with_items:
-    - { st: 'present', rx: "'^#?Ciphers'", ln: "'Ciphers aes128-ctr,aes192-ctr,aes256-ctr,aes128-cbc,3des-cbc,aes192-cbc,aes256-cbc'" }
-    - { st: 'present', rx: "'^#?IgnoreRhosts'", ln: "'IgnoreRhosts yes'" }
-    - { st: 'present', rx: "'^#?HostbasedAuthentication'", ln: "'HostbasedAuthentication no'" }
-    - { st: 'present', rx: "'^#?PermitRootLogin'", ln: "'PermitRootLogin no'" }
-  tags:
-      - cat2
-      - medium
-      - V-38617
-      - V-38611
-      - V-38612
-      - V-38613
-      - ssh
-  notify: restart ssh
 
 - name: V-38615 Medium  The SSH daemon must be configured with the Department of Defense (DoD) login banner.
   lineinfile: >
