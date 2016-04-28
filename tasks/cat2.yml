@@ -904,6 +904,7 @@
       value: 0
       state: present
       reload: yes
+      sysctl_set: yes
       ignoreerrors: yes
   when: not rhel6stig_system_is_router
   tags:
@@ -1146,6 +1147,7 @@
       value: 0
       state: present
       reload: yes
+      sysctl_set: yes
       ignoreerrors: yes
   tags:
       - cat2
@@ -1178,6 +1180,7 @@
       value: 0
       state: present
       reload: yes
+      sysctl_set: yes
       ignoreerrors: yes
   tags:
       - cat2
@@ -1210,6 +1213,7 @@
       value: 0
       state: present
       reload: yes
+      sysctl_set: yes
       ignoreerrors: yes
   tags:
       - cat2
@@ -1242,6 +1246,7 @@
       value: 0
       state: present
       reload: yes
+      sysctl_set: yes
       ignoreerrors: yes
   tags:
       - medium
@@ -1274,6 +1279,7 @@
       value: 0
       state: present
       reload: yes
+      sysctl_set: yes
       ignoreerrors: yes
   tags:
       - medium
@@ -1306,6 +1312,7 @@
       value: 1
       state: present
       reload: yes
+      sysctl_set: yes
       ignoreerrors: yes
   tags:
       - cat2
@@ -1338,6 +1345,7 @@
       value: 1
       state: present
       reload: yes
+      sysctl_set: yes
       ignoreerrors: yes
   tags:
       - cat2
@@ -1371,6 +1379,7 @@
       value: 1
       state: present
       reload: yes
+      sysctl_set: yes
       ignoreerrors: yes
   tags:
       - cat2
@@ -1431,6 +1440,7 @@
       value: 0
       state: present
       reload: yes
+      sysctl_set: yes
       ignoreerrors: yes
   tags:
       - medium
@@ -2053,6 +2063,7 @@
       value: 2
       state: present
       reload: yes
+      sysctl_set: yes
   tags:
       - cat2
       - patch
@@ -2080,6 +2091,7 @@
       value: 1
       state: present
       reload: yes
+      sysctl_set: yes
   tags:
       - cat2
       - patch
@@ -2141,6 +2153,7 @@
       name: net.ipv4.conf.default.send_redirects
       value: 0
       reload: yes
+      sysctl_set: yes
   tags:
       - medium
       - cat2
@@ -2167,6 +2180,7 @@
       name: net.ipv4.conf.all.send_redirects
       value: 0
       reload: yes
+      sysctl_set: yes
   tags:
       - medium
       - cat2
