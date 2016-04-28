@@ -9,7 +9,7 @@ The role tries to be helpful and pause to let you know it found something. You c
 
 ## IMPORTANT INSTALL STEP
 
-If you want to install this via the `ansible-galaxy` command you'll need to run it like this: 
+If you want to install this via the `ansible-galaxy` command you'll need to run it like this:
 
 `ansible-galaxy install -p roles nousdefions.STIG-RHEL6,devel`
 
@@ -44,7 +44,7 @@ There are many role variables defined in defaults/main.yml. This list shows the 
 
 **rhel6stig_xwindows_required**:           Whether or not X Windows is is use on taregt systems. Disables some changes if X Windows is not in use. (Default: false)
 
-**rhel6stig_ipv6_in_use**       Whether or not ipv6 is in use of the target system. This is set automatically to 'true' if ipv6 is found to be in use. (Default: false)
+**rhel6stig_ipv6_required**       Whether or not ipv6 is in use on the target system. (Default: no)
 
 **rhel6stig_tftp_required**  Whether or not TFTP is required. This will prevent the removal of `tftp` and `tftp-server` packages. It will also  reconfigure the `tftp-server` to run securely. (Default: false)
 Dependencies

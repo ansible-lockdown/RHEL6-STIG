@@ -1406,11 +1406,14 @@
 
 - name: "MEDIUM | V-38546 | PATCH | The IPv6 protocol handler must not be bound to the network stack unless needed."
   lineinfile:
-        state: present
-        create: yes
-        line: options ipv6 disable=1
-        dest: /etc/modprobe.d/disable-ipv6.conf
-  when: ipv6_protocol_handler_bound_network_stack_audit.stdout != 1
+      state: present
+      create: yes
+      regexp: '^options ipv6 disable='
+      line: options ipv6 disable={{ (not rhel6stig_ipv6_required) | bool | int }}
+      dest: /etc/modprobe.d/disable-ipv6.conf
+  when:
+      - ipv6_protocol_handler_bound_network_stack_audit is defined
+      - ipv6_protocol_handler_bound_network_stack_audit.stdout != 1
   tags:
       - V-38546
       - cat2
@@ -1457,7 +1460,7 @@
          MEDIUM | V-38549 | AUDIT | The system must employ a local IPv6 firewall.
          MEDIUM | V-38553 | AUDIT | The operating system must prevent public IPv6 access into an organizations internal networks, except as appropriately mediated by managed interfaces employing boundary protection devices.
   command: service ip6tables status
-  when: rhel6stig_ipv6_in_use
+  when: rhel6stig_ipv6_required
   ignore_errors: yes
   changed_when: no
   always_run: yes
@@ -1479,7 +1482,7 @@
       name: ip6tables
       state: started
       enabled: yes
-  when: rhel6stig_ipv6_in_use
+  when: rhel6stig_ipv6_required
   tags:
       - cat2
       - medium
@@ -2718,7 +2721,7 @@
 # IPv6 Firewall and Network settings
 - name: V-38444 Medium  The systems local IPv6 firewall must implement a deny-all allow-by-exception policy for inbound packets
   lineinfile: "state=present backup=yes dest=/etc/sysconfig/ip6tables regexp=':FORWARD' line=':FORWARD DROP [0:0]'"
-  when: rhel6stig_ipv6_in_use
+  when: rhel6stig_ipv6_required
   tags:
       - cat2
       - medium
@@ -2728,21 +2731,11 @@
       - network
   notify: restart ip6tables
 
-- name: V-38546 Medium  The IPv6 protocol handler must not be bound to the network stack unless needed
-  copy: backup=yes src=disable-ipv6.conf dest=/etc/modprobe.d/disable-ipv6.conf owner=root group=root mode=0644
-  when: not rhel6stig_ipv6_in_use
-  tags:
-      - cat2
-      - medium
-      - V-38546
-      - ipv6
-      - network
-
 - name: "V-38549 Medium  The system must employ a local IPv6 firewall
         \tV-38551 Medium  The operating system must connect to external networks or information systems only through managed IPv6 interfaces consisting of boundary protection devices arranged in accordance with an organizational security architecture
         \tV-38553 Medium  The operating system must prevent public IPv6 access into an organizations internal networks except as appropriately mediated by managed interfaces employing boundary protection devices"
   service: name=ip6tables enabled=yes state=started
-  when: rhel6stig_ipv6_in_use
+  when: rhel6stig_ipv6_required
   tags:
       - cat2
       - medium

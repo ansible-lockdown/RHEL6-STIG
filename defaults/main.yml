@@ -45,9 +45,9 @@ rhel6stig_root_email_address: foo@baz.com
 # Set to 'true' if X Windows is needed in your environment
 rhel6stig_xwindows_required: false
 
-# Assume ipv6 is disabled on the target system.
-# This will be changed to 'true' via set_fact in main.yml
-rhel6stig_ipv6_in_use: false
+# Assume ipv6 is not needed on the target system and disable it.
+# This will also skip tasks related to configuring ip6tables.
+rhel6stig_ipv6_required: no
 
 # Whether or not TFTP is required
 # This will prevent the removal of tftp and tftp-server packages
@@ -65,12 +65,12 @@ rhel6stig_is_mail_relay: false
 
 # By default will create a random password with the same grub-crypt --sha-512
 # mechanism rebuilt as an Ansible module.
-# The system will make a call to python to generate a random salt 
+# The system will make a call to python to generate a random salt
 # and a random string and generate the sha512 hash.
-# Change this to something other than 'random' if you want to 
+# Change this to something other than 'random' if you want to
 # define the password and be able to access the bootloader
 # KEEP AS 'random' ONLY IF YOU DON'T EVER WANT TO ACCESS THE BOOTLOADER
-# i.e. If this system is running in a public cloud 
+# i.e. If this system is running in a public cloud
 rhel6stig_bootloader_password: random
 
 # NTP configuration used in ntp.conf

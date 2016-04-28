@@ -99,24 +99,6 @@
       - cat2
       - cat3
 
-# See if IPv6 is enabled and set a fact
-- name: "PRELIM | Check if IPv6 is enabled"
-  shell: ip addr | grep inet6
-  changed_when: false
-  failed_when: false
-  register: rhel6stig_ipv6test
-  ignore_errors: yes
-  always_run: yes
-  tags:
-      - ipv6
-
-- name: "PRELIM | Set ipv6_in_use to 'true'"
-  set_fact: ipv6_in_use=true
-  when: rhel6stig_ipv6test.stdout
-  always_run: yes
-  tags:
-      - ipv6
-
 # Get list of shells
 - name: "PRELIM | Get list of shells on system"
   shell: grep -Pv "/(sh|nologin|dash)" /etc/shells | sed -r 's#/((bin|sbin|usr)/)+##'
