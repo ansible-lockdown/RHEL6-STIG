@@ -1427,7 +1427,7 @@
   shell: "sysctl net.ipv6.conf.default.accept_redirects | awk '{print $3}'"
   changed_when: no
   always_run: yes
-  register: icmpv4_ignore_redirects_default_audit
+  register: icmpv6_ignore_redirects_default_audit
   tags:
       - cat2
       - medium
@@ -2416,7 +2416,7 @@
   notify: restart ssh
   tags:
       - cat2
-      - MEDIUM
+      - medium
       - patch
       - V-38613
       - sshd
