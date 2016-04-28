@@ -1446,6 +1446,7 @@
       reload: yes
       sysctl_set: yes
       ignoreerrors: yes
+  when: rhel6stig_ipv6_required
   tags:
       - medium
       - cat2
@@ -2068,6 +2069,7 @@
       state: present
       reload: yes
       sysctl_set: yes
+      ignoreerrors: yes
   tags:
       - cat2
       - patch
