@@ -716,6 +716,7 @@
   shell: "grep -h pam_faillock /etc/pam.d/system-auth /etc/pam.d/password-auth | grep fail_interval | awk -F'=' '{print $NF}'"
   changed_when: no
   always_run: yes
+  ignore_errors: yes
   register: login_failures_interval_audit
   tags:
       - medium
