@@ -2418,14 +2418,41 @@
     regexp: '^#?Banner'
     line: Banner /etc/issue
     validate: sshd -t -f %s
+  notify: restart ssh
   tags:
       - cat2
       - medium
       - V-38615
-      - ssh
+      - sshd
       - logon_settings
       - dod_logon_banner
+
+- name: "MEDIUM | V-38617 | AUDIT | The SSH daemon must be configured to use only FIPS 140-2 approved ciphers."
+  command: grep Ciphers /etc/ssh/sshd_config
+  register: sshd_ciphers_audit
+  ignore_errors: yes
+  changed_when: no
+  tags:
+      - cat2
+      - medium
+      - audit
+      - V-38617
+      - sshd
+
+- name: "MEDIUM | V-38617 | PATCH | The SSH daemon must be configured to use only FIPS 140-2 approved ciphers."
+  lineinfile:
+      state: present
+      dest: /etc/ssh/sshd_config
+      regexp: '^#?Ciphers'
+      line: Ciphers aes128-ctr,aes192-ctr,aes256-ctr,aes128-cbc,3des-cbc,aes192-cbc,aes256-cbc
+      validate: sshd -t -f %s
   notify: restart ssh
+  tags:
+      - cat2
+      - medium
+      - patch
+      - V-38617
+      - sshd
 # Search for world writable files and print them out if any are found
 - name: Looking for world-writable files on the system
   command: find / -xdev -type f -perm -002
