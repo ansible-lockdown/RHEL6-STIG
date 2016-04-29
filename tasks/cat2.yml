@@ -2541,6 +2541,36 @@
       - V-38621
       - ntp
 
+- name: "MEDIUM | V-38622 | AUDIT | Mail relaying must be restricted."
+  command: grep ^inet_interfaces /etc/postfix/main.cf
+  register: mail_relay_audit
+  ignore_errors: yes
+  changed_when: no
+  when: not rhel6stig_is_mail_relay
+  tags:
+      - cat2
+      - medium
+      - audit
+      - V-38622
+      - postfix
+
+- name: "MEDIUM | V-38622 | PATCH | Mail relaying must be restricted."
+  lineinfile:
+      state: present
+      backup: yes
+      dest: /etc/postfix/main.cf
+      regexp: '^inet_interfaces'
+      line: 'inet_interfaces = localhost'
+      insertafter: '^#(\s)+?inet_interfaces'
+  when: not rhel6stig_is_mail_relay
+  notify: restart postfix
+  tags:
+      - cat2
+      - medium
+      - patch
+      - V-38622
+      - postfix
+
 # Search for world writable files and print them out if any are found
 - name: Looking for world-writable files on the system
   command: find / -xdev -type f -perm -002
@@ -2795,12 +2825,6 @@
   command: yum -y reinstall audit
   when: audit_integrity_check.stdout
   tags: [ 'cat2' , 'V-38637' , 'auditd' , 'rpm' ]
-
-- name: V-38622 Medium  Mail relaying must be restricted
-  lineinfile: "state=present backup=yes dest=/etc/postfix/main.cf regexp='^inet_interfaces' line='inet_interfaces = localhost' insertafter='^#\\s?inet_interfaces'"
-  when: not rhel6stig_is_mail_relay
-  notify: restart postfix
-  tags: [ 'cat2' , 'V-38622' , 'postfix' ]
 
 # IPv6 Firewall and Network settings
 - name: V-38444 Medium  The systems local IPv6 firewall must implement a deny-all allow-by-exception policy for inbound packets
