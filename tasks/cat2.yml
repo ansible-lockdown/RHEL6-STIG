@@ -1058,19 +1058,6 @@
       - patch
 
 - name: "MEDIUM | V-38518 | AUDIT | All rsyslog-generated log files must be owned by root."
-  shell: "grep -e '/' /etc/rsyslog.conf /etc/rsyslog.d/* | grep -v IncludeConfig | sed 's/-//'| awk 'NF==2 {print $2}'"
-  changed_when: no
-  always_run: yes
-  register: rsyslog_logfiles
-  tags:
-      - cat2
-      - medium
-      - V-38518
-      - log_files
-      - rsyslog
-      - audit
-
-- name: "MEDIUM | V-38518 | AUDIT | All rsyslog-generated log files must be owned by root."
   stat:
       path: "{{ item }}"
   with_items: rsyslog_logfiles.stdout_lines
