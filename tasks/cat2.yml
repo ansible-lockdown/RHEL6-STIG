@@ -2558,6 +2558,18 @@
       - V-38622
       - postfix
 
+- name: "MEDIUM | V-38623 | PATCH | All rsyslog-generated log files must have mode 0600 or less permissive."
+  file:
+      dest: "{{ item }}"
+      mode: 0600
+  with_items: "{{ rsyslog_logfiles .stdout_lines }}"
+  tags:
+      - cat2
+      - medium
+      - patch
+      - V-38623
+      - file_perms
+      - rsyslog
 # Search for world writable files and print them out if any are found
 - name: Looking for world-writable files on the system
   command: find / -xdev -type f -perm -002
@@ -2758,12 +2770,6 @@
     weekday={{ rhel6stig_aide_cron["aide_weekday"] | default('*') }}
     job="{{ rhel6stig_aide_cron["aide_job"] }}"
   tags: [ 'cat2' , 'V-38670' , 'V-38673' , 'V-38695' , 'V-38696' , 'V-38698' , 'V-38700' , 'file_integrity' , 'aide' ]
-
-- name: Check file state and type to avoid hard link failures
-  stat: path={{ item }}
-  with_items: rsyslog_log_files.stdout_lines
-  register: log_files_st
-  tags: [ 'cat2' , 'V-38519' , 'V-38518' , 'V-38623' , 'file_perms' ]
 
 - name: V-38691 Medium  The Bluetooth service must be disabled
   service: name=bluetooth state=stopped enabled=no
