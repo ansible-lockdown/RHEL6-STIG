@@ -2411,6 +2411,21 @@
       - V-38613
       - sshd
 
+- name: "MEDIUM | V-38615 | PATCH | The SSH daemon must be configured with the Department of Defense (DoD) login banner."
+  lineinfile:
+    state: present
+    dest: /etc/ssh/sshd_config
+    regexp: '^#?Banner'
+    line: Banner /etc/issue
+    validate: sshd -t -f %s
+  tags:
+      - cat2
+      - medium
+      - V-38615
+      - ssh
+      - logon_settings
+      - dod_logon_banner
+  notify: restart ssh
 # Search for world writable files and print them out if any are found
 - name: Looking for world-writable files on the system
   command: find / -xdev -type f -perm -002
@@ -2689,25 +2704,6 @@
   when: not rhel6stig_is_mail_relay
   notify: restart postfix
   tags: [ 'cat2' , 'V-38622' , 'postfix' ]
-
-- name: V-38615 Medium  The SSH daemon must be configured with the Department of Defense (DoD) login banner.
-  lineinfile: >
-    state={{ item.st }}
-    backup=yes dest=/etc/ssh/sshd_config
-    regexp={{ item.rx }}
-    line={{ item.ln }}
-  with_items:
-    - { st: 'present', rx: "'^#?Banner'", ln: "'Banner /etc/issue'" }
-    - { st: 'present', rx: "'^(#)?PrintLastLog'", ln: "'PrintLastLog yes'" }
-  tags:
-      - cat2
-      - medium
-      - V-38615
-      - V-38484
-      - ssh
-      - logon_settings
-      - dod_logon_banner
-  notify: restart ssh
 
 # IPv6 Firewall and Network settings
 - name: V-38444 Medium  The systems local IPv6 firewall must implement a deny-all allow-by-exception policy for inbound packets
