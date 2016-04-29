@@ -2477,6 +2477,70 @@
       - patch
       - V-38619
       - netrc
+
+- name: MEDIUM | V-38620, V-38621 | Ensure NTP is installed
+  yum:
+      name: ntp
+      state: present
+  tags:
+      - cat2
+      - medium
+      - patch
+      - V-38620
+      - V-38621
+      - ntp
+
+- name: "MEDIUM | V-38620 | AUDIT | The system clock must be synchronized continuously or at least daily."
+  command: service ntpd status
+  register: ntpd_service_status_audit
+  ignore_errors: yes
+  changed_when: no
+  tags:
+      - cat2
+      - medium
+      - audit
+      - V-38620
+      - ntp
+
+- name: "MEDIUM | V-38620 | PATCH | The system clock must be synchronized continuously or at least daily."
+  service:
+      name: ntpd
+      state: started
+      enabled: yes
+  tags:
+      - cat2
+      - medium
+      - patch
+      - V-38620
+      - ntp
+
+- name: "MEDIUM | V-38621 | AUDIT | The system clock must be synchronized to an authoritative DoD time source."
+  command: grep -E '^server' /etc/ntp.conf
+  register: ntp_server_audit
+  ignore_errors: yes
+  changed_when: no
+  tags:
+      - cat2
+      - medium
+      - audit
+      - V-38621
+      - ntp
+
+- name: "MEDIUM | V-38621 | PATCH | The system clock must be synchronized to an authoritative DoD time source."
+  template:
+      src: ntp.conf.j2
+      dest: /etc/ntp.conf
+      owner: root
+      group: root
+      mode: 0644
+  notify: restart ntpd
+  tags:
+      - cat2
+      - medium
+      - patch
+      - V-38621
+      - ntp
+
 # Search for world writable files and print them out if any are found
 - name: Looking for world-writable files on the system
   command: find / -xdev -type f -perm -002
@@ -2688,19 +2752,6 @@
   service: name=bluetooth state=stopped enabled=no
   ignore_errors: yes
   tags: [ 'cat2' , 'V-38691' , 'bluetooth' ]
-
-- name: Installing NTP for V-38620 Medium/V-38621 Medium
-  yum: name=ntp state=installed
-  tags: [ 'cat2' , 'V-38620' , 'V-38621' , 'ntp' ]
-
-- name: V-38621 Medium  The system clock must be synchronized to an authoritative DoD time source
-  template: src=ntp.conf.j2 dest=/etc/ntp.conf backup=yes owner=root group=root mode=0644
-  tags: [ 'cat2' , 'V-38621' , 'ntp' ]
-  notify: restart ntpd
-
-- name: V-38620 Medium  The system clock must be synchronized continuously or at least daily
-  service: name=ntpd state=started enabled=yes
-  tags: [ 'cat2' , 'V-38620' , 'ntp' ]
 
 - name: Check for LDAP
   stat: path=/etc/pam_ldap.conf
