@@ -2453,6 +2453,30 @@
       - patch
       - V-38617
       - sshd
+
+- name: "MEDIUM | V-38619 | AUDIT | There must be no .netrc files on the system."
+  command: find /root /home -xdev -name .netrc
+  register: netrc_files_audit
+  ignore_errors: yes
+  changed_when: no
+  tags:
+      - cat2
+      - MEDIUM
+      - audit
+      - V-38619
+      - netrc
+
+- name: "MEDIUM | V-38619 | PATCH | There must be no .netrc files on the system"
+  file:
+      state: absent
+      dest: "~{{ item }}/.netrc"
+  with_items: users.stdout_lines
+  tags:
+      - cat2
+      - medium
+      - patch
+      - V-38619
+      - netrc
 # Search for world writable files and print them out if any are found
 - name: Looking for world-writable files on the system
   command: find / -xdev -type f -perm -002
@@ -2664,11 +2688,6 @@
   service: name=bluetooth state=stopped enabled=no
   ignore_errors: yes
   tags: [ 'cat2' , 'V-38691' , 'bluetooth' ]
-
-- name: V-38619 Medium  There must be no .netrc files on the system
-  file: state=absent dest=~{{ item }}/.netrc
-  with_items: users.stdout_lines
-  tags: [ 'cat2' , 'V-38619' , 'netrc' ]
 
 - name: Installing NTP for V-38620 Medium/V-38621 Medium
   yum: name=ntp state=installed
