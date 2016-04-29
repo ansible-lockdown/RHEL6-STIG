@@ -463,33 +463,22 @@
   tags:
       - cat2
       - medium
-      - V-38484
       - audit
+      - V-38484
       - sshd
 
 - name: "MEDIUM | V-38484 | PATCH | The operating system, upon successful logon, must display to the user the date and time of the last logon or access via ssh."
   lineinfile:
-      regexp: '(^PrintLastLog)\s*(\d*)'
-      line: '\1 yes'
+      state: present
       dest: /etc/ssh/sshd_config
-      backrefs: yes
-
+      regexp: '^#?PrintLastLog'
+      line: PrintLastLog yes
+      validate: sshd -t -f %s
   tags:
       - cat2
       - medium
-      - V-38484
       - patch
-      - sshd
-
-- name: "MEDIUM | V-38484 | PATCH | The operating system, upon successful logon, must display to the user the date and time of the last logon or access via ssh."
-  lineinfile:
-      line: 'PrintLastLog yes'
-      dest: /etc/ssh/sshd_config
-  tags:
-      - cat2
-      - medium
       - V-38484
-      - patch
       - sshd
 
 # V-38486 cannot be automated
@@ -2410,7 +2399,6 @@
 - name: "MEDIUM | V-38613 | PATCH | The system must not permit root logins using remote access programs such as ssh."
   lineinfile:
       state: present
-      backup: yes
       dest: /etc/ssh/sshd_config
       regexp: '^#?PermitRootLogin'
       line: 'PermitRootLogin no'
