@@ -93,6 +93,19 @@
       - cat2
       - medium
 
+- name: "MEDIUM | V-38625 | AUDIT | If the system is using LDAP for authentication or account information the system must use a TLS connection using FIPS 140-2 approved cryptographic algorithms"
+  shell: ps -ef | grep [s]lapd
+  register: ldap_tls_audit
+  when: "'slapd' in sysv_services.stdout"
+  ignore_errors: yes
+  changed_when: no
+  tags:
+      - cat2
+      - medium
+      - audit
+      - V-38625
+      - ldap
+
 # CAT III
 - name: "LOW | V-38455 | AUDIT | The system must use a separate file system for /tmp"
   shell: mount | grep "on /tmp "
