@@ -2570,6 +2570,31 @@
       - V-38623
       - file_perms
       - rsyslog
+
+- name: "MEDIUM | V-38624 | AUDIT | System logs must be rotated daily."
+  shell: grep logrotate /var/log/cron*
+  changed_when: no
+  ignore_errors: yes
+  register: logrotate_audit
+  tags:
+      - cat2
+      - medium
+      - audit
+      - V-38624
+      - logrotate
+      - syslog
+
+- name: "MEDIUM | V-38624 | PATCH | System logs must be rotated daily."
+  yum:
+      name: logrotate
+      state: present
+  tags:
+      - cat2
+      - medium
+      - patch
+      - V-38624
+      - logrotate
+      - syslog
 # Search for world writable files and print them out if any are found
 - name: Looking for world-writable files on the system
   command: find / -xdev -type f -perm -002
