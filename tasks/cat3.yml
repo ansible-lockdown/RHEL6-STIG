@@ -718,7 +718,7 @@
   yum:
       name: openldap-servers
       state: absent
-  when: not rhel6stig_openldap_server_required
+  when: rhel6stig_openldap_server_required is not defined 
   tags:
       - cat3
       - low

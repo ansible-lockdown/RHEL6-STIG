@@ -2205,6 +2205,7 @@
       name: ypbind
       state: stopped
       enabled: no
+  ignore_errors: yes
   tags:
       - medium
       - V-38604
@@ -2287,6 +2288,7 @@
       name: tftp
       state: stopped
       enabled: no
+  ignore_errors: yes
   tags:
       - medium
       - cat2
