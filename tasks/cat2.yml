@@ -1701,6 +1701,7 @@
 - name: "MEDIUM | V-38580 | AUDIT | The audit system must be configured to audit the loading and unloading of dynamic kernel modules."
   shell: egrep -e "(-w |-F path=)/sbin/insmod" /etc/audit/audit.rules; egrep -e "(-w |-F path=)/sbin/modprobe" /etc/audit/audit.rules; egrep -e "(-w |-F path=)/sbin/rmmod" /etc/audit/audit.rules;grep -w "init_module" /etc/audit/audit.rules; grep -w "init_module" /etc/audit/audit.rules
   always_run: yes
+  ignore_errors: yes
   changed_when: false
   register: dynamic_kernel_loading_audit
   tags:
@@ -1749,6 +1750,7 @@
   shell: "chkconfig --list | sed -n '/xinetd based services/,$p'"
   changed_when: no
   always_run: yes
+  ignore_errors: yes
   register: xinetd_services
   tags:
       - cat2
@@ -2152,6 +2154,7 @@
       name: sysctl net.ipv4.conf.all.send_redirects
       value: 0
       reload: yes
+      ignoreerrors: yes
   tags:
       - medium
       - cat2
