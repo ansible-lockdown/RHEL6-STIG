@@ -716,6 +716,7 @@
   shell: grep -h pam_faillock /etc/pam.d/system-auth /etc/pam.d/password-auth | grep fail_interval | awk -F'=' '{print $NF}'
   changed_when: no
   always_run: yes
+  ignore_errors: yes
   register: login_failures_interval
   tags:
       - medium
@@ -729,6 +730,7 @@
   shell: grep -hG '^account\s*required\s*pam_faillock\.so' /etc/pam.d/system-auth /etc/pam.d/password-auth
   changed_when: no
   always_run: yes
+  ignore_errors: yes
   register: login_failures_account_require
   tags:
       - medium
@@ -2019,6 +2021,7 @@
   shell: sysctl kernel.randomize_va_space | awk '{print $3}'
   changed_when: no
   always_run: yes
+  ignore_errors: yes
   register: virt_addr_space_randomization_audit
   tags: 
       - cat2
@@ -2034,6 +2037,7 @@
       value: 2
       state: present
       reload: yes
+      ignoreerrors: yes
   tags: 
       - cat2
       - patch
