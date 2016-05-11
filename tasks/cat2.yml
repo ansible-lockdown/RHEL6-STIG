@@ -2318,7 +2318,7 @@
 - name: "MEDIUM | V-38611 | PATCH | The SSH daemon must ignore .rhosts files."
   lineinfile:
       state: present
-      regexp: '^#?IgnoreRhosts'
+      regexp: '^IgnoreRhosts'
       line: IgnoreRhosts yes
       dest: /etc/ssh/sshd_config
   tags:
@@ -2625,10 +2625,10 @@
     regexp={{ item.rx }}
     line={{ item.ln }}
   with_items:
-    - { st: 'present', rx: "'^#?Ciphers'", ln: "'Ciphers aes128-ctr,aes192-ctr,aes256-ctr,aes128-cbc,3des-cbc,aes192-cbc,aes256-cbc'" }
-    - { st: 'present', rx: "'^#?IgnoreRhosts'", ln: "'IgnoreRhosts yes'" }
-    - { st: 'present', rx: "'^#?HostbasedAuthentication'", ln: "'HostbasedAuthentication no'" }
-    - { st: 'present', rx: "'^#?PermitRootLogin'", ln: "'PermitRootLogin no'" }
+    - { st: 'present', rx: "'^Ciphers'", ln: "Ciphers aes128-ctr,aes192-ctr,aes256-ctr,aes128-cbc,3des-cbc,aes192-cbc,aes256-cbc" }
+    - { st: 'present', rx: "'^IgnoreRhosts'", ln: "IgnoreRhosts yes" }
+    - { st: 'present', rx: "'^HostbasedAuthentication'", ln: "HostbasedAuthentication no" }
+    - { st: 'present', rx: "'^PermitRootLogin'", ln: "PermitRootLogin no" }
   tags:
       - cat2
       - medium
@@ -2646,8 +2646,8 @@
     regexp={{ item.rx }}
     line={{ item.ln }}
   with_items:
-    - { st: 'present', rx: "'^#?Banner'", ln: "'Banner /etc/issue'" }
-    - { st: 'present', rx: "'^(#)?PrintLastLog'", ln: "'PrintLastLog yes'" }
+    - { st: 'present', rx: "'^Banner'", ln: "Banner /etc/issue" }
+    - { st: 'present', rx: "'^PrintLastLog'", ln: "PrintLastLog yes" }
   tags:
       - cat2
       - medium
