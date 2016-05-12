@@ -139,3 +139,15 @@
       - log_files
       - rsyslog
       - audit
+
+- name: "PRELIM | Check for existence of /etc/pam_ldap.conf"
+  stat:
+    path: /etc/pam_ldap.conf
+  register: pam_ldap_test
+  failed_when: no
+  changed_when: no
+  tags:
+      - cat2
+      - medium
+      - V-38626
+      - ldap

@@ -2597,6 +2597,34 @@
       - syslog
 
 # V-38625 is checked but not automatically patched, please see not_automated.yml
+
+- name: "MEDIUM | V-38626 | AUDIT | The LDAP client must use a TLS connection using trust certificates signed by the site CA."
+  command: grep tls_cacert /etc/pam_ldap.conf
+  register: ldap_tls_audit
+  when: pam_ldap_test.stat.exists
+  ignore_errors: yes
+  changed_when: no
+  tags:
+      - cat2
+      - medium
+      - audit
+      - V-38626
+      - ldap
+
+- name: "MEDIUM | V-38626 | PATCH | The LDAP client must use a TLS connection using trust certificates signed by the site CA."
+  lineinfile:
+    state: present
+    backup: yes
+    dest: /etc/pam_ldap.conf
+    regexp: '^#?tls_cacertdir'
+    line: 'tls_cacertdir /etc/ssl/certs'
+  when: pam_ldap_test.stat.exists
+  tags:
+      - cat2
+      - medium
+      - patch
+      - V-38626
+      - ldap
 # Search for world writable files and print them out if any are found
 - name: Looking for world-writable files on the system
   command: find / -xdev -type f -perm -002
@@ -2802,11 +2830,6 @@
   service: name=bluetooth state=stopped enabled=no
   ignore_errors: yes
   tags: [ 'cat2' , 'V-38691' , 'bluetooth' ]
-
-- name: V-38626 Medium  The LDAP client must use a TLS connection using trust certificates signed by the site CA
-  lineinfile: "state=present backup=yes dest=/etc/pam_ldap.conf regexp='^#?tls_cacertdir' line='tls_cacertdir /etc/ssl/certs'"
-  when: ldap_test.stat.exists
-  tags: [ 'cat2' , 'V-38626' , 'ldap' ]
 
 - name: V-38629 Medium  The graphical desktop environment must set the idle timeout to no more than 15 minutes
   command: gconftool-2 --direct --config-source xml:readwrite:/etc/gconf/gconf.xml.mandatory --type int --set /apps/gnome-screensaver/idle_delay 15
