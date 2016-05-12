@@ -2656,6 +2656,17 @@
       - V-38631
       - V-38632
       - auditd
+
+- name: "MEDIUM | V-38629 | PATCH | The graphical desktop environment must set the idle timeout to no more than 15 minutes"
+  command: gconftool-2 --direct --config-source xml:readwrite:/etc/gconf/gconf.xml.mandatory --type int --set /apps/gnome-screensaver/idle_delay 15
+  when: rhel6stig_xwindows_required
+  tags:
+      - cat2
+      - medium
+      - patch
+      - V-38629
+      - gui
+      - screen_lock
 # Search for world writable files and print them out if any are found
 - name: Looking for world-writable files on the system
   command: find / -xdev -type f -perm -002
@@ -2861,11 +2872,6 @@
   service: name=bluetooth state=stopped enabled=no
   ignore_errors: yes
   tags: [ 'cat2' , 'V-38691' , 'bluetooth' ]
-
-- name: V-38629 Medium  The graphical desktop environment must set the idle timeout to no more than 15 minutes
-  command: gconftool-2 --direct --config-source xml:readwrite:/etc/gconf/gconf.xml.mandatory --type int --set /apps/gnome-screensaver/idle_delay 15
-  when: rhel6stig_xwindows_required
-  tags: [ 'cat2' , 'V-38629' , 'gui' , 'screen_lock' ]
 
 - name: V-38638 Medium  The graphical desktop environment must have automatic lock enabled
   command: gconftool-2 --direct --config-source xml:readwrite:/etc/gconf/gconf.xml.mandatory --type bool --set /apps/gnome-screensaver/lock_enabled true
