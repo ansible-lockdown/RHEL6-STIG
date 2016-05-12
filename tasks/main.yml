@@ -11,6 +11,7 @@
 - include: prelim.yml
   tags:
       - prelim_tasks
+      - always
       - test
 
 - include: cat1.yml
