@@ -2667,6 +2667,17 @@
       - V-38629
       - gui
       - screen_lock
+
+- name: "MEDIUM | V-38630 | PATCH | The graphical desktop environment must automatically lock after 15 minutes of inactivity and the system must require user to re-authenticate to unlock the environment"
+  command: gconftool-2 --direct --config-source xml:readwrite:/etc/gconf/gconf.xml.mandatory --type bool --set /apps/gnome-screensaver/idle_activation_enabled true
+  when: rhel6stig_xwindows_required
+  tags:
+      - cat2
+      - medium
+      - patch
+      - V-38630
+      - gui
+      - screen_lock
 # Search for world writable files and print them out if any are found
 - name: Looking for world-writable files on the system
   command: find / -xdev -type f -perm -002
@@ -2792,11 +2803,6 @@
   lineinfile: state=present dest=/etc/inittab regexp='^id:' line='id:3:initdefault:' backup=yes
   when: not rhel6stig_xwindows_required
   tags: [ 'cat2' , 'V-38674' , 'xwindows' , 'gui' ]
-
-- name: V-38630 Medium  The graphical desktop environment must automatically lock after 15 minutes of inactivity and the system must require user to re-authenticate to unlock the environment
-  command: gconftool-2 --direct --config-source xml:readwrite:/etc/gconf/gconf.xml.mandatory --type bool --set /apps/gnome-screensaver/idle_activation_enabled true
-  when: rhel6stig_xwindows_required
-  tags: [ 'cat2' , 'V-38630' , 'gui' , 'screen_lock' ]
 
 # Get a list of interface config files. Exclude those with the current year in the name.
 # This prevents Ansible from continually changing the backup files it creates since they
