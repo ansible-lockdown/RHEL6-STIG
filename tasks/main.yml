@@ -1,4 +1,13 @@
 ---
+- name: Check OS version and family
+  fail:
+    msg: "This role can only be run agaist RHEL 6. {{ ansible_distribution }} {{ ansible_distribution_major_version }} is not supported."
+  when:
+    - ansible_os_family == 'RedHat'
+    - ansible_distribution_major_version | int != 6
+  tags:
+    - always
+
 - include: prelim.yml
   tags:
       - prelim_tasks
