@@ -63,6 +63,9 @@ rhel6stig_system_is_router: false
 # This will disable the postfix settings V-38622
 rhel6stig_is_mail_relay: false
 
+# Set to true is sytem is an LDAP server
+rhel6stig_ldap_server: false
+
 # By default will create a random password with the same grub-crypt --sha-512
 # mechanism rebuilt as an Ansible module.
 # The system will make a call to python to generate a random salt

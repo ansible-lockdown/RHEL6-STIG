@@ -2625,6 +2625,19 @@
       - patch
       - V-38626
       - ldap
+
+- name: "MEDIUM | V-38627 | PATCH | The openldap-servers package must not be installed unless required."
+  yum:
+      name: openldap-servers
+      state: absent
+  when: not rhel6stig_ldap_server
+  tags:
+      - cat2
+      - medium
+      - patch
+      - V-38627
+      - ldap
+
 # Search for world writable files and print them out if any are found
 - name: Looking for world-writable files on the system
   command: find / -xdev -type f -perm -002
