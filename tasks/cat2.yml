@@ -2708,6 +2708,21 @@
       - patch
       - V-38634
       - auditd
+
+- name: "MEDIUM | V-38636 | PATCH | The system must retain enough rotated audit logs to cover the required log retention period."
+  lineinfile:
+      state: present
+      backup: yes
+      dest: /etc/audit/auditd.conf
+      regexp: '^#?num_logs'
+      line: num_logs = {{ rhel6stig_auditd_config["num_logs"] }}
+  notify: restart auditd
+  tags:
+      - cat2
+      - medium
+      - patch
+      - V-38636
+      - auditd
 # Search for world writable files and print them out if any are found
 - name: Looking for world-writable files on the system
   command: find / -xdev -type f -perm -002
