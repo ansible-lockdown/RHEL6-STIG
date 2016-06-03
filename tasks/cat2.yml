@@ -220,7 +220,7 @@
       - patch
       - file_perms
 
-- name: "MEDIUM | V-384648 | AUDIT | The audit system must take appropriate action when the audit storage volume is full."
+- name: "MEDIUM | V-38468 | AUDIT | The audit system must take appropriate action when the audit storage volume is full."
   shell: grep disk_full_action /etc/audit/auditd.conf | cut -d = -f 2 | xargs basename
   register:  disk_full_action_audit
   changed_when: no
