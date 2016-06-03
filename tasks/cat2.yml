@@ -2792,6 +2792,7 @@
       - V-38658
       - pam
 
+# V-38660 is audited but not patched. See not_automated.yml.
 
 # --- BREAK --- #
 
@@ -2811,31 +2812,6 @@
   failed_when: audit_permissions.stderr
   notify: reset audit pkg perms
   tags: [ 'cat2' , 'V-38663' , 'file_perms' , 'auditd' , 'rpm' ]
-
-# Look for prior versions of SNMP in use and disable them if found
-- name: Check for SNMP config
-  stat:
-      path: /etc/snmp/snmpd.conf
-  register: snmpconf_test
-
-- name: Checking SNMP versions in use
-  shell: "grep -E 'v1|v2c|com2sec' /etc/snmp/snmpd.conf | grep -v '^#'"
-  changed_when: false
-  register: snmp_version_check
-  failed_when: '"FAIL" in snmp_version_check.stdout'
-  when: snmpconf_test.stat.exists
-  tags: [ 'cat2' , 'V-38660', 'snmp' ]
-
-- name: V-38660 Medium  The snmpd service must use only SNMP protocol version 3 or newer
-  replace: dest=/etc/snmp/snmpd.conf regexp='^(#+)?(.*)(v1|v2c|com2sec)(.*$)' replace='#\2\3\4' backup=yes
-  notify: restart snmpd
-  when: snmp_version_check.stdout is defined and snmpconf_test.stat.exists
-  tags: [ 'cat2' , 'V-38660' , 'snmp' ]
-
-- name: Previous versions of SNMP disabled
-  pause: prompt="Versions of SNMP prior to version 3 were found and disabled. More work must be done to fully convert to SNMPv3. Press Enter to continue"
-  when: snmp_version_check.stdout is defined and snmpconf_test.stat.exists and not rhel6stig_fullauto
-  tags: [ 'cat2' , 'V-38660' , 'snmp' ]
 
 # - name: V-38673 Medium  The operating system must ensure unauthorized, security-relevant configuration changes detected are tracked
 # - name: V-38670 Medium  The operating system must detect unauthorized changes to software and information

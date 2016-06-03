@@ -141,6 +141,18 @@
       - V-38654
       - nfs
 
+- name: "MEDIUM | V-38660 | AUDIT | The snmpd service must use only SNMP protocol version 3 or newer."
+  shell: "grep -E 'v1|v2c|com2sec' /etc/snmp/snmpd.conf | grep -v '^#'"
+  changed_when: false
+  register: snmp_version_check
+  failed_when: '"FAIL" in snmp_version_check.stdout'
+  when: snmpconf_test.stat.exists
+  tags:
+      - cat2
+      - medium
+      - audit
+      - V-38660
+      - snmp
 
 # CAT III
 - name: "LOW | V-38455 | AUDIT | The system must use a separate file system for /tmp"
