@@ -2747,6 +2747,21 @@
       - V-38637
       - auditd
       - rpm
+
+- name: "MEDIUM | V-38638 | PATCH | The graphical desktop environment must have automatic lock enabled"
+  command: >
+      gconftool-2 --direct
+                --config-source xml:readwrite:/etc/gconf/gconf.xml.mandatory
+                --type bool
+                --set /apps/gnome-screensaver/lock_enabled true
+  when: rhel6stig_xwindows_required
+  tags:
+      - cat2
+      - medium
+      - patch
+      - V-38638
+      - gui
+      - screen_lock
 # Search for world writable files and print them out if any are found
 - name: Looking for world-writable files on the system
   command: find / -xdev -type f -perm -002
@@ -2947,11 +2962,6 @@
   service: name=bluetooth state=stopped enabled=no
   ignore_errors: yes
   tags: [ 'cat2' , 'V-38691' , 'bluetooth' ]
-
-- name: V-38638 Medium  The graphical desktop environment must have automatic lock enabled
-  command: gconftool-2 --direct --config-source xml:readwrite:/etc/gconf/gconf.xml.mandatory --type bool --set /apps/gnome-screensaver/lock_enabled true
-  when: rhel6stig_xwindows_required
-  tags: [ 'cat2' , 'V-38638' , 'gui' , 'screen_lock' ]
 
 # IPv6 Firewall and Network settings
 - name: V-38444 Medium  The systems local IPv6 firewall must implement a deny-all allow-by-exception policy for inbound packets
