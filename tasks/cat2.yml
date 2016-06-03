@@ -2678,6 +2678,21 @@
       - V-38630
       - gui
       - screen_lock
+
+- name: "MEDIUM | V-38633 | PATCH | The system must set a maximum audit log file size."
+  lineinfile:
+      state: present
+      backup: yes
+      dest: /etc/audit/auditd.conf
+      regexp: '^#?max_log_file\b'
+      line: max_log_file = {{ rhel6stig_auditd_config["max_log_file"] }}
+  notify: restart auditd
+  tags:
+      - cat2
+      - medium
+      - patch
+      - V-38633
+      - auditd
 # Search for world writable files and print them out if any are found
 - name: Looking for world-writable files on the system
   command: find / -xdev -type f -perm -002
