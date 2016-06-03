@@ -2763,6 +2763,36 @@
       - gui
       - screen_lock
 
+- name: "MEDIUM | V-38658 | AUDIT | The system must prohibit the reuse of passwords within five iterations."
+  command: grep remember /etc/pam.d/system-auth
+  register: password_reuse_audit
+  ignore_errors: yes
+  changed_when: no
+  tags:
+      - cat2
+      - medium
+      - audit
+      - V-38658
+      - pam
+
+- name: "MEDIUM | V-38658 | PATCH | The system must prohibit the reuse of passwords within five iterations."
+  pam:
+      service: system-auth
+      backup: yes
+      type: password
+      control: sufficient
+      pam_module: pam_unix.so
+      arguments: sha512 shadow try_first_pass use_authtok remember={{ rhel6stig_pass_reuse }}
+      after_line: password requisite pam_cracklib.so
+      state: present
+  tags:
+      - cat2
+      - medium
+      - patch
+      - V-38658
+      - pam
+
+
 # --- BREAK --- #
 
 - name: "V-38664 Medium  The system package management tool must verify ownership on all files and directories associated with the audit package
