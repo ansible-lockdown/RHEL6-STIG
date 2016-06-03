@@ -2762,22 +2762,8 @@
       - V-38638
       - gui
       - screen_lock
-# Search for world writable files and print them out if any are found
-- name: Looking for world-writable files on the system
-  command: find / -xdev -type f -perm -002
-  register: world_writable_files
-  changed_when: false
-  tags: [ 'cat2' , 'V-38643', 'file_perms' ]
 
-- name: The following files are world writable. This is a finding.
-  debug: var=world_writable_files.stdout_lines
-  when: world_writable_files.stdout_lines
-  tags: [ 'cat2' , 'V-38643', 'file_perms' ]
-
-- name: V-38643 Medium  There must be no world-writable files on the system
-  pause: prompt="World writable files are present on the system. This is a finding. Press Enter to continue"
-  when: world_writable_files.stdout_lines and not rhel6stig_fullauto
-  tags: [ 'cat2' , 'V-38643', 'file_perms' ]
+# --- BREAK --- #
 
 # List nfs mounts that are missing the nodev option and ask the sys admin to correct this in /etc/fstab
 # This would be a bit tricky to automatically fix in /etc/fstab.

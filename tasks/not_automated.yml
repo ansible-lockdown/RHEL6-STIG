@@ -106,6 +106,17 @@
       - V-38625
       - ldap
 
+- name: "MEDIUM | V-38643 | AUDIT | There must be no world-writable files on the system."
+  command: find / -xdev -type f -perm -002
+  register: world_writable_files
+  changed_when: false
+  tags:
+      - cat2
+      - medium
+      - audit
+      - V-38643
+      - file_perms
+
 # CAT III
 - name: "LOW | V-38455 | AUDIT | The system must use a separate file system for /tmp"
   shell: mount | grep "on /tmp "
