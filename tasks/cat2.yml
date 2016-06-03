@@ -2765,44 +2765,6 @@
 
 # --- BREAK --- #
 
-# List nfs mounts that are missing the nodev option and ask the sys admin to correct this in /etc/fstab
-# This would be a bit tricky to automatically fix in /etc/fstab.
-- name: Checking for nfs mounts missing the 'nodev' option
-  shell: mount | grep 'type nfs' | grep -v 'nodev'
-  changed_when: false
-  register: nfs_mounts_missing_nodev
-  failed_when: nfs_mounts_missing_nodev.stderr
-  tags: [ 'cat2' , 'V-38652' , 'nfs' ]
-
-- name: V-38652 Medium  Remote file systems must be mounted with the 'nodev' option
-  debug: var=nfs_mounts_missing_nodev.stdout_lines
-  when: nfs_mounts_missing_nodev.stdout
-  tags: [ 'cat2' , 'V-38652' , 'nfs' ]
-
-- name: V-38652 Medium  Remote file systems must be mounted with the 'nodev' option
-  pause: prompt="There are nfs mounts without the 'nodev' option set. This is a finding. Press Enter to continue"
-  when: nfs_mounts_missing_nodev.stdout and not rhel6stig_fullauto
-  tags: [ 'cat2' , 'V-38652' , 'nfs' ]
-
-# List nfs mounts that are missing the 'nosuid' option and ask the sys admin to correct this in /etc/fstab
-# This would be a bit tricky to automatically fix in /etc/fstab.
-- name: Checking for nfs mounts missing the 'nosuid' option
-  shell: mount | grep 'type nfs' | grep -v 'nosuid'
-  changed_when: false
-  failed_when: nfs_mounts_missing_nosuid.stderr
-  register: nfs_mounts_missing_nosuid
-  tags: [ 'cat2' , 'V-38652' , 'nfs' ]
-
-- name: V-38652 Medium  Remote file systems must be mounted with the nosuid option
-  debug: var=nfs_mounts_missing_nosuid.stdout_lines
-  when: nfs_mounts_missing_nosuid.stdout
-  tags: [ 'cat2' , 'V-38652' , 'nfs' ]
-
-- name: V-38652 Medium  Remote file systems must be mounted with the nosuid option
-  pause: prompt="There are nfs mounts without the 'nosuid' option set. This is a finding. Press Enter to continue"
-  when: nfs_mounts_missing_nosuid.stdout and not rhel6stig_fullauto
-  tags: [ 'cat2' , 'V-38652' , 'nfs' ]
-
 - name: "V-38664 Medium  The system package management tool must verify ownership on all files and directories associated with the audit package
         \tV-38665 Medium  The system package management tool must verify group-ownership on all files and directories associated with the audit package"
   shell: "rpm -V audit | grep '^.....\\(U\\.\\|\\.G\\|UG\\)'"

@@ -117,6 +117,31 @@
       - V-38643
       - file_perms
 
+- name: "MEDIUM | V-38652 | AUDIT | Remote file systems must be mounted with the 'nodev' option"
+  shell: mount | grep 'type nfs' | grep -v 'nodev'
+  changed_when: false
+  register: nfs_mounts_missing_nodev
+  failed_when: nfs_mounts_missing_nodev.stderr
+  tags:
+      - cat2
+      - medium
+      - audit
+      - V-38652
+      - nfs
+
+- name: "MEDIUM | V-38654 | PATCH | Remote file systems must be mounted with the nosuid option"
+  shell: mount | grep 'type nfs' | grep -v 'nosuid'
+  changed_when: false
+  failed_when: nfs_mounts_missing_nosuid.stderr
+  register: nfs_mounts_missing_nosuid
+  tags:
+      - cat2
+      - medium
+      - audit
+      - V-38654
+      - nfs
+
+
 # CAT III
 - name: "LOW | V-38455 | AUDIT | The system must use a separate file system for /tmp"
   shell: mount | grep "on /tmp "
