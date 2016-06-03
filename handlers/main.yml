@@ -76,8 +76,5 @@
   async: 45
   poll: 0
 
-- name: reset audit pkg perms
-  command: rpm --setperms audit
-
 - name: reset audit pkg ugids
   command: rpm --setugids audit

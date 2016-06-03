@@ -2794,6 +2794,34 @@
 
 # V-38660 is audited but not patched. See not_automated.yml.
 
+- name: "MEDIUM | V-38663 | AUDIT | The system package management tool must verify permissions on all files and directories associated with the audit package."
+  shell: rpm -V audit | grep '^.M'
+  register: audit_permissions_check
+  failed_when: audit_permissions_check.stderr
+  ignore_errors: yes
+  changed_when: no
+  tags:
+      - cat2
+      - medium
+      - audit
+      - V-38663
+      - auditd
+      - file_perms
+      - rpm
+
+- name: "MEDIUM | V-38663 | PATCH | The system package management tool must verify permissions on all files and directories associated with the audit package."
+  command: rpm --setperms audit
+  register: audit_permissions
+  when: audit_permissions_check.stdout
+  tags:
+      - cat2
+      - medium
+      - patch
+      - V-38663
+      - file_perms
+      - auditd
+      - rpm
+
 # --- BREAK --- #
 
 - name: "V-38664 Medium  The system package management tool must verify ownership on all files and directories associated with the audit package
@@ -2805,13 +2833,6 @@
   notify: reset audit pkg ugids
   tags: [ 'cat2' , 'V-38664' , 'V-38665' , 'file_perms' , 'auditd' , 'rpm' ]
 
-- name: V-38663 Medium  The system package management tool must verify permissions on all files and directories associated with the audit package
-  shell: rpm -V audit | grep '^.M'
-  register: audit_permissions
-  changed_when: audit_permissions.stdout != ''
-  failed_when: audit_permissions.stderr
-  notify: reset audit pkg perms
-  tags: [ 'cat2' , 'V-38663' , 'file_perms' , 'auditd' , 'rpm' ]
 
 # - name: V-38673 Medium  The operating system must ensure unauthorized, security-relevant configuration changes detected are tracked
 # - name: V-38670 Medium  The operating system must detect unauthorized changes to software and information
