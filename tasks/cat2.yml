@@ -2723,6 +2723,30 @@
       - patch
       - V-38636
       - auditd
+
+- name: "MEDIUM | V-38637 | AUDIT | The system package management tool must verify contents of all files associated with the audit package."
+  shell: "rpm -V audit | awk '$1 ~ /..5/ && $2 != \"c\"'"
+  changed_when: false
+  register: audit_integrity_check
+  failed_when: audit_integrity_check.stderr
+  tags:
+      - cat2
+      - medium
+      - audit
+      - V-38637
+      - auditd
+      - rpm
+
+- name: "MEDIUM | V-38637 | PATCH | The system package management tool must verify contents of all files associated with the audit package."
+  command: yum -y reinstall audit
+  when: audit_integrity_check.stdout
+  tags:
+      - cat2
+      - medium
+      - patch
+      - V-38637
+      - auditd
+      - rpm
 # Search for world writable files and print them out if any are found
 - name: Looking for world-writable files on the system
   command: find / -xdev -type f -perm -002
@@ -2928,18 +2952,6 @@
   command: gconftool-2 --direct --config-source xml:readwrite:/etc/gconf/gconf.xml.mandatory --type bool --set /apps/gnome-screensaver/lock_enabled true
   when: rhel6stig_xwindows_required
   tags: [ 'cat2' , 'V-38638' , 'gui' , 'screen_lock' ]
-
-- name: Check for auditd files that have a different hash than rpm expects
-  shell: "rpm -V audit | awk '$1 ~ /..5/ && $2 != \"c\"'"
-  changed_when: false
-  register: audit_integrity_check
-  failed_when: audit_integrity_check.stderr
-  tags: [ 'cat2' , 'V-38637' , 'auditd' , 'rpm' ]
-
-- name: V-38637 Medium  The system package management tool must verify contents of all files associated with the audit package
-  command: yum -y reinstall audit
-  when: audit_integrity_check.stdout
-  tags: [ 'cat2' , 'V-38637' , 'auditd' , 'rpm' ]
 
 # IPv6 Firewall and Network settings
 - name: V-38444 Medium  The systems local IPv6 firewall must implement a deny-all allow-by-exception policy for inbound packets
