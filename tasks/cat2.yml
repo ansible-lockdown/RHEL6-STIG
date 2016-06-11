@@ -2727,8 +2727,8 @@
 - name: "MEDIUM | V-38637 | AUDIT | The system package management tool must verify contents of all files associated with the audit package."
   shell: "rpm -V audit | awk '$1 ~ /..5/ && $2 != \"c\"'"
   changed_when: false
-  register: audit_integrity_check
-  failed_when: audit_integrity_check.stderr
+  register: audit_package_integrity_check_audit
+  failed_when: audit_package_integrity_check_audit.stderr
   tags:
       - cat2
       - medium
@@ -2739,7 +2739,7 @@
 
 - name: "MEDIUM | V-38637 | PATCH | The system package management tool must verify contents of all files associated with the audit package."
   command: yum -y reinstall audit
-  when: audit_integrity_check.stdout
+  when: audit_package_integrity_check_audit.stdout
   tags:
       - cat2
       - medium
@@ -2796,8 +2796,8 @@
 
 - name: "MEDIUM | V-38663 | AUDIT | The system package management tool must verify permissions on all files and directories associated with the audit package."
   shell: rpm -V audit | grep '^.M'
-  register: audit_permissions_check
-  failed_when: audit_permissions_check.stderr
+  register: audit_package_permissions_audit
+  failed_when: audit_package_permissions_audit.stderr
   ignore_errors: yes
   changed_when: no
   tags:
@@ -2811,8 +2811,8 @@
 
 - name: "MEDIUM | V-38663 | PATCH | The system package management tool must verify permissions on all files and directories associated with the audit package."
   command: rpm --setperms audit
-  register: audit_permissions
-  when: audit_permissions_check.stdout
+  register: audit_package_permissions_audit
+  when: audit_package_permissions_audit.stdout
   tags:
       - cat2
       - medium
