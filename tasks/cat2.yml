@@ -2822,17 +2822,61 @@
       - auditd
       - rpm
 
+- name: "MEDIUM | V-38664 | AUDIT | The system package management tool must verify ownership on all files and directories associated with the audit package."
+  shell: rpm -V audit | grep '^.....U'
+  register: audit_package_ownership_audit
+  failed_when: audit_package_ownership_audit.stderr
+  ignore_errors: yes
+  changed_when: no
+  tags:
+      - cat2
+      - medium
+      - audit
+      - V-38664
+      - auditd
+      - file_perms
+      - rpm
+
+- name: "MEDIUM | V-38664 | PATCH | The system package management tool must verify ownership on all files and directories associated with the audit package."
+  command: rpm --setugids audit
+  when: audit_package_ownership_audit.stdout
+  tags:
+      - cat2
+      - medium
+      - patch
+      - V-38664
+      - auditd
+      - file_perms
+      - rpm
+
+- name: "MEDIUM | V-38665 | AUDIT | The system package management tool must verify group-ownership on all files and directories associated with the audit package."
+  shell: rpm -V audit | grep '^......G'
+  register: audit_package_group_ownership_audit
+  failed_when: audit_package_group_ownership_audit.stderr
+  ignore_errors: yes
+  changed_when: no
+  tags:
+      - cat2
+      - medium
+      - audit
+      - V-38665
+      - auditd
+      - file_perms
+      - rpm
+
+- name: "MEDIUM | V-38665 | PATCH | The system package management tool must verify group-ownership on all files and directories associated with the audit package."
+  command: rpm --setugids audit
+  when: audit_package_group_ownership_audit.stdout
+  tags:
+      - cat2
+      - medium
+      - patch
+      - V-38665
+      - auditd
+      - file_perms
+      - rpm
+
 # --- BREAK --- #
-
-- name: "V-38664 Medium  The system package management tool must verify ownership on all files and directories associated with the audit package
-        \tV-38665 Medium  The system package management tool must verify group-ownership on all files and directories associated with the audit package"
-  shell: "rpm -V audit | grep '^.....\\(U\\.\\|\\.G\\|UG\\)'"
-  register: audit_ownership
-  changed_when: audit_ownership.stdout != ''
-  failed_when: audit_ownership.stderr
-  notify: reset audit pkg ugids
-  tags: [ 'cat2' , 'V-38664' , 'V-38665' , 'file_perms' , 'auditd' , 'rpm' ]
-
 
 # - name: V-38673 Medium  The operating system must ensure unauthorized, security-relevant configuration changes detected are tracked
 # - name: V-38670 Medium  The operating system must detect unauthorized changes to software and information
