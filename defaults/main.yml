@@ -175,6 +175,8 @@ rhel6stig_auditd_config:
 
 # AIDE settings
 rhel6stig_aide_cron:
+  cron_user: root
+  cron_file: /etc/crontab
   aide_job: '/usr/sbin/aide --check'
   aide_minute: 04
   aide_hour: 05

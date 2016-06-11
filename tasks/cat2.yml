@@ -2876,10 +2876,66 @@
       - file_perms
       - rpm
 
-# --- BREAK --- #
+# V-38667 is not automated. Inspect the system to determine if intrusion detection software has been installed.
 
-# - name: V-38673 Medium  The operating system must ensure unauthorized, security-relevant configuration changes detected are tracked
-# - name: V-38670 Medium  The operating system must detect unauthorized changes to software and information
+- name: |
+
+        MEDIUM | V-38670 | AUDIT | The operating system must detect unauthorized changes to software and information.
+        MEDIUM | V-38673 | AUDIT | The operating system must ensure unauthorized, security-relevant configuration changes detected are tracked.
+        MEDIUM | V-38695 | AUDIT | A file integrity tool must be used at least weekly to check for unauthorized file changes, particularly the addition of unauthorized system libraries or binaries, or for unauthorized modification to authorized system libraries or binaries.
+        MEDIUM | V-38696 | AUDIT | The operating system must employ automated mechanisms, per organization defined frequency, to detect the addition of unauthorized components/devices into the operating system.
+        MEDIUM | V-38698 | AUDIT | The operating system must employ automated mechanisms to detect the presence of unauthorized software on organizational information systems and notify designated organizational officials in accordance with the organization defined frequency.
+        MEDIUM | V-38700 | AUDIT | The operating system must provide a near real-time alert when any of the organization defined list of compromise or potential compromise indicators occurs.
+  shell: grep aide {{ rhel6stig_aide_cron['cron_file'] }} /etc/cron.*/*
+  register: aide_cron_audit
+  failed_when: aide_cron_audit.stderr
+  ignore_errors: yes
+  changed_when: no
+  tags:
+      - cat2
+      - medium
+      - audit
+      - V-38670
+      - V-38673
+      - V-38695
+      - V-38696
+      - V-38698
+      - V-38700
+      - file_integrity
+      - aide
+
+- name: |
+
+        MEDIUM | V-38670 | PATCH | The operating system must detect unauthorized changes to software and information.
+        MEDIUM | V-38673 | PATCH | The operating system must ensure unauthorized, security-relevant configuration changes detected are tracked.
+        MEDIUM | V-38695 | PATCH | A file integrity tool must be used at least weekly to check for unauthorized file changes, particularly the addition of unauthorized system libraries or binaries, or for unauthorized modification to authorized system libraries or binaries.
+        MEDIUM | V-38696 | PATCH | The operating system must employ automated mechanisms, per organization defined frequency, to detect the addition of unauthorized components/devices into the operating system.
+        MEDIUM | V-38698 | PATCH | The operating system must employ automated mechanisms to detect the presence of unauthorized software on organizational information systems and notify designated organizational officials in accordance with the organization defined frequency.
+        MEDIUM | V-38700 | PATCH | The operating system must provide a near real-time alert when any of the organization defined list of compromise or potential compromise indicators occurs.
+  cron:
+      name: Run AIDE integrity check weekly
+      cron_file: "{{ rhel6stig_aide_cron['cron_file'] }}"
+      user: "{{ rhel6stig_aide_cron['cron_user'] }}"
+      minute: "{{ rhel6stig_aide_cron['aide_minute'] | default('05') }}"
+      hour: "{{ rhel6stig_aide_cron['aide_hour'] | default('04') }}"
+      day: "{{ rhel6stig_aide_cron['aide_day'] | default('*') }}"
+      month: "{{ rhel6stig_aide_cron['aide_month'] | default('*') }}"
+      weekday: "{{ rhel6stig_aide_cron['aide_weekday'] | default('*') }}"
+      job: "{{ rhel6stig_aide_cron['aide_job'] }}"
+  tags:
+      - cat2
+      - medium
+      - patch
+      - V-38670
+      - V-38673
+      - V-38695
+      - V-38696
+      - V-38698
+      - V-38700
+      - file_integrity
+      - aide
+
+# --- BREAK --- #
 
 - name: "MEDIUM | V-38671 | PATCH | Ensure postfix is installed"
   yum:
@@ -2960,22 +3016,6 @@
     - bluetooth
     - net-pf-31
   tags: [ 'cat2' , 'V-38682' , 'kernel_modules' , 'bluetooth' ]
-
-- name: "V-38670 Medium   The operating system must detect unauthorized changes to software and information.\n
-         \tV-38673 Medium  The operating system must ensure unauthorized, security-relevant configuration changes detected are tracked.\n
-         \tV-38695 Medium  A file integrity tool must be used at least weekly to check for unauthorized file changes, particularly the addition of unauthorized system libraries or binaries, or for unauthorized modification to authorized system libraries or binaries\n
-         \tV-38696 Medium  The operating system must employ automated mechanisms, per organization defined frequency, to detect the addition of unauthorized components/devices into the operating system\n
-         \tV-38698 Medium  The operating system must employ automated mechanisms to detect the presence of unauthorized software on organizational information systems and notify designated organizational officials in accordance with the organization defined frequency\n
-         \tV-38700  Medium  The operating system must provide a near real-time alert when any of the organization defined list of compromise or potential compromise indicators occurs"
-  cron: >
-    name='Run AIDE integrity check weekly'
-    minute={{ rhel6stig_aide_cron["aide_minute"] | default('05') }}
-    hour={{ rhel6stig_aide_cron["aide_hour"] | default('04') }}
-    day={{ rhel6stig_aide_cron["aide_day"] | default('*') }}
-    month={{ rhel6stig_aide_cron["aide_month"] | default('*') }}
-    weekday={{ rhel6stig_aide_cron["aide_weekday"] | default('*') }}
-    job="{{ rhel6stig_aide_cron["aide_job"] }}"
-  tags: [ 'cat2' , 'V-38670' , 'V-38673' , 'V-38695' , 'V-38696' , 'V-38698' , 'V-38700' , 'file_integrity' , 'aide' ]
 
 - name: V-38691 Medium  The Bluetooth service must be disabled
   service: name=bluetooth state=stopped enabled=no
