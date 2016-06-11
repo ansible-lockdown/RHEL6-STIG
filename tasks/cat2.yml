@@ -2935,17 +2935,17 @@
       - file_integrity
       - aide
 
-# --- BREAK --- #
-
-- name: "MEDIUM | V-38671 | PATCH | Ensure postfix is installed"
+- name: "MEDIUM | V-38671 | PATCH | The sendmail package must be removed."
   yum:
       name: postfix
       state: present
   tags:
       - cat2
       - medium
-      - V-38671
       - patch
+      - V-38671
+      - sendmail
+      - unauthorized_packages
 
 - name: "MEDIUM | V-38671 | PATCH | The sendmail package must be removed"
   yum:
@@ -2953,15 +2953,42 @@
       state: absent
   tags:
       - cat2
-      - V-38671
+      - medium
       - patch
+      - V-38671
       - sendmail
       - unauthorized_packages
 
-- name: V-38674 Medium  X Windows must not be enabled unless required
-  lineinfile: state=present dest=/etc/inittab regexp='^id:' line='id:3:initdefault:' backup=yes
+- name: "MEDIUM | V-38674 | AUDIT | X Windows must not be enabled unless required."
+  command: grep initdefault /etc/inittab
+  register: runlevel_audit
+  ignore_errors: yes
+  changed_when: no
+  tags:
+      - cat2
+      - medium
+      - audit
+      - V-38674
+      - xwindows
+      - gui
+
+- name: "MEDIUM | V-38674 | PATCH | X Windows must not be enabled unless required"
+  lineinfile:
+      state: present
+      dest: /etc/inittab
+      regexp: '^id:'
+      line: 'id:3:initdefault:'
+      backup: yes
   when: not rhel6stig_xwindows_required
-  tags: [ 'cat2' , 'V-38674' , 'xwindows' , 'gui' ]
+  tags:
+      - cat2
+      - medium
+      - patch
+      - V-38674
+      - xwindows
+      - gui
+
+# --- BREAK --- #
 
 # Get a list of interface config files. Exclude those with the current year in the name.
 # This prevents Ansible from continually changing the backup files it creates since they
