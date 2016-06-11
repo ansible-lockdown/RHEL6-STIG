@@ -1392,12 +1392,12 @@
       - ipv6_protocol_handler_bound_network_stack_audit is defined
       - ipv6_protocol_handler_bound_network_stack_audit.stdout != 1
   tags:
-      - V-38546
       - cat2
       - medium
+      - patch
+      - V-38546
       - ipv6
       - network
-      - audit
 
 - name: "MEDIUM | V-38548 | AUDIT | The system must ignore ICMPv6 redirects by default."
   shell: "sysctl net.ipv6.conf.default.accept_redirects | awk '{print $3}'"
