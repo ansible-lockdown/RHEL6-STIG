@@ -93,6 +93,67 @@
       - cat2
       - medium
 
+- name: "MEDIUM | V-38625 | AUDIT | If the system is using LDAP for authentication or account information the system must use a TLS connection using FIPS 140-2 approved cryptographic algorithms"
+  shell: ps -ef | grep [s]lapd
+  register: ldap_tls_audit
+  when: "'slapd' in sysv_services.stdout"
+  ignore_errors: yes
+  changed_when: no
+  tags:
+      - cat2
+      - medium
+      - audit
+      - V-38625
+      - ldap
+
+- name: "MEDIUM | V-38643 | AUDIT | There must be no world-writable files on the system."
+  command: find / -xdev -type f -perm -002
+  register: world_writable_files
+  changed_when: false
+  tags:
+      - cat2
+      - medium
+      - audit
+      - V-38643
+      - file_perms
+
+- name: "MEDIUM | V-38652 | AUDIT | Remote file systems must be mounted with the 'nodev' option"
+  shell: mount | grep 'type nfs' | grep -v 'nodev'
+  changed_when: false
+  register: nfs_mounts_missing_nodev
+  failed_when: nfs_mounts_missing_nodev.stderr
+  tags:
+      - cat2
+      - medium
+      - audit
+      - V-38652
+      - nfs
+
+- name: "MEDIUM | V-38654 | PATCH | Remote file systems must be mounted with the nosuid option"
+  shell: mount | grep 'type nfs' | grep -v 'nosuid'
+  changed_when: false
+  failed_when: nfs_mounts_missing_nosuid.stderr
+  register: nfs_mounts_missing_nosuid
+  tags:
+      - cat2
+      - medium
+      - audit
+      - V-38654
+      - nfs
+
+- name: "MEDIUM | V-38660 | AUDIT | The snmpd service must use only SNMP protocol version 3 or newer."
+  shell: "grep -E 'v1|v2c|com2sec' /etc/snmp/snmpd.conf | grep -v '^#'"
+  changed_when: false
+  register: snmp_version_check
+  failed_when: '"FAIL" in snmp_version_check.stdout'
+  when: snmpconf_test.stat.exists
+  tags:
+      - cat2
+      - medium
+      - audit
+      - V-38660
+      - snmp
+
 # CAT III
 - name: "LOW | V-38455 | AUDIT | The system must use a separate file system for /tmp"
   shell: mount | grep "on /tmp "
