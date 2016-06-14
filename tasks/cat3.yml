@@ -419,6 +419,7 @@
       value: 1
       state: present
       reload: yes
+      sysctl_set: yes
       ignoreerrors: yes
   tags:
       - cat3
@@ -455,6 +456,7 @@
       value: 0
       state: present
       reload: yes
+      sysctl_set: yes
       ignoreerrors: yes
   tags:
       - cat3
@@ -489,6 +491,7 @@
       value: 1
       state: present
       reload: yes
+      sysctl_set: yes
       ignoreerrors: yes
   tags:
       - cat3
@@ -523,6 +526,7 @@
       value: 1
       state: present
       reload: yes
+      sysctl_set: yes
       ignoreerrors: yes
   tags:
       - cat3

@@ -99,24 +99,6 @@
       - cat2
       - cat3
 
-# See if IPv6 is enabled and set a fact
-- name: "PRELIM | Check if IPv6 is enabled"
-  shell: ip addr | grep inet6
-  changed_when: false
-  failed_when: false
-  register: rhel6stig_ipv6test
-  ignore_errors: yes
-  always_run: yes
-  tags:
-      - ipv6
-
-- name: "PRELIM | Set ipv6_in_use to 'true'"
-  set_fact: ipv6_in_use=true
-  when: rhel6stig_ipv6test.stdout
-  always_run: yes
-  tags:
-      - ipv6
-
 # Get list of shells
 - name: "PRELIM | Get list of shells on system"
   shell: grep -Pv "/(sh|nologin|dash)" /etc/shells | sed -r 's#/((bin|sbin|usr)/)+##'
@@ -142,3 +124,30 @@
       - cat3
       - V-38656
       - smb
+
+- name: "PRELIM | Get list of rsyslog genarated log files"
+  shell: "grep -e '/' /etc/rsyslog.conf /etc/rsyslog.d/* | grep -v IncludeConfig | sed 's/-//'| awk 'NF==2 {print $2}'"
+  changed_when: no
+  always_run: yes
+  register: rsyslog_logfiles
+  tags:
+      - cat2
+      - medium
+      - V-38518
+      - V-38519
+      - V-38522
+      - log_files
+      - rsyslog
+      - audit
+
+- name: "PRELIM | Check for existence of /etc/pam_ldap.conf"
+  stat:
+    path: /etc/pam_ldap.conf
+  register: pam_ldap_test
+  failed_when: no
+  changed_when: no
+  tags:
+      - cat2
+      - medium
+      - V-38626
+      - ldap
