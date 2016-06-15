@@ -3051,7 +3051,6 @@
   ignore_errors: yes
   tags: [ 'cat2' , 'V-38691' , 'bluetooth' ]
 
-<<<<<<< HEAD
 - name: V-38619 Medium  There must be no .netrc files on the system
   file: state=absent dest=~{{ item }}/.netrc
   with_items: users.stdout_lines
