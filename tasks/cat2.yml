@@ -2137,6 +2137,7 @@
       value: 0
       reload: yes
       sysctl_set: yes
+      ignoreerrors: yes
   tags:
       - medium
       - cat2
@@ -2164,6 +2165,7 @@
       value: 0
       reload: yes
       sysctl_set: yes
+      ignoreerrors: yes
   tags:
       - medium
       - cat2
