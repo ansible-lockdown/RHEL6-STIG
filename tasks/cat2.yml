@@ -3164,8 +3164,6 @@
       - dod_logon_banner
   notify: restart ssh
 
-=======
->>>>>>> 33f682f094f46d222860638149115e68695b3d3c
 # IPv6 Firewall and Network settings
 - name: V-38444 Medium  The systems local IPv6 firewall must implement a deny-all allow-by-exception policy for inbound packets
   lineinfile: "state=present backup=yes dest=/etc/sysconfig/ip6tables regexp=':FORWARD' line=':FORWARD DROP [0:0]'"
