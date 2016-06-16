@@ -255,7 +255,7 @@ def add_to_config(pam_entry, reference_line, config_lines, config_path, placemen
     conf = open(config_path, 'w')
     try:
         for line in config_lines:
-            conf.write(line)
+            conf.write(line.strip(' '))
     finally:
         conf.close()
 
@@ -319,18 +319,19 @@ def modify_rule(module, config_path, rule_index, config_lines, **kwargs):
         args_index = 4
 
     if kwargs['arguments']:
-        if not set(kwargs['arguments'].split()).issuperset(filter(None, set(rule_split[args_index:]))):
-            rule_split[args_index] = kwargs['arguments']
+        if not set(kwargs['arguments'].split()).issubset(filter(None, rule_split[args_index:])):
             pam_conf = open(config_path, 'w')
             try:
-                for rule in config_lines:
-                    pam_conf.write(rule)
+                for line_num, rule in enumerate(config_lines):
+                    if line_num != rule_index:
+                        pam_conf.write(rule.strip(' '))
+                    else:
+                        pam_conf.write('    '.join(rule_split[:3]) + '    ' + kwargs['arguments'] + '\n')
             finally:
                 pam_conf.close()
 
             return True
         else:
-            # print 'yay'
             return False
 
 
@@ -392,7 +393,7 @@ def move_line(path=None, content=None, pam_entry=None, pam_entry_index=None, ref
         config = open(path, 'w')
         try:
             for line in content:
-                config.write(line)
+                config.write(line.strip(' '))
         finally:
             config.close()
 
@@ -404,7 +405,7 @@ def move_line(path=None, content=None, pam_entry=None, pam_entry_index=None, ref
         config = open(path, 'w')
         try:
             for line in content:
-                config.write(line)
+                config.write(line.strip(' '))
         finally:
             config.close()
     return
@@ -416,7 +417,7 @@ def delete_rule(path, index, original_lines):
     config = open(path, 'w')
     try:
         for line in original_lines:
-            config.write(line)
+            config.write(line.strip(' '))
     finally:
         config.close()
     return
