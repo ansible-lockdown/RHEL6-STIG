@@ -27,6 +27,18 @@
     - patch
     - file_perms
 
+- name: "MEDIUM | V-38445 | PATCH | Audit log files must be group-owned by root."
+  file:
+      path: "{{ auditd_logfile.stdout }}"
+      group: root
+  tags:
+      - cat2
+      - medium
+      - V-38445
+      - log_files
+      - auditd
+      - patch
+
 - name: "MEDIUM | V-38448 | PATCH | The /etc/gshadow file must be group-owned by root."
   file:
       path: /etc/gshadow
