@@ -111,7 +111,7 @@
       - audit
 
 - name: "LOW | V-38453 | PATCH | The system package management tool must verify group-ownership on all files and directories associated with packages."
-  command: rpm --setugids {{ item.stdout }}
+  command: rpm --setugids {{ item.stdout }} && rpm --setperms {{ item.stdout }}
   when: item|changed
   with_items: rpm_group_ownership_audit.results
   tags:
