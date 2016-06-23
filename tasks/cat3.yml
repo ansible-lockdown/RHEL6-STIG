@@ -1128,6 +1128,21 @@
       - xwindows
       - audit
 
+# The OpenSCAP scanner checks for the xorg-x11-server-common
+# package. The package is not part of the X Window System package
+# group.
+- name: "LOW | V-38676 | PATCH | The xorg-x11-server-common (X Windows) package must not be installed, unless required."
+  yum:
+      name: xorg-x11-server-common
+      state: absent
+  when: not rhel6stig_xwindows_required
+  tags:
+      - cat3
+      - low
+      - V-38676
+      - xwindows
+      - audit
+
 # V-38681 see not_automated.yml
 
 # V-38683 see not_automated.yml
