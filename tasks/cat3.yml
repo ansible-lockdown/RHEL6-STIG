@@ -433,6 +433,35 @@
 # V-38530 auditd localtime
 
 # V-38531 auditd account creation
+# V-38534 auditd account mod
+# V-38536 auditd account disable
+# V-38538 auditd account term
+- name: |
+
+        LOW | V-38531 | PATCH | The operating system must automatically audit account creation.
+        LOW | V-38534 | PATCH | The operating system must automatically audit account modification.
+        LOW | V-38536 | PATCH | The operating system must automatically audit account disabling actions.
+        LOW | V-38538 | PATCH | The operating system must automatically audit account termination.
+  lineinfile:
+      line: "{{ item }}"
+      state: present
+      dest: /etc/audit/audit.rules
+  with_items:
+      - "-w /etc/group -p wa -k audit_account_changes"
+      - "-w /etc/passwd -p wa -k audit_account_changes"
+      - "-w /etc/gshadow -p wa -k audit_account_changes"
+      - "-w /etc/shadow -p wa -k audit_account_changes"
+      - "-w /etc/security/opasswd -p wa -k audit_account_changes"
+  tags:
+      - cat3
+      - low
+      - V-38531
+      - V-38534
+      - V-38536
+      - V-38538
+      - auditd
+      - account_changes
+      - patch
 
 # V-38533 icmp redirect ignore
 - name: "LOW | V-38533 | AUDIT | The system must ignore ICMPv4 redirect messages by default."
@@ -467,8 +496,6 @@
       - icmp_redirects
       - patch
 
-# V-38534 auditd account mod
-
 # V-38535 icmp broadcast ignore
 - name: "LOW | V-38535 | AUDIT | The system must not respond to ICMPv4 sent to a broadcast address."
   command: sysctl net.ipv4.icmp_echo_ignore_broadcasts
@@ -502,8 +529,6 @@
       - ignore_broadcasts
       - patch
 
-# V-38536 auditd account disable
-
 # V-38537 icmp bogus ignore
 - name: "LOW | V-38537 | AUDIT | The system must ignore ICMPv4 bogus error responses."
   command: sysctl net.ipv4.icmp_ignore_bogus_error_responses
@@ -536,8 +561,6 @@
       - network
       - ignore_bogus_error
       - patch
-
-# V-38538 auditd account term
 
 # V-38540 auditd network change
 
