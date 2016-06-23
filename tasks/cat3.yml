@@ -1102,6 +1102,18 @@
       - patch
 
 # V-38567 auditd
+- name: "LOW | V-38567 | PATCH | The audit system must be configured to audit all use of setuid and setgid programs."
+  lineinfile:
+      line: "-a always,exit -F path={{ item }} -F perm=x -F auid>=500 -F auid!=4294967295 -k privileged"
+      state: present
+      dest: /etc/audit/audit.rules
+  with_items: "{{ setugid_programs.stdout_lines }}"
+  tags:
+      - cat3
+      - low
+      - V-38567
+      - auditd
+      - patch
 
 # V-38568 auditd
 
