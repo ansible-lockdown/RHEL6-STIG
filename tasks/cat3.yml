@@ -570,6 +570,42 @@
 # V-38565 auditd
 
 # V-38566 auditd
+- name: "LOW | V-38566 | PATCH | The audit system must be configured to audit failed attempts to access files and programs."
+  lineinfile:
+      line: "{{ item }}"
+      state: present
+      dest: /etc/audit/audit.rules
+  with_items:
+      - "-a always,exit -F arch=b32 -S creat -S open -S openat -S open_by_handle_at -S truncate -S ftruncate -F exit=-EACCES -F auid>=500 -F auid!=4294967295 -k access"
+      - "-a always,exit -F arch=b32 -S creat -S open -S openat -S open_by_handle_at -S truncate -S ftruncate -F exit=-EPERM -F auid>=500 -F auid!=4294967295 -k access"
+      - "-a always,exit -F arch=b32 -S creat -S open -S openat -S open_by_handle_at -S truncate -S ftruncate -F exit=-EACCES -F auid=0 -k access"
+      - "-a always,exit -F arch=b32 -S creat -S open -S openat -S open_by_handle_at -S truncate -S ftruncate -F exit=-EPERM -F auid=0 -k access"
+  tags:
+      - cat3
+      - low
+      - V-38566
+      - auditd
+      - access
+      - patch
+
+- name: "LOW | V-38566 | PATCH | The audit system must be configured to audit failed attempts to access files and programs."
+  lineinfile:
+      line: "{{ item }}"
+      state: present
+      dest: /etc/audit/audit.rules
+  with_items:
+      - "-a always,exit -F arch=b64 -S creat -S open -S openat -S open_by_handle_at -S truncate -S ftruncate -F exit=-EACCES -F auid>=500 -F auid!=4294967295 -k access"
+      - "-a always,exit -F arch=b64 -S creat -S open -S openat -S open_by_handle_at -S truncate -S ftruncate -F exit=-EPERM -F auid>=500 -F auid!=4294967295 -k access"
+      - "-a always,exit -F arch=b64 -S creat -S open -S openat -S open_by_handle_at -S truncate -S ftruncate -F exit=-EACCES -F auid=0 -k access"
+      - "-a always,exit -F arch=b64 -S creat -S open -S openat -S open_by_handle_at -S truncate -S ftruncate -F exit=-EPERM -F auid=0 -k access"
+  when: audit_arch == 'b64'
+  tags:
+      - cat3
+      - low
+      - V-38566
+      - auditd
+      - access
+      - patch
 
 # V-38567 auditd
 
