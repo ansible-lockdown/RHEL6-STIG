@@ -1005,6 +1005,21 @@
 # V-38655 fstab noexec
 
 # V-38656 smb signing
+- name: "LOW | V-38656 | PATCH | The system must use SMB client signing for connecting to samba servers using smbclient."
+  lineinfile:
+      state: present
+      dest: /etc/samba/smb.conf
+      regexp: '^#?client signing'
+      line: 'client signing = mandatory'
+      insertafter: '^\[global\]'
+  when: samba_check.stat.exists
+  notify: restart samba
+  tags:
+      - cat3
+      - low
+      - V-38656
+      - smb
+      - patch
 
 # V-38657 fstab sec
 
