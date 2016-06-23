@@ -472,7 +472,7 @@ def pam_manager(**kwargs):
             if isinstance(current_rule_index, int) and not isinstance(current_rule_index, bool): #Here when the index of the line was 0 or 1 it was getting translated into boolean value.
                 changed = modify_rule(module, config_path, current_rule_index, config_lines, **mod_args)
 
-            if not is_full_line_present(config_lines, pam_entry):
+            if not is_full_line_present(config_lines, pam_entry) and not changed:
                 if is_full_line_present(config_lines, before_line):
                     changed = add_to_config(pam_entry, before_line, config_lines, config_path, placement='before')
                     module.exit_json(changed=changed, config_path=config_path, pam_entry=pam_entry.rstrip().expandtabs(), backup_file=backup_file)
