@@ -78,3 +78,6 @@
 
 - name: reset audit pkg ugids
   command: rpm --setugids audit
+
+- name: remount /tmp
+  command: mount -o remount /tmp
