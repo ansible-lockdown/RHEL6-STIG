@@ -3140,3 +3140,14 @@
       - V-51363
       - selinux
 
+- name: "MEDIUM | V-54381 | PATCH | The audit system must switch the system to single-user mode when available audit storage volume becomes dangerously low."
+  lineinfile:
+      regexp: '^admin_space_left_action'
+      line: "admin_space_left_action = {{ rhel6stig_auditd_config['admin_space_left_action'] }}"
+      dest: /etc/audit/auditd.conf
+  tags:
+    - cat2
+    - medium
+    - V-54381
+    - auditd
+    - patch
