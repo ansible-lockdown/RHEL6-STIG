@@ -627,6 +627,23 @@
       - patch
 
 # V-38540 auditd network change
+- name: "LOW | V-38540 | PATCH | The audit system must be configured to audit modifications to the systems network configuration."
+  lineinfile:
+      line: "{{ item }}"
+      state: present
+      dest: /etc/audit/audit.rules
+  with_items:
+      - "-a always,exit -F arch={{ audit_arch }} -S sethostname -S setdomainname -k audit_network_modifications"
+      - "-w /etc/issue -p wa -k audit_network_modifications"
+      - "-w /etc/issue.net -p wa -k audit_network_modifications"
+      - "-w /etc/hosts -p wa -k audit_network_modifications"
+      - "-w /etc/sysconfig/network -p wa -k audit_network_modifications"
+  tags:
+      - cat3
+      - low
+      - V-38540
+      - auditd
+      - network
 
 # V-38541 auditd selinux change
 
