@@ -149,11 +149,11 @@ rhel6stig_cat3_services:
 
 # Auditd.conf settings
 rhel6stig_auditd_config:
-  disk_error_action: SYSLOG     # V-38464 - compliant options SYSLOG|EXEC|SINGLE|HALT
-  disk_full_action: SYSLOG      # V-38468 - compliant options SYSLOG|EXEC|SINGLE|HALT
-  space_left_action: EMAIL      # V-38470 - compliant options EMAIL|SYSLOG
+  disk_error_action: syslog     # V-38464 - compliant options SYSLOG|EXEC|SINGLE|HALT
+  disk_full_action: syslog      # V-38468 - compliant options SYSLOG|EXEC|SINGLE|HALT
+  space_left_action: email      # V-38470 - compliant options EMAIL|SYSLOG
   max_log_file: 6               # V-38633 - compliant options 6 or higher (MB)
-  max_log_file_action: ROTATE   # V-38634 - compliant options ROTATE
+  max_log_file_action: rotate   # V-38634 - compliant options ROTATE
   num_logs: 5                   # V-38636 - compliant options 5 or higher
   space_left: 75                # V-38678 - must be set to locally defined value - default 75 MB
   action_mail_acct: root        # V-38680 - compliant options - admin account to email
@@ -163,7 +163,7 @@ rhel6stig_auditd_config:
   # system where availability need is high will need to set this to
   # something else entirely.
   # NOTE: SINGLE user mode setting will break cloud systems.
-  admin_space_left_action: HALT # V-54381 - compliant options SINGLE|SUSPEND|HALT|EXEC|SYSLOG
+  admin_space_left_action: halt # V-54381 - compliant options SINGLE|SUSPEND|HALT|EXEC|SYSLOG
   # auditd_failure_flag
   # 2    Tells your system to perform an immediate shutdown without
   #      flushing any pending data to disk when the limits of your
