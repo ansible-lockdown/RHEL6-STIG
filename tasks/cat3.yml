@@ -392,10 +392,62 @@
       - patch
 
 # V-38522 auditd timeofday changes
+- name: "LOW | V-38522 | PATCH | The audit system must be configured to audit all attempts to alter system time through settimeofday."
+  lineinfile:
+      state: present
+      dest: /etc/audit/audit.rules
+      line: "-a always,exit -F arch={{ audit_arch }} -S settimeofday -k audit_time_rules"
+  tags:
+      - cat3
+      - low
+      - V-38522
+      - auditd
+      - settimeofday
+      - patch
 
 # V-38525 auditd stime change
+# this audit rule only works on and applies to 32-bit systems
+- name: "LOW | V-38525 | PATCH | The audit system must be configured to audit all attempts to alter system time through stime."
+  lineinfile:
+      state: present
+      dest: /etc/audit/audit.rules
+      line: "-a always,exit -F arch=b32 -S stime -k audit_time_rules"
+  when: audit_arch == 'b32'
+  tags:
+      - cat3
+      - low
+      - V-38525
+      - auditd
+      - stime
+      - patch
 
 # V-38527 auditd settime
+- name: "LOW | V-38527 | PATCH | The audit system must be configured to audit all attempts to alter system time through clock_settime."
+  lineinfile:
+      state: present
+      dest: /etc/audit/audit.rules
+      line: "-a always,exit -F arch=b32 -S clock_settime -F a0=0x0 -k time-change"
+  tags:
+      - cat3
+      - low
+      - V-38527
+      - auditd
+      - clock_settime
+      - patch
+
+- name: "LOW | V-38527 | PATCH | The audit system must be configured to audit all attempts to alter system time through clock_settime."
+  lineinfile:
+      state: present
+      dest: /etc/audit/audit.rules
+      line: "-a always,exit -F arch=b64 -S clock_settime -F a0=0x0 -k time-change"
+  when: audit_arch == 'b64'
+  tags:
+      - cat3
+      - low
+      - V-38527
+      - auditd
+      - clock_settime
+      - patch
 
 # V-38528 log martians
 - name: "LOW | V-38528 | AUDIT The system must log Martian packets."
