@@ -11,9 +11,7 @@
 - name: Check ansible version
   fail:
       msg: You must use ansible 2.1 or greater
-  when:
-      - ansible_version.major < 2
-      - ansible.version.minor < 1
+  when: ansible_version.full[:3] | float < 2.1
   tags:
       - always
 
