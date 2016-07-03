@@ -483,6 +483,18 @@
       - patch
 
 # V-38530 auditd localtime
+- name: "LOW | V-38530 | PATCH | The audit system must be configured to audit all attempts to alter system time through /etc/localtime."
+  lineinfile:
+      state: present
+      dest: /etc/audit/audit.rules
+      line: '-w /etc/localtime -p wa -k audit_localtime_rules'
+  tags:
+      - cat3
+      - low
+      - V-38530
+      - auditd
+      - localtime
+      - patch
 
 # V-38531 auditd account creation
 # V-38534 auditd account mod
