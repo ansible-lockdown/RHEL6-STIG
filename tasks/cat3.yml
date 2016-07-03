@@ -1261,6 +1261,18 @@
       - audit
 
 # V-38635 auditd
+- name: "LOW | V-38635 | PATCH | The audit system must be configured to audit all attempts to alter system time through adjtimex."
+  lineinfile:
+    line: -a always,exit -F arch={{ audit_arch }} -S adjtimex -k audit_time_rules 
+    dest: /etc/audit/audit.rules
+    state: present
+  tags:
+    - cat3
+    - low
+    - V-38627
+    - auditd
+    - system_time
+    - patch
 
 # V-38639 gconf
 
