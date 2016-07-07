@@ -2574,6 +2574,21 @@
       - file_perms
       - rsyslog
 
+# As described in https://access.redhat.com/solutions/66805, the
+# permissions for /var/log/boot.log have to be changed each time the
+# system is rebooted.
+- name: "MEDIUM | V-38623 | PATCH | All rsyslog-generated log files must have mode 0600 or less permissive."
+  lineinfile:
+      dest: /etc/rc.d/rc.local
+      line: chmod u-x,go-rwx /var/log/boot.log
+  tags:
+      - cat2
+      - medium
+      - V-38623
+      - file_perms
+      - rsyslog
+      - patch
+
 - name: "MEDIUM | V-38624 | AUDIT | System logs must be rotated daily."
   shell: grep logrotate /var/log/cron*
   changed_when: no
