@@ -2580,7 +2580,7 @@
 - name: "MEDIUM | V-38623 | PATCH | All rsyslog-generated log files must have mode 0600 or less permissive."
   lineinfile:
       dest: /etc/rc.d/rc.local
-      line: chmod 600 /var/log/boot.log
+      line: chmod u-x,go-rwx /var/log/boot.log
   tags:
       - cat2
       - medium
