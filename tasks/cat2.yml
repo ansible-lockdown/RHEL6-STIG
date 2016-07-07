@@ -3155,14 +3155,18 @@
       - V-51363
       - selinux
 
-- name: "MEDIUM | V-54381 | PATCH | The audit system must switch the system to single-user mode when available audit storage volume becomes dangerously low."
-  lineinfile:
-      regexp: '^admin_space_left_action'
-      line: "admin_space_left_action = {{ rhel6stig_auditd_config['admin_space_left_action'] }}"
-      dest: /etc/audit/auditd.conf
+- name: "MEDIUM | V-51875 | PATCH  | The operating system, upon successful logon/access, must display to the user the number of unsuccessful logon/access attempts since the last successful logon/access."
+  pam:
+      service: system-auth-ac
+      type: session
+      control: required
+      pam_module: pam_lastlog.so
+      arguments: showfailed
+      after_line: session required pam_limits.so
+      state: present
   tags:
-    - cat2
-    - medium
-    - V-54381
-    - auditd
-    - patch
+   - cat2
+   - medium
+   - V-51875
+   - pam
+   - patch
