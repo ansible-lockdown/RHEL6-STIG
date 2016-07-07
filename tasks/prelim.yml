@@ -158,3 +158,14 @@
   tags:
       - cat3
       - auditd
+
+- name: "PRELIM | List /etc/fstab mount points"
+  shell: awk '/^[^#]/ { print $2; }' /etc/fstab
+  changed_when: false
+  register: fstab_mountpoints
+  tags:
+      - cat2
+      - medium
+      - V-57569
+      - fstab
+      - patch
