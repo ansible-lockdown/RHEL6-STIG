@@ -3182,3 +3182,34 @@
    - V-51875
    - pam
    - patch
+
+- name: "MEDIUM | V-57569 | AUDIT | The noexec option must be added to the /tmp partition."
+  command: egrep '^([^#[:space:]]+[[:space:]]+/tmp[[:space:]]+[^[:space:]]+[[:space:]]+)([^[:space:]]+)([[:space:]]+.*)$' /etc/fstab
+  register: fstab_tmp_audit
+  changed_when: false
+  failed_when: false
+  always_run: yes
+  tags:
+     - cat2
+     - medium
+     - V-57569
+     - fstab
+     - tmpdir
+     - audit
+
+- name: "MEDIUM | V-57569 | PATCH | The noexec option must be added to the /tmp partition."
+  lineinfile:
+      regexp: "^([^\\s]+\\s+/tmp\\s+[^\\s]+\\s+)([^\\s]+)(\\s+.*)$"
+      line: "\\1\\2,noexec\\3"
+      backrefs: yes
+      dest: /etc/fstab
+      backup: yes
+  when: "'/tmp' in fstab_mountpoints.stdout_lines and 'noexec' not in fstab_tmp_audit.stdout"
+  notify: remount /tmp
+  tags:
+     - cat2
+     - medium
+     - V-57569
+     - fstab
+     - tmpdir
+     - patch
