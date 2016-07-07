@@ -167,5 +167,16 @@
       - cat3
       - low
       - V-38567
+
+- name: "PRELIM | Get path of auditd log file"
+  shell: "grep '^log_file' /etc/audit/auditd.conf | sed s/^[^\\/]*//"
+  changed_when: no
+  always_run: yes
+  register: auditd_logfile
+  tags:
+      - cat2
+      - medium
+      - V-38445
+      - log_files
       - auditd
       - patch
