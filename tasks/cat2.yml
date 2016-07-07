@@ -3166,3 +3166,19 @@
     - V-54381
     - auditd
     - patch
+
+- name: "MEDIUM | V-51875 | PATCH  | The operating system, upon successful logon/access, must display to the user the number of unsuccessful logon/access attempts since the last successful logon/access."
+  pam:
+      service: system-auth-ac
+      type: session
+      control: required
+      pam_module: pam_lastlog.so
+      arguments: showfailed
+      after_line: session required pam_limits.so
+      state: present
+  tags:
+   - cat2
+   - medium
+   - V-51875
+   - pam
+   - patch
