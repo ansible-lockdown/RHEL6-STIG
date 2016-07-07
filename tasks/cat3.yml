@@ -1198,11 +1198,11 @@
 
 - name: "LOW | V-38608 | PATCH | The SSH daemon must set a timeout interval on idle sessions."
   lineinfile:
-    state: present
-    backup: yes
-    dest: /etc/ssh/sshd_config
-    regexp: '^(#)?ClientAliveInterval'
-    line: ClientAliveInterval 900
+      state: present
+      backup: yes
+      dest: /etc/ssh/sshd_config
+      regexp: '^(#)?ClientAliveInterval'
+      line: ClientAliveInterval 900
   when: sshd_client_alive_interval_audit.stdout|int < 900
   tags:
       - cat3
@@ -1215,11 +1215,11 @@
 # V-38610 sshd conf
 - name: "LOW | V-38610 | PATCH | The SSH daemon must set a timeout count on idle sessions."
   lineinfile:
-    state: present
-    backup: yes
-    dest: /etc/ssh/sshd_config
-    regexp: '^(#)?ClientAliveCountMax'
-    line: ClientAliveCountMax 0
+      state: present
+      backup: yes
+      dest: /etc/ssh/sshd_config
+      regexp: '^(#)?ClientAliveCountMax'
+      line: ClientAliveCountMax 0
   tags:
       - cat3
       - low
@@ -1231,11 +1231,11 @@
 # V-38616 sshd conf
 - name: "LOW | V-38616 | PATCH | The SSH daemon must not permit user environment settings."
   lineinfile:
-    state: present
-    backup: yes
-    dest: /etc/ssh/sshd_config
-    regexp: '^(#)?PermitUserEnvironment'
-    line: PermitUserEnvironment no
+      state: present
+      backup: yes
+      dest: /etc/ssh/sshd_config
+      regexp: '^(#)?PermitUserEnvironment'
+      line: PermitUserEnvironment no
   tags:
       - cat3
       - low
@@ -1318,16 +1318,16 @@
 # V-38635 auditd
 - name: "LOW | V-38635 | PATCH | The audit system must be configured to audit all attempts to alter system time through adjtimex."
   lineinfile:
-    line: -a always,exit -F arch={{ audit_arch }} -S adjtimex -k audit_time_rules 
-    dest: /etc/audit/audit.rules
-    state: present
+      line: -a always,exit -F arch={{ audit_arch }} -S adjtimex -k audit_time_rules 
+      dest: /etc/audit/audit.rules
+      state: present
   tags:
-    - cat3
-    - low
-    - V-38627
-    - auditd
-    - system_time
-    - patch
+      - cat3
+      - low
+      - V-38627
+      - auditd
+      - system_time
+      - patch
 
 # V-38639 gconf
 
