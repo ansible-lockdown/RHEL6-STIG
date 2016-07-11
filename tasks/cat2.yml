@@ -1,7 +1,7 @@
 ---
 # This audit.rules file is from https://github.com/RedHatGov/stig-fix-el6/tree/master/config
 
-# Not automated 
+# Not automated
 #- name: "MEDIUM | V-38439 | The system must provide automated support for account management functions."
 
 - name: "MEDIUM | V-38443, V-38448, V-38449 | AUDIT | The /etc/gshadow file must be owned by root. The /etc/gshadow file must be group-owned by root. The /etc/gshadow file must have mode 0000"
@@ -2944,7 +2944,6 @@
 - name: "MEDIUM | V-38663 | AUDIT | The system package management tool must verify permissions on all files and directories associated with the audit package."
   shell: rpm -V audit | grep '^.M'
   register: audit_package_permissions_audit
-  failed_when: audit_package_permissions_audit.stderr
   failed_when: no
   changed_when: no
   tags:
@@ -2972,7 +2971,6 @@
 - name: "MEDIUM | V-38664 | AUDIT | The system package management tool must verify ownership on all files and directories associated with the audit package."
   shell: rpm -V audit | grep '^.....U'
   register: audit_package_ownership_audit
-  failed_when: audit_package_ownership_audit.stderr
   failed_when: no
   changed_when: no
   tags:
@@ -2999,7 +2997,6 @@
 - name: "MEDIUM | V-38665 | AUDIT | The system package management tool must verify group-ownership on all files and directories associated with the audit package."
   shell: rpm -V audit | grep '^......G'
   register: audit_package_group_ownership_audit
-  failed_when: audit_package_group_ownership_audit.stderr
   failed_when: no
   changed_when: no
   tags:
@@ -3036,7 +3033,6 @@
         MEDIUM | V-38700 | AUDIT | The operating system must provide a near real-time alert when any of the organization defined list of compromise or potential compromise indicators occurs.
   shell: grep aide {{ rhel6stig_aide_cron['cron_file'] }} /etc/cron.*/*
   register: aide_cron_audit
-  failed_when: aide_cron_audit.stderr
   failed_when: no
   changed_when: no
   tags:
