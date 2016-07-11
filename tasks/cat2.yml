@@ -30,7 +30,7 @@
       - file_perms
 
 - name: "MEDIUM | V-38444 | AUDIT | The systems local IPv6 firewall must implement a deny-all, allow-by-exception policy for inbound packets."
-  shell: grep ":INPUT" /etc/sysconfig/ip6tables | awk '{print $2}'
+  shell: 'grep ":INPUT" /etc/sysconfig/ip6tables | awk ''{print $2}'''
   register: ipv6_inbound_packets_audit
   changed_when: no
   failed_when: no
