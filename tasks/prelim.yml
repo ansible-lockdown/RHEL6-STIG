@@ -191,3 +191,16 @@
       - V-57569
       - fstab
       - patch
+
+- name: "PRELIM | List interface config files"
+  find:
+      paths: /etc/sysconfig/network-scripts
+      file_type: file
+      patterns: ifcfg-eth*
+  register: interface_config_files
+  tags:
+      - cat2
+      - medium
+      - V-38679
+      - dhcp
+      - network
