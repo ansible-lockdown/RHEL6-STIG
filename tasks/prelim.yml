@@ -182,7 +182,7 @@
       - patch
 
 - name: "PRELIM | List /etc/fstab mount points"
-  shell: awk '/^[^#]/ { print $2; }' /etc/fstab
+  shell: 'awk ''/^[^#]/ { print $2; }'' /etc/fstab'
   changed_when: false
   register: fstab_mountpoints
   tags:
