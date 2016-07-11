@@ -497,9 +497,9 @@
 - name: "MEDIUM | V-38483 | PATCH | The system package management tool must cryptographically verify the authenticity of system software packages during installation."
   replace:
       backup: yes
-      dest: "{{ item }}"
-      regexp: ^gpgcheck=0
-      replace: gpgcheck=1
+      dest: '{{ item }}'
+      regexp: '^gpgcheck=0'
+      replace: 'gpgcheck=1'
   with_flattened:
     - /etc/yum.conf
     - "{{ repo_crypto_check_audit.stdout_lines }}"
@@ -1869,7 +1869,7 @@
       - audit
 
 - name: "MEDIUM | V-38582 | AUDIT | The xinetd service must be disabled if no network services utilizing it are enabled"
-  command: chkconfig xinetd --list
+  command: chkconfig "xinetd" --list
   always_run: yes
   failed_when: no
   changed_when: no
