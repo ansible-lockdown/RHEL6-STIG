@@ -509,9 +509,9 @@
 - name: "MEDIUM | V-38483 | PATCH | The system package management tool must cryptographically verify the authenticity of system software packages during installation."
   replace:
       backup: yes
-      dest: '{{ item }}'
-      regexp: '^gpgcheck=0'
-      replace: 'gpgcheck=1'
+      dest: "{{ item }}"
+      regexp: ^gpgcheck=0
+      replace: gpgcheck=1
   with_flattened:
     - /etc/yum.conf
     - repo_crypto_check_audit.stdout_lines
