@@ -3134,8 +3134,8 @@
 
 - name: "MEDIUM | V-38678 | PATCH | The audit system must provide a warning when allocated audit record storage volume reaches a documented percentage of maximum audit record storage capacity."
   lineinfile:
-      regexp: "^space_left\\s*=.*"
-      line: "space_left = {{ rhel6stig_auditd_config['space_left'] }}"
+      regexp: ^space_left\s*=.*
+      line: space_left = {{ rhel6stig_auditd_config['space_left'] }}
       dest: /etc/audit/auditd.conf
   tags:
       - cat2
