@@ -337,7 +337,7 @@
       - patch
       - file_perms
 
-- name: "MEDIUM | V-38470 | AUDIT | The audit system must alert designated staff members when the audit storage volume approaches capacity.."
+- name: "MEDIUM | V-38470 | AUDIT | The audit system must alert designated staff members when the audit storage volume approaches capacity."
   shell: grep space_left_action /etc/audit/auditd.conf | cut -d = -f 2 | xargs basename
   register:  space_left_action_audit
   changed_when: no
@@ -1878,7 +1878,7 @@
       - audit
 
 - name: "MEDIUM | V-38582 | AUDIT | The xinetd service must be disabled if no network services utilizing it are enabled"
-  command: chkconfig "xinetd" --list
+  command: chkconfig xinetd --list
   always_run: yes
   failed_when: no
   changed_when: no
@@ -1896,7 +1896,10 @@
       name: xinetd
       enabled: no
       state: stopped
-  when: xinetd_audit.rc == 0 or (xinetd_services.stdout and xinetd_services.stdout.find('\ton\n') == -1)
+  when:
+      - xinetd_audit.rc == 0
+      - xinetd_services.stdout
+      - "not xinetd_services.stdout | search(': +\ton')"
   tags:
       - cat2
       - medium
