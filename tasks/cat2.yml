@@ -3169,12 +3169,12 @@
     line: 'action_mail_acct = root'
     state: present
     dest: /etc/audit/auditd.conf
-  tags: 
-   - cat2
-   - medium
-   - V-38680
-   - auditd
-   - patch
+  tags:
+      - cat2
+      - medium
+      - V-38680
+      - auditd
+      - patch
 
 - name: "MEDIUM | V-38682 | PATCH | The Bluetooth kernel module must be disabled."
   copy:
@@ -3249,17 +3249,17 @@
 
 - name: "MEDIUM | V-38691 | PATCH | The Bluetooth service must be disabled"
   service:
-    name: bluetooth
-    state: stopped
-    enabled: no
+      name: bluetooth
+      state: stopped
+      enabled: no
   when: "':on' in bluetooth_service_audit.stdout"
   tags:
-    - cat2
-    - medium
-    - V-38691
-    - bluetooth
-    - services
-    - patch
+      - cat2
+      - medium
+      - V-38691
+      - bluetooth
+      - services
+      - patch
 
 - name: "MEDIUM | V-43150 | PATCH | The login user list must be disabled."
   command: "gconftool-2 --direct --config-source xml:readwrite:/etc/gconf/gconf.xml.mandatory --type bool --set /apps/gdm/simple-greeter/disable_user_list true"
@@ -3321,21 +3321,21 @@
       path: /var/lib/aide/aide.db.gz
   register: aide_db
   tags:
-   - cat2
-   - medium
-   - V-51391
-   - aide
-   - audit
+      - cat2
+      - medium
+      - V-51391
+      - aide
+      - audit
 
 - name: 'MEDIUM | V-51391 | PATCH | A file integrity baseline must be created.'
   shell: /usr/sbin/aide --init && cp /var/lib/aide/aide.db.new.gz /var/lib/aide/aide.db.gz
   when: not aide_db.stat.exists
   tags:
-     - cat2
-     - medium
-     - V-51391
-     - aide
-     - patch
+      - cat2
+      - medium
+      - V-51391
+      - aide
+      - patch
 
 - name: "MEDIUM | V-54381 | PATCH | The audit system must switch the system to single-user mode when available audit storage volume becomes dangerously low."
   lineinfile:
