@@ -3178,11 +3178,13 @@
 
 - name: "MEDIUM | V-38682 | PATCH | The Bluetooth kernel module must be disabled."
   copy:
-      src: disable-bluetooth.conf
+      content: |
+          install net-pf-31 /bin/true
+          install bluetooth /bin/true
       dest: /etc/modprobe.d/disable-bluetooth.conf
       owner: root
       group: root
-      mode: "0644"
+      mode: 0644
   tags:
       - cat2
       - medium
