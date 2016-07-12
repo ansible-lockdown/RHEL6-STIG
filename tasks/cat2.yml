@@ -3423,8 +3423,8 @@
 - name: 'MEDIUM | V-58901 | PATCH | The sudo command must require authentication.'
   lineinfile:
       dest: "{{ item }}"
-      line: "\\1\\2"
-      regexp: "(.*)(!authenticate|NOPASSWD)(.*)"
+      line: \1\2
+      regexp: (.*)(!authenticate|NOPASSWD)(.*)
       state: absent
   with_items: "{{ sudoer_configs }}"
   tags:
