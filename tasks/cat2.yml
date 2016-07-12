@@ -3147,12 +3147,14 @@
 - name: "MEDIUM | V-38679 | PATCH | The DHCP client must be disabled if not needed"
   lineinfile:
       state: present
-      dest: '{{ item }}'
-      regexp: '^BOOTPROTO='
-      line: 'BOOTPROTO=\"none\"'
-  with_items: "{{ interface_config_files.stdout_lines }}"
+      dest: "{{ item.path }}"
+      regexp: ^BOOTPROTO=
+      line: 'BOOTPROTO="none"'
+  with_items: "{{ interface_config_files.files }}"
   register: dhcp_change
-  when: interface_config_files.stdout and not rhel6stig_use_dhcp
+  when:
+      - interface_config_files.matched > 0
+      - not rhel6stig_use_dhcp
   tags:
       - cat2
       - medium
