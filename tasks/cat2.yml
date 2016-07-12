@@ -514,7 +514,7 @@
       replace: gpgcheck=1
   with_flattened:
     - /etc/yum.conf
-    - repo_crypto_check_audit.stdout_lines
+    - "{{ repo_crypto_check_audit.stdout_lines }}"
   tags:
       - cat2
       - medium

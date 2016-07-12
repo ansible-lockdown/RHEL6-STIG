@@ -83,7 +83,7 @@
       path: ~{{ item }}/.rhosts
   register: rhosts_audit
   always_run: yes
-  with_items: users.stdout_lines
+  with_items: "{{ users.stdout_lines }}"
   tags:
       - cat1
       - high
@@ -95,7 +95,7 @@
   file:
     state: absent
     dest: ~{{ item }}/.rhosts
-  with_items: users.stdout_lines
+  with_items: "{{ users.stdout_lines }}"
   tags:
       - cat1
       - high
