@@ -83,7 +83,7 @@
       path: ~{{ item }}/.rhosts
   register: rhosts_audit
   always_run: yes
-  with_items: users.stdout_lines
+  with_items: "{{ users.stdout_lines }}"
   tags:
       - cat1
       - high
@@ -95,7 +95,7 @@
   file:
     state: absent
     dest: ~{{ item }}/.rhosts
-  with_items: users.stdout_lines
+  with_items: "{{ users.stdout_lines }}"
   tags:
       - cat1
       - high
@@ -410,8 +410,8 @@
       state: present
       backup: yes
       dest: /etc/xinetd.d/tftp
-      regexp: 'server_args\\s+=\\s+(/.*$)'
-      line: '\tserver_args\t\t= -s \\1'
+      regexp: 'server_args\s+=\s+(/.*$)'
+      line: '\tserver_args\t\t= -s \1'
       backrefs: yes
   when: "rhel6stig_tftp_required and 'tftp' in xinetd_services.stdout_lines"
   ignore_errors: yes

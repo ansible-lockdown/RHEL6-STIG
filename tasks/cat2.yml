@@ -1,7 +1,4 @@
----
-# This audit.rules file is from https://github.com/RedHatGov/stig-fix-el6/tree/master/config
-
-# Not automated 
+# Not automated
 #- name: "MEDIUM | V-38439 | The system must provide automated support for account management functions."
 
 - name: "MEDIUM | V-38443, V-38448, V-38449 | AUDIT | The /etc/gshadow file must be owned by root. The /etc/gshadow file must be group-owned by root. The /etc/gshadow file must have mode 0000"
@@ -30,7 +27,7 @@
       - file_perms
 
 - name: "MEDIUM | V-38444 | AUDIT | The systems local IPv6 firewall must implement a deny-all, allow-by-exception policy for inbound packets."
-  shell: grep ":INPUT" /etc/sysconfig/ip6tables | awk '{print $2}'
+  shell: 'grep ":INPUT" /etc/sysconfig/ip6tables | awk ''{print $2}'''
   register: ipv6_inbound_packets_audit
   changed_when: no
   failed_when: no
@@ -225,8 +222,8 @@
 
 - name: "MEDIUM | V-38464 | PATCH | The audit system must take appropriate action when there are disk errors on the audit storage volume."
   lineinfile:
-      regexp: "(^disk_error_action\\s*=)(\\s*)"
-      line: "\\1 {{ rhel6stig_auditd_config['disk_full_action'] }}"
+      regexp: '(^disk_error_action\s*=)(\s*)'
+      line: '\1 {{ rhel6stig_auditd_config["disk_full_action"] }}'
       dest: /etc/audit/auditd.conf
       backrefs: yes
   tags:
@@ -302,8 +299,8 @@
 
 - name: "MEDIUM | V-38468 | PATCH | The audit system must take appropriate action when the audit storage volume is full."
   lineinfile:
-      regexp: '(^disk_full_action\\s*=)(\\s*)'
-      line: "\\1 {{ rhel6stig_auditd_config['disk_full_action'] }}"
+      regexp: '(^disk_full_action\s*=)(\s*)'
+      line: '\1 {{ rhel6stig_auditd_config["disk_full_action"] }}'
       dest: /etc/audit/auditd.conf
       backrefs: yes
   tags:
@@ -340,7 +337,7 @@
       - patch
       - file_perms
 
-- name: "MEDIUM | V-38470 | AUDIT | The audit system must alert designated staff members when the audit storage volume approaches capacity.."
+- name: "MEDIUM | V-38470 | AUDIT | The audit system must alert designated staff members when the audit storage volume approaches capacity."
   shell: grep space_left_action /etc/audit/auditd.conf | cut -d = -f 2 | xargs basename
   register:  space_left_action_audit
   changed_when: no
@@ -354,8 +351,8 @@
 
 - name: "MEDIUM | V-38470 | PATCH | The audit system must alert designated staff members when the audit storage volume approaches capacity."
   lineinfile:
-      regexp: '(^space_left_action\\s*=)(\\s*)'
-      line: "\\1 {{ rhel6stig_auditd_config['space_left_action'] }}"
+      regexp: '(^space_left_action\s*=)(\s*)'
+      line: '\1 {{ rhel6stig_auditd_config["space_left_action"] }}'
       dest: /etc/audit/auditd.conf
       backrefs: yes
   tags:
@@ -509,12 +506,12 @@
 - name: "MEDIUM | V-38483 | PATCH | The system package management tool must cryptographically verify the authenticity of system software packages during installation."
   replace:
       backup: yes
-      dest: '{{ item }}'
-      regexp: '^gpgcheck=0'
-      replace: 'gpgcheck=1'
+      dest: "{{ item }}"
+      regexp: ^gpgcheck=0
+      replace: gpgcheck=1
   with_flattened:
     - /etc/yum.conf
-    - repo_crypto_check_audit.stdout_lines
+    - "{{ repo_crypto_check_audit.stdout_lines }}"
   tags:
       - cat2
       - medium
@@ -1836,14 +1833,14 @@
 - name: "MEDIUM | V-38580 | PATCH | The audit system must be configured to audit the loading and unloading of dynamic kernel modules."
   lineinfile:
       backup: yes
-      line: "{{ item }}"
+      line: '{{ item }}'
       dest: /etc/audit/audit.rules
       state: present
   with_items:
       - -w /sbin/insmod -p x -k modules
       - -w /sbin/rmmod -p x -k modules
       - -w /sbin/modprobe -p x -k modules
-      - -a always,exit -F arch=b{{ansible_architecture | regex_replace('.*_(\\d*)','\\\\1')}} -S init_module -S delete_module -k modules
+      - -a always,exit -F arch=b{{ ansible_architecture.split('_')[1] }} -S init_module -S delete_module -k modules
   tags:
     - cat2
     - medium
@@ -1881,7 +1878,7 @@
       - audit
 
 - name: "MEDIUM | V-38582 | AUDIT | The xinetd service must be disabled if no network services utilizing it are enabled"
-  command: chkconfig "xinetd" --list
+  command: chkconfig xinetd --list
   always_run: yes
   failed_when: no
   changed_when: no
@@ -1899,7 +1896,10 @@
       name: xinetd
       enabled: no
       state: stopped
-  when: xinetd_audit.rc == 0 or (xinetd_services.stdout and xinetd_services.stdout.find('\ton\n') == -1)
+  when:
+      - xinetd_audit.rc == 0
+      - xinetd_services.stdout
+      - "not xinetd_services.stdout | search(': +\ton')"
   tags:
       - cat2
       - medium
@@ -1954,7 +1954,7 @@
       line: password --encrypted {{ grub_pass.passhash }}
       dest: /etc/grub.conf
       follow: yes
-      insertafter: '^#\\s'
+      insertafter: '^#\s'
       regexp: password
   when: grub_auth_audit|failed
   tags:
@@ -2944,7 +2944,6 @@
 - name: "MEDIUM | V-38663 | AUDIT | The system package management tool must verify permissions on all files and directories associated with the audit package."
   shell: rpm -V audit | grep '^.M'
   register: audit_package_permissions_audit
-  failed_when: audit_package_permissions_audit.stderr
   failed_when: no
   changed_when: no
   tags:
@@ -2972,7 +2971,6 @@
 - name: "MEDIUM | V-38664 | AUDIT | The system package management tool must verify ownership on all files and directories associated with the audit package."
   shell: rpm -V audit | grep '^.....U'
   register: audit_package_ownership_audit
-  failed_when: audit_package_ownership_audit.stderr
   failed_when: no
   changed_when: no
   tags:
@@ -2999,7 +2997,6 @@
 - name: "MEDIUM | V-38665 | AUDIT | The system package management tool must verify group-ownership on all files and directories associated with the audit package."
   shell: rpm -V audit | grep '^......G'
   register: audit_package_group_ownership_audit
-  failed_when: audit_package_group_ownership_audit.stderr
   failed_when: no
   changed_when: no
   tags:
@@ -3036,7 +3033,6 @@
         MEDIUM | V-38700 | AUDIT | The operating system must provide a near real-time alert when any of the organization defined list of compromise or potential compromise indicators occurs.
   shell: grep aide {{ rhel6stig_aide_cron['cron_file'] }} /etc/cron.*/*
   register: aide_cron_audit
-  failed_when: aide_cron_audit.stderr
   failed_when: no
   changed_when: no
   tags:
@@ -3138,8 +3134,8 @@
 
 - name: "MEDIUM | V-38678 | PATCH | The audit system must provide a warning when allocated audit record storage volume reaches a documented percentage of maximum audit record storage capacity."
   lineinfile:
-      regexp: "^space_left\\s*=.*"
-      line: "space_left = {{ rhel6stig_auditd_config['space_left'] }}"
+      regexp: ^space_left\s*=.*
+      line: space_left = {{ rhel6stig_auditd_config['space_left'] }}
       dest: /etc/audit/auditd.conf
   tags:
       - cat2
@@ -3151,12 +3147,14 @@
 - name: "MEDIUM | V-38679 | PATCH | The DHCP client must be disabled if not needed"
   lineinfile:
       state: present
-      dest: '{{ item }}'
-      regexp: '^BOOTPROTO='
-      line: 'BOOTPROTO=\"none\"'
-  with_items: "{{ interface_config_files.stdout_lines }}"
+      dest: "{{ item.path }}"
+      regexp: ^BOOTPROTO=
+      line: 'BOOTPROTO="none"'
+  with_items: "{{ interface_config_files.files }}"
   register: dhcp_change
-  when: interface_config_files.stdout and not rhel6stig_use_dhcp
+  when:
+      - interface_config_files.matched > 0
+      - not rhel6stig_use_dhcp
   tags:
       - cat2
       - medium
@@ -3171,20 +3169,22 @@
     line: 'action_mail_acct = root'
     state: present
     dest: /etc/audit/auditd.conf
-  tags: 
-   - cat2
-   - medium
-   - V-38680
-   - auditd
-   - patch
+  tags:
+      - cat2
+      - medium
+      - V-38680
+      - auditd
+      - patch
 
 - name: "MEDIUM | V-38682 | PATCH | The Bluetooth kernel module must be disabled."
   copy:
-      src: disable-bluetooth.conf
+      content: |
+          install net-pf-31 /bin/true
+          install bluetooth /bin/true
       dest: /etc/modprobe.d/disable-bluetooth.conf
       owner: root
       group: root
-      mode: "0644"
+      mode: 0644
   tags:
       - cat2
       - medium
@@ -3251,17 +3251,17 @@
 
 - name: "MEDIUM | V-38691 | PATCH | The Bluetooth service must be disabled"
   service:
-    name: bluetooth
-    state: stopped
-    enabled: no
+      name: bluetooth
+      state: stopped
+      enabled: no
   when: "':on' in bluetooth_service_audit.stdout"
   tags:
-    - cat2
-    - medium
-    - V-38691
-    - bluetooth
-    - services
-    - patch
+      - cat2
+      - medium
+      - V-38691
+      - bluetooth
+      - services
+      - patch
 
 - name: "MEDIUM | V-43150 | PATCH | The login user list must be disabled."
   command: "gconftool-2 --direct --config-source xml:readwrite:/etc/gconf/gconf.xml.mandatory --type bool --set /apps/gdm/simple-greeter/disable_user_list true"
@@ -3293,7 +3293,7 @@
 - name: "MEDIUM | V-51363 | PATCH | The system must use a Linux Security Module configured to enforce limits on system services."
   selinux:
       conf: /etc/selinux/config
-      policy: '{{ rhel6stig_selinux_pol }}'
+      policy: "{{ rhel6stig_selinux_pol }}"
       state: enforcing
   tags:
       - cat2
@@ -3303,15 +3303,15 @@
       - patch
 
 - name: "MEDIUM | V-51875 | PATCH  | The operating system, upon successful logon/access, must display to the user the number of unsuccessful logon/access attempts since the last successful logon/access."
-  pam: 
+  pam:
       service: system-auth-ac
       type: session
       control: required
-      pam_module: pam_lastlog.so 
+      pam_module: pam_lastlog.so
       arguments: showfailed
       after_line: session required pam_limits.so
       state: present
-  tags: 
+  tags:
       - cat2
       - medium
       - V-51875
@@ -3323,21 +3323,21 @@
       path: /var/lib/aide/aide.db.gz
   register: aide_db
   tags:
-   - cat2
-   - medium
-   - V-51391
-   - aide
-   - audit
+      - cat2
+      - medium
+      - V-51391
+      - aide
+      - audit
 
 - name: 'MEDIUM | V-51391 | PATCH | A file integrity baseline must be created.'
   shell: /usr/sbin/aide --init && cp /var/lib/aide/aide.db.new.gz /var/lib/aide/aide.db.gz
   when: not aide_db.stat.exists
   tags:
-     - cat2
-     - medium
-     - V-51391
-     - aide
-     - patch
+      - cat2
+      - medium
+      - V-51391
+      - aide
+      - patch
 
 - name: "MEDIUM | V-54381 | PATCH | The audit system must switch the system to single-user mode when available audit storage volume becomes dangerously low."
   lineinfile:
@@ -3357,7 +3357,7 @@
   changed_when: false
   failed_when: false
   always_run: yes
-  tags: 
+  tags:
       - cat2
       - medium
       - V-57569
@@ -3367,14 +3367,14 @@
 
 - name: "MEDIUM | V-57569 | PATCH | The noexec option must be added to the /tmp partition."
   lineinfile:
-      regexp: "^([^\\s]+\\s+/tmp\\s+[^\\s]+\\s+)([^\\s]+)(\\s+.*)$"
-      line: "\\1\\2,noexec\\3"
+      regexp: '^([^\s]+\s+/tmp\s+[^\s]+\s+)([^\s]+)(\s+.*)$'
+      line: '\1\2,noexec\3'
       backrefs: yes
       dest: /etc/fstab
       backup: yes
   when: "'/tmp' in fstab_mountpoints.stdout_lines and 'noexec' not in fstab_tmp_audit.stdout"
   notify: remount /tmp
-  tags: 
+  tags:
       - cat2
       - medium
       - V-57569
@@ -3411,7 +3411,7 @@
 
 - name: 'MEDIUM | V-58901 | AUDIT | The sudo command must require authentication.'
   # Combine lists
-  set_fact: 
+  set_fact:
       sudoer_configs: "{{ sudoers_include_audit.stdout_lines + sudoers_includedirs_files.stdout_lines + ['/etc/sudoers'] }}"
   tags:
       - cat2
@@ -3423,8 +3423,8 @@
 - name: 'MEDIUM | V-58901 | PATCH | The sudo command must require authentication.'
   lineinfile:
       dest: "{{ item }}"
-      line: "\\1\\2"
-      regexp: "(.*)(!authenticate|NOPASSWD)(.*)"
+      line: \1\2
+      regexp: (.*)(!authenticate|NOPASSWD)(.*)
       state: absent
   with_items: "{{ sudoer_configs }}"
   tags:
@@ -3432,4 +3432,4 @@
       - medium
       - V-58901
       - sudoers
-      - patch 
+      - patch

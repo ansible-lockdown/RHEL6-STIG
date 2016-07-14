@@ -1319,7 +1319,7 @@
   yum:
       name: openldap-servers
       state: absent
-  when: not rhel6stig_openldap_server_required
+  when: not rhel6stig_ldap_server
   tags:
       - cat3
       - low
@@ -1330,7 +1330,7 @@
 # V-38635 auditd
 - name: "LOW | V-38635 | PATCH | The audit system must be configured to audit all attempts to alter system time through adjtimex."
   lineinfile:
-      line: -a always,exit -F arch={{ audit_arch }} -S adjtimex -k audit_time_rules 
+      line: -a always,exit -F arch={{ audit_arch }} -S adjtimex -k audit_time_rules
       dest: /etc/audit/audit.rules
       state: present
   tags:

@@ -142,7 +142,7 @@
 
 - name: "PRELIM | Check for existence of /etc/pam_ldap.conf"
   stat:
-    path: /etc/pam_ldap.conf
+      path: /etc/pam_ldap.conf
   register: pam_ldap_test
   failed_when: no
   changed_when: no
@@ -182,7 +182,7 @@
       - patch
 
 - name: "PRELIM | List /etc/fstab mount points"
-  shell: awk '/^[^#]/ { print $2; }' /etc/fstab
+  shell: 'awk ''/^[^#]/ { print $2; }'' /etc/fstab'
   changed_when: false
   register: fstab_mountpoints
   tags:
@@ -191,3 +191,16 @@
       - V-57569
       - fstab
       - patch
+
+- name: "PRELIM | List interface config files"
+  find:
+      paths: /etc/sysconfig/network-scripts
+      file_type: file
+      patterns: ifcfg-eth*
+  register: interface_config_files
+  tags:
+      - cat2
+      - medium
+      - V-38679
+      - dhcp
+      - network
