@@ -139,6 +139,9 @@ rhel6stig_cat3_services:
     state: stopped
     enabled: no
 
+rhel6stig_emergency_accounts: []
+  # - user: foo
+  #   expiration: "2021-09-24"
 
 # List of temporary accounts and their expiration dates
 # Format of expiration date is YYYY-MM-DD
