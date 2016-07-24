@@ -1429,7 +1429,30 @@
       - services
       - patch
 
-# V-38642 umask
+- name: "LOW | V-38642 | AUDIT | The system default umask for daemons must be 027 or 022."
+  shell: grep -e '^umask' /etc/init.d/functions | awk '{print $2}'
+  register: daemon_umask_audit
+  always_run: yes
+  failed_when: no
+  changed_when: no
+  tags:
+      - cat3
+      - low
+      - V-38642
+      - umask
+      - audit
+
+- name: "LOW | V-38642 | PATCH | The system default umask for daemons must be 027 or 022."
+  replace:
+      dest: /etc/init.d/functions
+      regexp: 'umask \d\d\d'
+      replace: 'umask 022'
+  tags:
+      - cat3
+      - low
+      - V-38642
+      - umask
+      - patch
 
 # V-38644 ntpdate service
 - name: "LOW | V-38644 | AUDIT | The ntpdate service must not be running."
@@ -1473,8 +1496,31 @@
       - ntpdate
       - services
       - patch
+ 
+- name: "LOW | V-38645 | AUDIT | The system default umask in /etc/login.defs must be 077."
+  shell: grep UMASK /etc/login.defs | awk '{print $2}'
+  register: login_defs_umask_audit
+  changed_when: no
+  always_run: yes
+  failed_when: no
+  tags:
+      - cat3
+      - low
+      - V-38645
+      - umask
+      - audit
 
-# V-38645 umask
+- name: "LOW | V-38645 | PATCH | The system default umask in /etc/login.defs must be 077."
+  replace:
+      dest: /etc/login.defs
+      regexp: '^UMASK.*'
+      replace: 'UMASK           077'
+  tags:
+      - cat3
+      - low
+      - V-38645
+      - umask
+      - patch
 
 # V-38646 oddjobd service
 - name: "LOW | V-38646 | AUDIT | The oddjobd service must not be running."
@@ -1519,7 +1565,30 @@
       - services
       - patch
 
-# V-38647 umask
+- name: "LOW | V-38647 | AUDIT | The system default umask in /etc/profile must be 077."
+  shell: grep -e 'umask [0-9]' /etc/profile | awk '{print $2}'
+  register: sys_default_umask_audit
+  changed_when: no
+  failed_when: no
+  always_run: yes
+  tags:
+      - cat3
+      - low
+      - V-38647
+      - umask
+      - audit
+
+- name: "LOW | V-38647 | PATCH | The system default umask in /etc/profile must be 077."
+  replace:
+      dest: /etc/profile
+      regexp: 'umask \d\d\d'
+      replace: 'umask 077'
+  tags:
+      - cat3
+      - low
+      - V-38647
+      - umask
+      - patch
 
 # V-38648 qpidd
 - name: "LOW | V-38648 | AUDIT | The qpidd service must not be running."
@@ -1564,9 +1633,33 @@
       - services
       - patch
 
-# V-38649 umask
+- name: "LOW | V-38649 | AUDIT | The system default umask for the csh shell must be 077."
+  shell: grep umask /etc/csh.cshrc | awk '{print $2}'
+  register: csh_umask_audit
+  failed_when: no
+  changed_when: no
+  always_run: yes
+  tags:
+      - cat3
+      - low
+      - V-38649
+      - umask
+      - csh
+      - audit 
 
-# V-38650 rdisc service
+- name: "LOW | V-38649 | PATCH | The system default umask for the csh shell must be 077."
+  replace:
+      dest: /etc/csh.cshrc
+      regexp: 'umask \d\d\d'
+      replace: 'umask 077'
+  tags:
+      - cat3
+      - low
+      - V-38649
+      - umask
+      - csh
+      - patch
+
 - name: "LOW | V-38650 | AUDIT | The rdisc service must not be running."
   command: chkconfig 'rdisc' --list
   register: rdisc_service_enabled_audit
@@ -1943,71 +2036,3 @@
       - secontext
       - patch
 
-# --- BREAK --- #
-
-- name: V-38649 Low  The system default umask for the csh shell must be 077
-  replace: backup=yes dest=/etc/csh.cshrc regexp="umask \d\d\d" replace="umask 077"
-  tags: [ 'cat3' , 'V-38649' , 'csh' , 'umask' ]
-
-- name: V-38642 Low  The system default umask for daemons must be 027 or 022
-  lineinfile: state=present backup=yes dest=/etc/init.d/functions regexp="umask \d\d\d" line="umask 022"
-  tags: [ 'cat3' , 'V-38642' , 'umask' ]
-
-- name: V-38647 Low  The system default umask in /etc/profile must be 077
-  replace: backup=yes dest={{ item }} regexp="umask \d\d\d" replace="umask 077"
-  with_items:
-    - /etc/profile
-    - /etc/bashrc
-  tags: [ 'cat3' , 'V-38647' , 'umask' , 'bash' ]
-
-# Set default umask for fish shell if it is installed
-# This required two tasks in order to add multiple lines cleanly
-# Adding '\n' to the 'line' field causes this module to reinsert the same
-# line every time the task is run which is very undesirable.
-- name: Set default umask for fish shell to 077
-  lineinfile: backup=yes dest=/etc/fish/config.fish line="# Set default umask" insertafter=EOF
-  when: '"fish" in shells.stdout_lines'
-  tags: [ 'cat3' , 'V-38647' , 'umask' , 'bash' ]
-
-- name: Set default umask for fish shell to 077
-  lineinfile: backup=yes dest=/etc/fish/config.fish line="umask 077" insertafter="# Set default umask"
-  when: '"fish" in shells.stdout_lines'
-  tags: [ 'cat3' , 'V-38647' , 'umask' , 'bash' ]
-
-- name: V-38645 Low  The system default umask in /etc/login.defs must be 077
-  lineinfile: "state=present backup=yes dest=/etc/login.defs regexp='^UMASK' line='UMASK           077'"
-  tags: [ 'cat3' , 'V-38645' , 'umask' ]
-
-- name: V-38608 Low  The SSH daemon must set a timeout interval on idle sessions
-  lineinfile: "state=present backup=yes dest=/etc/ssh/sshd_config regexp='^(#)?ClientAliveInterval' line='ClientAliveInterval 900'"
-  tags: [ 'cat3' , 'V-38608' , 'ssh' ]
-  notify: restart ssh
-
-- name: V-38651 Low  The system default umask for the bash shell must be 077
-  replace: backup=yes dest=/etc/bashrc regexp="umask \d\d\d" replace="umask 077"
-  tags: [ 'cat3' , 'V-38651' , 'umask' ]
-
-- name: V-38656 Low  The system must use SMB client signing for connecting to samba servers using smbclient
-  lineinfile: "state=present backup=yes dest=/etc/samba/smb.conf regexp='client signing' line='client signing = mandatory' insertafter='\\[global\\]'"
-  when: samba_check.stat.exists
-  tags: [ 'cat3' , 'V-38656' , 'smb' ]
-  notify: restart samba
-
-- name: V-38675 Low  Process core dumps must be disabled unless needed
-  lineinfile: "state=present backup=yes dest=/etc/security/limits.conf regexp='^#?\\*.*(hard|soft).*core' line='*               hard    core            0'"
-  tags: [ 'cat3' , 'V-38675' , 'core_dump' ]
-
-- name: V-38685 Low  Temporary accounts must be provisioned with an expiration date
-  command: chage -E {{ item.expiration }}  {{ item.user }}
-  when: rhel6stig_temporary_users is defined
-  with_items: rhel6stig_temporary_users
-  tags: [ 'cat3' , 'V-38685' , 'accounts' ]
-
-- name: V-38684 Low  The system must limit users to 10 simultaneous system logins, or a site-defined number, in accordance with operational requirements
-  lineinfile: "state=present backup=yes dest=/etc/security/limits.conf insertbefore='^# End of file' regexp='^#?\\*.*maxlogins' line='*               hard    maxlogins       {{ rhel6stig_maxlogins }}'"
-  tags: [ 'cat3' , 'V-38684' , 'logon_settings' ]
-
-- name: Use strong MAC algorithms
-  lineinfile: "state=present backup=yes dest=/etc/ssh/sshd_config regexp='^#?MACS' line='MACS    hmac-sha1,umac-64@openssh.com,hmac-ripemd160,hmac-sha2-256,hmac-sha2-512'"
-  tags: [ 'cat3' , 'ssh' , 'config' ]
-  notify: restart ssh

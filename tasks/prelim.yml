@@ -106,6 +106,7 @@
   changed_when: false
   always_run: yes
   tags:
+      - cat3
       - umask
 
 - name: "PRELIM | Check for device files with unlabeled_t context"
@@ -159,15 +160,6 @@
       - cat3
       - auditd
 
-- name: "PRELIM | List setuid / setgid programs on all mounted filesystems"
-  shell: find $(lsblk -o MOUNTPOINT -n | grep '^/') -xdev -type f -perm /6000 2>/dev/null
-  changed_when: false
-  register: setugid_programs
-  tags:
-      - cat3
-      - low
-      - V-38567
-
 - name: "PRELIM | Get path of auditd log file"
   shell: "grep '^log_file' /etc/audit/auditd.conf | sed s/^[^\\/]*//"
   changed_when: no
@@ -178,6 +170,29 @@
       - medium
       - V-38445
       - log_files
+      - auditd
+      - patch
+
+- name: "PRELIM | List interface config files"
+  shell: ls /etc/sysconfig/network-scripts/ifcfg-eth* | grep -v $(date +%Y)
+  changed_when: false
+  register: interface_config_files
+  tags:
+      - cat2
+      - medium
+      - V-38679
+      - network
+      - dhcp
+      - patch
+
+- name: "PRELIM | List setuid / setgid programs on all mounted filesystems"
+  shell: find $(lsblk -o MOUNTPOINT -n | grep '^/') -xdev -type f -perm /6000 2>/dev/null
+  changed_when: false
+  register: setugid_programs
+  tags:
+      - cat3
+      - low
+      - V-38567
       - auditd
       - patch
 
