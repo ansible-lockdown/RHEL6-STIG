@@ -307,6 +307,7 @@
       - patch
 
 - name: |
+
         LOW | V-38482 | AUDIT | The system must require passwords to contain at least one numeric character.
         LOW | V-38569 | AUDIT | The system must require passwords to contain at least one uppercase alphabetic character.
         LOW | V-38570 | AUDIT | The system must require passwords to contain at least one special character.
@@ -331,6 +332,7 @@
       - patch
 
 - name: |
+
         LOW | V-38482 | PATCH | The system must require passwords to contain at least one numeric character.
         LOW | V-38569 | PATCH | The system must require passwords to contain at least one uppercase alphabetic character.
         LOW | V-38570 | PATCH | The system must require passwords to contain at least one special character.
@@ -2152,8 +2154,9 @@
       - patch
 
 - name: |
-        LOW | V-38694 | AUDIT | The operating system must manage information system identifiers for users and devices by disabling the user identifier after an organization defined time period of inactivity.
+
         LOW | V-38692 | AUDIT | Accounts must be locked upon 35 days of inactivity.
+        LOW | V-38694 | AUDIT | The operating system must manage information system identifiers for users and devices by disabling the user identifier after an organization defined time period of inactivity.
   command: grep "INACTIVE" /etc/default/useradd
   register: inactive_useradd_audit
   changed_when: no
@@ -2162,8 +2165,8 @@
   tags:
       - cat3
       - low
-      - V-38694
       - V-38692
+      - V-38694
       - accounts
       - users
       - audit
