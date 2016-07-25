@@ -2909,8 +2909,7 @@
       - pam
 
 - name: "MEDIUM | V-38660 | AUDIT | The snmpd service must use only SNMP protocol version 3 or newer."
-  shell: |
-    grep 'v1\|v2c\|com2sec' /etc/snmp/snmpd.conf | grep -v '^#'
+  shell: 'grep ''v1\|v2c\|com2sec'' /etc/snmp/snmpd.conf | grep -v ''^#'''
   register: snmpd_version_audit
   changed_when: no
   failed_when: no

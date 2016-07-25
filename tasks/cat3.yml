@@ -2127,7 +2127,7 @@
       - patch
 
 - name: "LOW | V-38690 | AUDIT | Emergency accounts must be provisioned with an expiration date."
-  shell: chage -l {{ item.user }} | grep "Account expires" | awk -F':' '{print $2}'
+  shell: 'chage -l {{ item.user }} | grep ''Account expires'' | awk -F'':'' ''{print $2}'''
   with_items: "{{ rhel6stig_emergency_accounts }}"
   when: "{{ rhel6stig_emergency_accounts | length > 0 }}"
   register: emergency_account_expiry_audit
