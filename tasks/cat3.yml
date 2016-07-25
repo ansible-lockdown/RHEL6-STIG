@@ -28,7 +28,7 @@
       - autofs
       - services
       - patch
-      
+
 - name: "LOW | V-38438 | AUDIT | Auditing must be enabled at boot by setting a kernel parameter."
   command: grep audit=1 /etc/grub.conf
   register: grub_audit_audit
@@ -82,7 +82,7 @@
   command: rpm -qf {{ item | regex_replace('^..5......\\s+(/.+)$', '\\1') }}
   register: rpm_integrity_audit
   when: item | match("^..5......[^c]*/.+$")
-  with_items: rpm_verify_packages.stdout_lines
+  with_items: "{{ rpm_verify_packages.stdout_lines }}"
   always_run: yes
   tags:
       - cat3
@@ -94,7 +94,7 @@
 - name: "LOW | V-38447 | PATCH | The system package management tool must verify contents of all files associated with packages."
   command: yum reinstall -y {{ item.stdout }}
   when: item|changed
-  with_items: rpm_integrity_audit.results
+  with_items: "{{ rpm_integrity_audit.results }}"
   tags:
       - cat3
       - low
@@ -106,7 +106,7 @@
   command: rpm -qf {{ item | regex_replace('^.M.......\s+[a-z]?\s*(/.+)$', '\1') }}
   when: item | match("^.M.......\\s+.*?/.+$")
   register: rpm_file_permissions_audit
-  with_items: rpm_verify_packages.stdout_lines
+  with_items: "{{ rpm_verify_packages.stdout_lines }}"
   always_run: yes
   tags:
       - cat3
@@ -118,7 +118,7 @@
 - name: "LOW | V-38452 | PATCH | The system package management tool must verify permissions on all files and directories associated with packages."
   command: rpm --setperms {{ item.stdout }}
   when: item|changed
-  with_items: rpm_file_permissions_audit.results
+  with_items: "{{ rpm_file_permissions_audit.results }}"
   tags:
       - cat3
       - low
@@ -130,7 +130,7 @@
   command: rpm -qf {{ item | regex_replace('^......G..\\s+[a-z]?\\s*(/.+)$', '\\1') }}
   when: item | match("^......G..\\s+.*?/.+$")
   register: rpm_group_ownership_audit
-  with_items: rpm_verify_packages.stdout_lines
+  with_items: "{{ rpm_verify_packages.stdout_lines }}"
   always_run: yes
   tags:
       - cat3
@@ -142,7 +142,7 @@
 - name: "LOW | V-38453 | PATCH | The system package management tool must verify group-ownership on all files and directories associated with packages."
   command: rpm --setugids {{ item.stdout }} && rpm --setperms {{ item.stdout }}
   when: item|changed
-  with_items: rpm_group_ownership_audit.results
+  with_items: "{{ rpm_group_ownership_audit.results }}"
   tags:
       - cat3
       - low
@@ -154,7 +154,7 @@
   command: rpm -qf {{ item | regex_replace('^.....U...\\s+[a-z]?\\s*(/.+)$', '\\1') }}
   when: item | match("^.....U...\\s+.*?/.+$")
   register: rpm_group_ownership_audit
-  with_items: rpm_verify_packages.stdout_lines
+  with_items: "{{ rpm_verify_packages.stdout_lines }}"
   always_run: yes
   tags:
       - cat3
@@ -166,7 +166,7 @@
 - name: "LOW | V-38454 | PATCH | The system package management tool must verify ownership on all files and directories associated with packages."
   command: rpm --setugids {{ item.stdout }}
   when: item|changed
-  with_items: rpm_group_ownership_audit.results
+  with_items: "{{ rpm_group_ownership_audit.results }}"
   tags:
       - cat3
       - low
@@ -322,7 +322,7 @@
         LOW | V-38571 | AUDIT | The system must require passwords to contain at least one lower-case alphabetic character.
         LOW | V-38572 | AUDIT | The system must require at least eight characters be changed between the old and new passwords during a password change.
         LOW | V-38693 | AUDIT | The system must require passwords to contain no more than three consecutive repeating characters.
-  command: grep pam_cracklib /etc/pam.d/system-auth 
+  command: grep pam_cracklib /etc/pam.d/system-auth
   register: cracklib_audit
   always_run: yes
   changed_when: no
@@ -347,11 +347,11 @@
         LOW | V-38572 | PATCH | The system must require at least eight characters be changed between the old and new passwords during a password change.
         LOW | V-38693 | PATCH | The system must require passwords to contain no more than three consecutive repeating characters.
   pam:
-      service: '{{ item }}' 
+      service: "{{ item }}"
       type: password
       control: requisite
       pam_module: pam_cracklib.so
-      arguments: '{{ rhel6stig_pam_cracklib_params }}'
+      arguments: "{{ rhel6stig_pam_cracklib_params }}"
       state: present
   with_items:
       - system-auth-ac
@@ -384,10 +384,10 @@
 - name: "LOW | V-38487 | PATCH | The system package management tool must cryptographically verify the authenticity of all software packages during installation."
   replace:
       backup: no
-      dest: '{{ item }}'
+      dest: "{{ item }}"
       regexp: '^gpgcheck=0'
       replace: 'gpgcheck=1'
-  with_items: repo_d_gpgcheck_check_audit.stdout_lines
+  with_items: "{{ repo_d_gpgcheck_check_audit.stdout_lines }}"
   tags:
       - cat3
       - low
@@ -1234,7 +1234,7 @@
       - patch
 
 - name: "LOW | V-38578 | AUDIT | The audit system must be configured to audit changes to the /etc/sudoers file."
-  command: grep -w "/etc/sudoers" /etc/audit/audit.rules 
+  command: grep -w "/etc/sudoers" /etc/audit/audit.rules
   register: auditd_sudoers_audit
   changed_when: no
   always_run: yes
@@ -1462,7 +1462,7 @@
       - patch
 
 - name: "LOW | V-38639 | AUDIT | The system must display a publicly-viewable pattern during a graphical desktop environment session lock."
-  command: gconftool-2 --direct --config-source xml:readwrite:/etc/gconf/gconf.xml.mandatory --get /apps/gnome-screensaver/mode 
+  command: gconftool-2 --direct --config-source xml:readwrite:/etc/gconf/gconf.xml.mandatory --get /apps/gnome-screensaver/mode
   register: gconftool_pattern_audit
   always_run: yes
   changed_when: no
@@ -1636,7 +1636,7 @@
       - ntpdate
       - services
       - patch
- 
+
 - name: "LOW | V-38645 | AUDIT | The system default umask in /etc/login.defs must be 077."
   shell: grep UMASK /etc/login.defs | awk '{print $2}'
   register: login_defs_umask_audit
@@ -1783,7 +1783,7 @@
       - V-38649
       - umask
       - csh
-      - audit 
+      - audit
 
 - name: "LOW | V-38649 | PATCH | The system default umask for the csh shell must be 077."
   replace:
@@ -1865,7 +1865,7 @@
       - patch
 
 - name: "LOW | V-38655 | AUDIT | The noexec option must be added to removable media partitions."
-  command: grep noexec /etc/fstab 
+  command: grep noexec /etc/fstab
   always_run: yes
   changed_when: no
   failed_when: no
@@ -1895,13 +1895,13 @@
 #Not automated
 #- name: "LOW | V-38657 | The system must use SMB client signing for connecting to samba servers using mount.cifs.
 
-# not automated 
+# not automated
 #- name: "LOW | V-38659 | The operating system must employ cryptographic mechanisms to protect information in storage."
 
 #not automated
-#- name: "LOW | V-38661 | The operating system must protect the confidentiality and integrity of data at rest." 
+#- name: "LOW | V-38661 | The operating system must protect the confidentiality and integrity of data at rest."
 #Not automated
-#- name: "LOW | V-38662 | The operating system must employ cryptographic mechanisms to prevent unauthorized disclosure of data at rest unless otherwise protected by alternative physical measures. 
+#- name: "LOW | V-38662 | The operating system must employ cryptographic mechanisms to prevent unauthorized disclosure of data at rest unless otherwise protected by alternative physical measures.
 
 - name: "LOW | V-38669 | AUDIT | The postfix service must be enabled for mail delivery."
   command: chkconfig 'postfix' --list
@@ -2160,7 +2160,7 @@
 - name: |
         LOW | V-38694 | AUDIT | The operating system must manage information system identifiers for users and devices by disabling the user identifier after an organization defined time period of inactivity.
         LOW | V-38692 | AUDIT | Accounts must be locked upon 35 days of inactivity.
-  command: grep "INACTIVE" /etc/default/useradd 
+  command: grep "INACTIVE" /etc/default/useradd
   register: inactive_useradd_audit
   changed_when: no
   failed_when: no
