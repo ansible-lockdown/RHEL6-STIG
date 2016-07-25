@@ -2101,8 +2101,8 @@
       - audit
 
 - name: "MEDIUM | V-38593 | PATCH |  The Department of Defense (DoD) login banner must be displayed immediately prior to or as part of console login prompts"
-  copy:
-      src: issue
+  template:
+      src: issue.j2
       dest: /etc/{{ item }}
       owner: root
       group: root
