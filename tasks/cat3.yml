@@ -264,23 +264,13 @@
       - audit
 
 - name: "LOW | V-38478 | PATCH | The Red Hat Network Service (rhnsd) service must not be running, unless using RHN or an RHN Satellite."
-  shell: chkconfig rhnsd off && chkconfig rhnsd --list
-  register: rhnsd_service_disable
-  when: "rhnsd_service_audit.rc == 0 and ':on' in rhnsd_service_audit.stdout"
-  failed_when: "rhnsd_service_disable.rc != 0 and ':on' in rhnsd_service_disable.stdout"
-  tags:
-      - cat3
-      - low
-      - V-38478
-      - rhnsd
-      - patch
-
-- name: "LOW | V-38478 | PATCH | The Red Hat Network Service (rhnsd) service must not be running, unless using RHN or an RHN Satellite."
-  command: service rhnsd stop
-  register: rhnsd_service_stop
-  when: rhnsd_service_audit.rc == 0
-  failed_when: result.rc != 0 and result.rc != 6
-  changed_when: "rhnsd_service_stop.rc == 0 and 'Stopping' in rhnsd_service_stop.stdout and 'OK' in rhnsd_service_stop.stdout"
+  service:
+      name: rhnsd
+      state: stopped
+      enabled: no
+  when:
+      - "'rhnsd' in sysv_services.stdout"
+      - rhel6stig_rhnsatellite_required
   tags:
       - cat3
       - low

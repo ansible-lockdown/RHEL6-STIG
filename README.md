@@ -42,6 +42,7 @@ There are many role variables defined in defaults/main.yml. Here are the most im
 | `rhel6stig_ipv6_in_use` | False | Whether or not ipv6 is in use of the target system. This is set automatically to 'true' if ipv6 is found to be in use. (Default: false) |
 | `rhel6stig_tftp_required` | False |  Whether or not TFTP is required. This will prevent the removal of `tftp` and `tftp-server` packages. It will also  reconfigure the `tftp-server` to run securely. |
 | `rhel6stig_change_grub_password` | False | Whether or not to update the grub password even if a hash already exists in `/boot/grub/grub.conf`. |
+| `rhel6stig_rhnsatellite_required` | `no` | Whether or not Red Hat Satellite is required in the environment. If not required, `rhnsd` will be stopped and disabled. |
 | `rhel6stig_bootloader_password` | [Randomly generated and encrypted string] | The new grub password to use if `rhel6stig_change_grub_password` is **True** |
 
 

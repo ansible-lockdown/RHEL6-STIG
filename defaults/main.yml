@@ -55,6 +55,10 @@ rhel6stig_ipv6_required: no
 # and configure tftp to run securely
 rhel6stig_tftp_required: false
 
+# Whether or not RHN Satellion is required
+# This will disable rhnsd if set to False
+rhel6stig_rhnsatellite_required: no
+
 # Set to true if system is acting as a router
 # This will disable changing net.ipv4 settings as well as
 # allow the kernel to forward packets
