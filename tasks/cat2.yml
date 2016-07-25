@@ -461,7 +461,7 @@
   failed_when: no
   changed_when: no
   register: yum_pkgs_update_audit
-  when: rhel6stig_update_packages
+  when: rhel6stig_update_all_packages
   tags:
       - cat2
       - medium
@@ -475,7 +475,7 @@
       name: '*'
       state: latest
       update_cache: yes
-      when: rhel6stig_update_packages
+  when: rhel6stig_update_all_packages
   tags:
       - cat2
       - medium

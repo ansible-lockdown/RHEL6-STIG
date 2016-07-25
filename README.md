@@ -40,7 +40,7 @@ There are many role variables defined in defaults/main.yml. Here are the most im
 | `rhel6stig_tftp_required` | `no` |  Whether or not TFTP is required. If set to `yes`, this will prevent the removal of `tftp` and `tftp-server` packages. It will also  reconfigure the `tftp-server` to run securely. |
 | `rhel6stig_rhnsatellite_required` | `no` | Whether or not Red Hat Satellite is required in the environment. If not required, `rhnsd` will be stopped and disabled. |
 | `rhel6stig_bootloader_password` | [Randomly generated and encrypted string] | The new grub password to use if `rhel6stig_change_grub_password` is **True** |
-| `rhel6stig_update_packages` | `yes` | Whether to install all system updates. |
+| `rhel6stig_update_all_packages` | `yes` | Whether to install all system updates. |
 
 
 Dependencies
@@ -58,7 +58,7 @@ Correct CAT I and CAT II findings but don't apply all updates.
   become: yes
 
   vars:
-    rhel6stig_update_packages: no
+    rhel6stig_update_all_packages: no
 
   roles:
     - { role: nousdefions.STIG-RHEL6,
@@ -75,7 +75,7 @@ Prompt for the GRUB password.
   become: yes
 
   vars:
-    rhel6stig_update_packages: no
+    rhel6stig_update_all_packages: no
 
   vars:
     rhel6stig_cat1: yes

@@ -27,7 +27,7 @@ rhel6stig_selinux_pol: targeted
 rhel6stig_use_dhcp: yes
 
 # Set to true to install all patches and updates available via yum
-rhel6stig_update_packages: yes
+rhel6stig_update_all_packages: yes
 
 # Set maximum number of simultaneous system logins (V-38684)
 rhel6stig_maxlogins: 10
