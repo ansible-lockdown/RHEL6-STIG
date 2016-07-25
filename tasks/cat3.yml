@@ -388,7 +388,7 @@
       - patch
 
 - name: "LOW | V-38494 | AUDIT | The system must prevent the root account from logging in from serial consoles."
-  command: grep '^ttyS[0-9]' /etc/securetty
+  command: "grep '^ttyS[0-9]' /etc/securetty"
   register: securetty_serial_consoles_audit
   failed_when: securetty_serial_consoles_audit.rc == 2
   changed_when: false
@@ -1458,25 +1458,25 @@
   register: gconftool_pattern_audit
   always_run: yes
   changed_when: no
-  when: rhel6stig_graphical_desktop
+  when: rhel6stig_xwindows_required
   tags:
-    - cat3
-    - low
-    - V-38639
-    - screensaver
-    - gconftool
-    - audit
+      - cat3
+      - low
+      - V-38639
+      - screensaver
+      - gconftool
+      - audit
 
 - name: "LOW | V-38639 | PATCH | The system must display a publicly-viewable pattern during a graphical desktop environment session lock."
   command: gconftool-2 --direct --config-source xml:readwrite:/etc/gconf/gconf.xml.mandatory --type string --set /apps/gnome-screensaver/mode blank-only
-  when: rhel6stig_graphical_desktop
+  when: rhel6stig_xwindows_required
   tags:
-    - cat3
-    - low
-    - V-38639
-    - screensaver
-    - gconftool
-    - patch
+      - cat3
+      - low
+      - V-38639
+      - screensaver
+      - gconftool
+      - patch
 
 - name: "LOW | V-38640 | AUDIT | The Automatic Bug Reporting Tool (abrtd) service must not be running."
   command: chkconfig 'abrtd' --list
@@ -2074,9 +2074,9 @@
       - patch
 
 - name: "LOW | V-38685 | AUDIT | Temporary accounts must be provisioned with an expiration date."
-  shell: chage -l {{ item.user }} | grep "Account expires" | awk -F':' '{print $2}'
-  with_items: "{{ rhel6stig_temporary_accounts }}"
-  when: "{{ rhel6stig_temporary_accounts | length > 0 }}"
+  shell: 'chage -l {{ item.user }} | grep ''Account expires'' | awk -F'':'' ''{print $2}'''
+  with_items: "{{ rhel6stig_temporary_users }}"
+  when: rhel6stig_temporary_users | length > 0
   register: temporary_account_expiry_audit
   changed_when: no
   always_run: yes
@@ -2089,8 +2089,8 @@
 
 - name: "LOW | V-38685 | PATCH | Temporary accounts must be provisioned with an expiration date."
   command: chage -E {{ item.expiration }} {{ item.user }}
-  with_items: "{{ rhel6stig_temporary_accounts }}"
-  when: "{{ rhel6stig_temporary_accounts | length > 0 }}"
+  with_items: "{{ rhel6stig_temporary_users }}"
+  when: "{{ rhel6stig_temporary_users | length > 0 }}"
   tags:
       - cat3
       - low
