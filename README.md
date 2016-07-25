@@ -31,18 +31,18 @@ There are many role variables defined in defaults/main.yml. Here are the most im
 
 | Name              | Default Value       | Description          |
 |-------------------|---------------------|----------------------|
-| `rhel6stig_cat1` | True | Correct CAT I findings |
-| `rhel6stig_cat2` | False | Correct CAT II findings |
-| `rhel6stig_cat3` | False | Correct CAT III findings |
-| `rhel6stig_fullauto` | True | Run the role without pausing |
-| `rhel6stig_use_dhcp` | True | Whether the system should use DHCP or Static IPs. **Setting this False is dangerous**. |
-| `rhel6stig_system_is_router` | False | Whether on not the target system is acting as a router. Disables settings that would break the system if it is a acting as a router |
+| `rhel6stig_cat1` | `yes` | Correct CAT I findings |
+| `rhel6stig_cat2` | `no` | Correct CAT II findings |
+| `rhel6stig_cat3` | `no` | Correct CAT III findings |
+| `rhel6stig_fullauto` | `yes` | Run the role without pausing |
+| `rhel6stig_use_dhcp` | `yes` | Whether the system should use DHCP or Static IPs. **Setting this False is dangerous**. |
+| `rhel6stig_system_is_router` | `no` | Whether on not the target system is acting as a router. Disables settings that would break the system if it is a acting as a router |
 | `rhel6stig_root_email_address` | `foo@baz.com` | Address where system email is sent. |
-| `rhel6stig_xwindows_required` | False | Whether or not X Windows is is use on taregt systems. Disables some changes if X Windows is not in use. |
-| `rhel6stig_ipv6_in_use` | False | Whether or not ipv6 is in use of the target system. This is set automatically to 'true' if ipv6 is found to be in use. (Default: false) |
-| `rhel6stig_tftp_required` | False |  Whether or not TFTP is required. This will prevent the removal of `tftp` and `tftp-server` packages. It will also  reconfigure the `tftp-server` to run securely. |
-| `rhel6stig_change_grub_password` | False | Whether or not to update the grub password even if a hash already exists in `/boot/grub/grub.conf`. |
+| `rhel6stig_xwindows_required` | `no` | Whether or not X Windows is is use on taregt systems. Disables some changes if X Windows is not in use. |
+| `rhel6stig_ipv6_in_use` | `no` | Whether or not ipv6 is in use of the target system. This is set automatically to 'true' if ipv6 is found to be in use. (Default: false) |
+| `rhel6stig_tftp_required` | `no` |  Whether or not TFTP is required. This will prevent the removal of `tftp` and `tftp-server` packages. It will also  reconfigure the `tftp-server` to run securely. |
 | `rhel6stig_rhnsatellite_required` | `no` | Whether or not Red Hat Satellite is required in the environment. If not required, `rhnsd` will be stopped and disabled. |
+| `rhel6stig_change_grub_password` | `no` | Whether or not to update the grub password even if a hash already exists in `/boot/grub/grub.conf`. |
 | `rhel6stig_bootloader_password` | [Randomly generated and encrypted string] | The new grub password to use if `rhel6stig_change_grub_password` is **True** |
 
 

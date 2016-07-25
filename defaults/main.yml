@@ -1,11 +1,11 @@
 ---
 # Generate an audit report
-make_audit_report: false
+make_audit_report: no
 
 # Enable or disable remediation for each category
-rhel6stig_cat1: true
-rhel6stig_cat2: false
-rhel6stig_cat3: false
+rhel6stig_cat1: yes
+rhel6stig_cat2: no
+rhel6stig_cat3: no
 
 # Changing system defaults
 rhel6stig_snmp_community: B0re4lis
@@ -29,13 +29,13 @@ rhel6stig_selinux_pol: targeted
 # Setting this to false will cause the playbook to execute tasks
 # that disable DHCP in /etc/sysconfig/network-scripts/ifcfg-eth*
 # and may leave your system in an unusable state after a reboot.
-rhel6stig_use_dhcp: true
+rhel6stig_use_dhcp: yes
 
 # Set this to false to have the role pause
-rhel6stig_fullauto: true
+rhel6stig_fullauto: yes
 
 # Set to true to install all patches and updates available via yum
-rhel6stig_update_packages: true
+rhel6stig_update_packages: yes
 
 # Set maximum number of simultaneous system logins (V-38684)
 rhel6stig_maxlogins: 10
@@ -44,7 +44,7 @@ rhel6stig_maxlogins: 10
 rhel6stig_root_email_address: foo@baz.com
 
 # Set to 'true' if X Windows is needed in your environment
-rhel6stig_xwindows_required: false
+rhel6stig_xwindows_required: no
 
 # Assume ipv6 is not needed on the target system and disable it.
 # This will also skip tasks related to configuring ip6tables.
@@ -53,7 +53,7 @@ rhel6stig_ipv6_required: no
 # Whether or not TFTP is required
 # This will prevent the removal of tftp and tftp-server packages
 # and configure tftp to run securely
-rhel6stig_tftp_required: false
+rhel6stig_tftp_required: no
 
 # Whether or not RHN Satellion is required
 # This will disable rhnsd if set to False
@@ -62,14 +62,14 @@ rhel6stig_rhnsatellite_required: no
 # Set to true if system is acting as a router
 # This will disable changing net.ipv4 settings as well as
 # allow the kernel to forward packets
-rhel6stig_system_is_router: false
+rhel6stig_system_is_router: no
 
 # Set to true if system is an authorized mail relay
 # This will disable the postfix settings V-38622
-rhel6stig_is_mail_relay: false
+rhel6stig_is_mail_relay: no
 
 # Set to true is sytem is an LDAP server
-rhel6stig_ldap_server: false
+rhel6stig_ldap_server: no
 
 # By default will create a random password with the same grub-crypt --sha-512
 # mechanism rebuilt as an Ansible module.
