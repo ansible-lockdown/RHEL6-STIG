@@ -2088,9 +2088,11 @@
       - audit
 
 - name: "LOW | V-38685 | PATCH | Temporary accounts must be provisioned with an expiration date."
-  command: chage -E {{ item.expiration }} {{ item.user }}
+  user:
+      name: "{{ item.user }}"
+      expires: "{{ item.expiration }}"
   with_items: "{{ rhel6stig_temporary_users }}"
-  when: "{{ rhel6stig_temporary_users | length > 0 }}"
+  when: rhel6stig_temporary_users | length > 0
   tags:
       - cat3
       - low
