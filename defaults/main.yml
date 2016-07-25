@@ -95,6 +95,9 @@ rhel6stig_ntp_config_restrict:
   - "127.0.0.1"
   - "-6 ::1"
 
+# V-38694
+rhel6stig_acct_max_inactive: 35
+
 # Services listed in CAT III findings and their configuration
 # state should be started or stopped
 # enabled can be yes or no
@@ -145,7 +148,7 @@ rhel6stig_cat3_services:
 
 rhel6stig_emergency_accounts: []
   # - user: foo
-  #   expiration: "2021-09-24"
+  #   expiration: 1632441600    # 2021-09-24. Time mush be in epoch.
 
 # List of temporary accounts and their expiration dates
 # Format of expiration date is YYYY-MM-DD

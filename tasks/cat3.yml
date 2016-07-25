@@ -2145,7 +2145,9 @@
       - audit
 
 - name: "LOW | V-38690 | PATCH | Emergency accounts must be provisioned with an expiration date."
-  command: chage -E {{ item.expiration }} {{ item.user }}
+  user:
+      name: "{{ item.user }}"
+      expires: "{{ item.expiration }}"
   with_items: "{{ rhel6stig_emergency_accounts }}"
   when: rhel6stig_emergency_accounts | length > 0
   tags:
