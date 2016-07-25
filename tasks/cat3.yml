@@ -240,7 +240,7 @@
       - screen_lock
       - audit
 
-- name: "LOW | V-38474 | PATCH | Low  The system must allow locking of graphical desktop sessions."
+- name: "LOW | V-38474 | PATCH | The system must allow locking of graphical desktop sessions."
   command: gconftool-2 --direct --config-source xml:readwrite:/etc/gconf/gconf.xml.mandatory --type string --set /apps/gnome_settings_daemon/keybindings/screensaver "<Ctrl><Alt>l"
   when: rhel6stig_xwindows_required
   tags:
@@ -256,6 +256,7 @@
   always_run: yes
   changed_when: false
   ignore_errors: yes
+  failed_when: no
   tags:
       - cat3
       - low
@@ -1224,9 +1225,10 @@
       - patch
 
 - name: "LOW | V-38578 | AUDIT | The audit system must be configured to audit changes to the /etc/sudoers file."
-  command: grep -w "/etc/sudoers" /etc/audit/audit.rules
+  command: grep -w /etc/sudoers /etc/audit/audit.rules
   register: auditd_sudoers_audit
   changed_when: no
+  failed_when: no
   always_run: yes
   tags:
       - cat3
