@@ -44,7 +44,9 @@
       dest: /etc/sysconfig/ip6tables
       line: ":INPUT DROP [0:0]"
       regexp: '^:INPUT\s*.*\s*\[0:0\]'
-  when: "ipv6_inbound_packets_audit.stdout != 'DROP'"
+  when:
+      - "ipv6_inbound_packets_audit.stdout != 'DROP'"
+      - "'No such file or directory' not in ipv6_inbound_packets_audit.stderr"
   tags:
       - cat2
 
