@@ -2131,7 +2131,7 @@
 - name: "LOW | V-38690 | AUDIT | Emergency accounts must be provisioned with an expiration date."
   shell: 'chage -l {{ item.user }} | grep ''Account expires'' | awk -F'':'' ''{print $2}'''
   with_items: "{{ rhel6stig_emergency_accounts }}"
-  when: "{{ rhel6stig_emergency_accounts | length > 0 }}"
+  when: rhel6stig_emergency_accounts | length > 0
   register: emergency_account_expiry_audit
   changed_when: no
   always_run: yes
@@ -2145,7 +2145,7 @@
 - name: "LOW | V-38690 | PATCH | Emergency accounts must be provisioned with an expiration date."
   command: chage -E {{ item.expiration }} {{ item.user }}
   with_items: "{{ rhel6stig_emergency_accounts }}"
-  when: "{{ rhel6stig_emergency_accounts | length > 0 }}"
+  when: rhel6stig_emergency_accounts | length > 0
   tags:
       - cat3
       - low

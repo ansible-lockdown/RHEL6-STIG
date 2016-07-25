@@ -3199,7 +3199,7 @@
 
 - name: "MEDIUM | V-38688 | PATCH | A login banner must be displayed immediately prior to, or as part of, graphical desktop environment login prompts."
   command: "gconftool-2 --direct --config-source xml:readwrite:/etc/gconf/gconf.xml.mandatory --type bool --set /apps/gdm/simple-greeter/banner_message_enable true"
-  when: '{{ rhel6stig_xwindows_required }}'
+  when: rhel6stig_xwindows_required
   notify: restart gdm
   tags:
       - cat2
