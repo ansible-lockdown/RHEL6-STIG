@@ -1,4 +1,3 @@
----
 # Generate an audit report
 make_audit_report: no
 
@@ -15,11 +14,7 @@ rhel6stig_pass_max_days: 60
 rhel6stig_pass_reuse: 5         # V-38658 Number of passwords to remember to prevent reuse.
 rhel6stig_pam_unix_params: sha512 shadow try_first_pass use_authtok remember=24
 rhel6stig_pam_auth_sufficient: pam_unix.so try_first_pass
-rhel6stig_pam_cracklib_params: try_first_pass retry=3 maxrepeat=3 minlen=14 dcredit=-1 ucredit=-1 ocredit=-1 lcredit=-1 difok=4
-rhel6stig_pam_faillock_params:
-  - 'auth        [default=die] pam_faillock.so authfail deny=3 unlock_time=604800 fail_interval=900'
-  - 'auth        required      pam_faillock.so authsucc deny=3 unlock_time=604800 fail_interval=900'
-  - 'auth        required      pam_faillock.so preauth silent deny=3 unlock_time=604800 fail_interval=900'
+rhel6stig_pam_cracklib_params: try_first_pass retry=3 maxrepeat=3 minlen={{ rhel6stig_pass_min_length }} dcredit=-1 ucredit=-1 ocredit=-1 lcredit=-1 difok=4
 
 # SELinux settings
 rhel6stig_selinux_pol: targeted
@@ -30,9 +25,6 @@ rhel6stig_selinux_pol: targeted
 # that disable DHCP in /etc/sysconfig/network-scripts/ifcfg-eth*
 # and may leave your system in an unusable state after a reboot.
 rhel6stig_use_dhcp: yes
-
-# Set this to false to have the role pause
-rhel6stig_fullauto: yes
 
 # Set to true to install all patches and updates available via yum
 rhel6stig_update_packages: yes
@@ -97,54 +89,6 @@ rhel6stig_ntp_config_restrict:
 
 # V-38694
 rhel6stig_acct_max_inactive: 35
-
-# Services listed in CAT III findings and their configuration
-# state should be started or stopped
-# enabled can be yes or no
-rhel6stig_cat3_services:
-  - name: abrtd
-    state: stopped
-    enabled: no
-
-  - name: atd
-    state: stopped
-    enabled: no
-
-  - name: qpidd
-    state: stopped
-    enabled: no
-
-  - name: oddjobd
-    state: stopped
-    enabled: no
-
-  - name: ntpdate
-    state: stopped
-    enabled: no
-
-  - name: rdisc
-    state: stopped
-    enabled: no
-
-  - name: autofs
-    state: stopped
-    enabled: no
-
-  - name: postfix
-    state: started
-    enabled: yes
-
-  - name: netconsole
-    state: stopped
-    enabled: no
-
-  - name: rhnsd
-    state: stopped
-    enabled: no
-
-  - name: ipsec
-    state: stopped
-    enabled: no
 
 rhel6stig_emergency_accounts: []
   # - user: foo

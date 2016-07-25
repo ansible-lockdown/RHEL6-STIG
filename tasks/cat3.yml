@@ -2294,7 +2294,7 @@
 
 - name: "LOW | V-51369 | PATCH | The system must use a Linux Security Module configured to limit the privileges of system services."
   selinux:
-      policy: targeted
+      policy: "{{ rhel6stig_selinux_pol }}"
       state: enforcing
   tags:
       - cat3
