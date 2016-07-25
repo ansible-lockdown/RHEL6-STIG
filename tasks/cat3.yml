@@ -432,7 +432,9 @@
 - name: "LOW | V-38516 | PATCH | The Reliable Datagram Sockets (RDS) protocol must be disabled unless required."
   copy:
       backup: no
-      src: disable-rds.conf
+      content: |
+          blacklist rds
+          install rds /bin/true
       dest: /etc/modprobe.d/disable-rds.conf
       owner: root
       group: root

@@ -588,8 +588,7 @@
 
 - name: "MEDIUM | V-38490 | PATCH | The operating system must enforce requirements for the connection of mobile devices to operating systems."
   copy:
-      backup: no
-      src: disable-usb.conf
+      content: install usb-storage /bin/true
       dest: /etc/modprobe.d/disable-usb.conf
       owner: root
       group: root
