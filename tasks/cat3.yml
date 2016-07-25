@@ -93,7 +93,7 @@
 
 - name: "LOW | V-38447 | PATCH | The system package management tool must verify contents of all files associated with packages."
   command: yum reinstall -y {{ item.stdout }}
-  when: item|changed
+  when: item | changed
   with_items: "{{ rpm_integrity_audit.results }}"
   tags:
       - cat3
@@ -117,7 +117,7 @@
 
 - name: "LOW | V-38452 | PATCH | The system package management tool must verify permissions on all files and directories associated with packages."
   command: rpm --setperms {{ item.stdout }}
-  when: item|changed
+  when: item | changed
   with_items: "{{ rpm_file_permissions_audit.results }}"
   tags:
       - cat3
@@ -141,7 +141,7 @@
 
 - name: "LOW | V-38453 | PATCH | The system package management tool must verify group-ownership on all files and directories associated with packages."
   command: rpm --setugids {{ item.stdout }} && rpm --setperms {{ item.stdout }}
-  when: item|changed
+  when: item | changed
   with_items: "{{ rpm_group_ownership_audit.results }}"
   tags:
       - cat3
@@ -165,7 +165,7 @@
 
 - name: "LOW | V-38454 | PATCH | The system package management tool must verify ownership on all files and directories associated with packages."
   command: rpm --setugids {{ item.stdout }}
-  when: item|changed
+  when: item | changed
   with_items: "{{ rpm_group_ownership_audit.results }}"
   tags:
       - cat3
