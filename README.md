@@ -12,7 +12,7 @@ This role **will make changes to the system** that could break things. This is n
 
 To install this role with `ansible-galaxy` use the following command:
 
-`ansible-galaxy install -p roles nousdefions.STIG-RHEL6,devel`
+`ansible-galaxy install -p roles nousdefions.STIG-RHEL6,$TAG` Where `$TAG` represents a git tag of this repo, for example `v0.9`
 
 Based on [Red Hat Enterprise Linux 6 STIG Version 1 Release 6 - 2015-01-23](http://iase.disa.mil/stigs/os/unix-linux/Pages/index.aspx).
 
