@@ -245,6 +245,31 @@
       - patch
       - auditd
 
+- name: "MEDIUM | V-54381 | AUDIT | The audit system must switch the system to single-user mode when available audit storage volume becomes dangerously low."
+  shell: grep admin_space_left_action /etc/audit/auditd.conf | cut -d = -f 2 | xargs basename
+  register:  admin_space_left_action_audit
+  changed_when: no
+  always_run: yes
+  tags:
+      - cat2
+      - medium
+      - V-54381
+      - audit
+      - auditd
+
+- name: "MEDIUM | V-54381 | PATCH | The audit system must switch the system to single-user mode when available audit storage volume becomes dangerously low."
+  lineinfile:
+      regexp: '^admin_space_left_action'
+      line: "admin_space_left_action = {{ rhel6stig_auditd_config['admin_space_left_action'] }}"
+      dest: /etc/audit/auditd.conf
+      backrefs: yes
+  tags:
+      - cat2
+      - medium
+      - V-54381
+      - patch
+      - auditd
+
 - name: "MEDIUM | V-38469 | AUDIT | All system command files must have mode 755 or less permissive."
   script: sys_command_files_with_bad_perms.sh
   become_user: root
@@ -273,7 +298,7 @@
       - file_perms
 
 - name: "MEDIUM | V-38470 | AUDIT | The audit system must alert designated staff members when the audit storage volume approaches capacity.."
-  shell: grep space_left_action /etc/audit/auditd.conf | cut -d = -f 2 | xargs basename
+  shell: grep ^space_left_action /etc/audit/auditd.conf | cut -d = -f 2 | xargs basename
   register:  space_left_action_audit
   changed_when: no
   always_run: yes
@@ -286,8 +311,8 @@
 
 - name: "MEDIUM | V-38470 | PATCH | The audit system must alert designated staff members when the audit storage volume approaches capacity."
   lineinfile:
-      regexp: '(^space_left_action\\s*=)(\\s*)'
-      line: "\\1 {{ rhel6stig_auditd_config['space_left_action'] }}"
+      regexp: '^space_left_action'
+      line: "space_left_action = {{ rhel6stig_auditd_config['space_left_action'] }}"
       dest: /etc/audit/auditd.conf
       backrefs: yes
   tags:
@@ -479,6 +504,35 @@
       - medium
       - patch
       - V-38484
+      - sshd
+
+- name: "MEDIUM | V-51875 | AUDIT | The operating system, upon successful logon, must display to the user the date and time of the last logon or access via ssh."
+  shell: "grep 'pam_lastlog.so' /etc/pam.d/system-auth"
+  ignore_errors: yes
+  register: pam_lastlog_audit
+  changed_when: no
+  always_run: yes
+  tags:
+      - cat2
+      - medium
+      - V-51875
+      - audit
+      - sshd
+
+- name: "MEDIUM | V-51875 | PATCH | The operating system, upon successful logon, must display to the user the date and time of the last logon or access via ssh."
+  pam:
+      service: system-auth
+      type: session
+      control: required
+      pam_module: pam_lastlog.so
+      after_line: session     required      pam_limits.so
+      arguments: showfailed
+      state: present
+  tags:
+      - cat2
+      - medium
+      - patch
+      - V-51875
       - sshd
 
 # V-38486 cannot be automated
@@ -1740,7 +1794,7 @@
       - -w /sbin/insmod -p x -k modules
       - -w /sbin/rmmod -p x -k modules
       - -w /sbin/modprobe -p x -k modules
-      - -a always,exit -F arch=b{{ansible_architecture | regex_replace('.*_(\\d*)','\\\\1')}} -S init_module -S delete_module -k modules
+      - -a always,exit -F arch=b{{ansible_userspace_bits}} -S init_module -S delete_module -k modules
   tags:
     - cat2
     - medium
@@ -1837,7 +1891,7 @@
   grub_crypt:
       password: "{{ rhel6stig_bootloader_password }}"
   register: grub_pass
-  when: grub_auth_audit|failed
+  when: rhel6stig_set_bootloader_password
   tags:
       - cat2
       - medium
@@ -1854,7 +1908,7 @@
       follow: yes
       insertafter: '^#\\s'
       regexp: password
-  when: grub_auth_audit|failed
+  when: rhel6stig_set_bootloader_password and grub_pass.passhash
   tags:
       - cat2
       - medium

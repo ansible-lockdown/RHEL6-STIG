@@ -76,6 +76,7 @@ rhel6stig_ldap_server: false
 # KEEP AS 'random' ONLY IF YOU DON'T EVER WANT TO ACCESS THE BOOTLOADER
 # i.e. If this system is running in a public cloud
 rhel6stig_bootloader_password: random
+rhel6stig_set_bootloader_password: true
 
 # NTP configuration used in ntp.conf
 # These should be set to DoD authoritative time source

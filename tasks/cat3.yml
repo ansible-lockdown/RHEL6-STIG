@@ -293,14 +293,16 @@
       state: present
       backup: no
       dest: /etc/login.defs
-      regexp: '^#?PASS_WARN_AGE'
-      line: 'PASS_WARN_AGE\t7'
+      regexp: '^PASS_WARN_AGE'
+      line: 'PASS_WARN_AGE    7'
   tags:
       - cat3
       - low
       - V-38480
       - passwords
       - patch
+      - bassie
+
 
 # V-38482 pam cracklib digits
 
@@ -391,11 +393,87 @@
       - kernel_modules
       - patch
 
-# V-38522 auditd timeofday changes
 
 # V-38525 auditd stime change
 
 # V-38527 auditd settime
+- name: "MEDIUM | V-38522 | AUDIT | The audit system must be configured to audit all attempts to alter system time through settimeofday."
+  shell: grep settimeofday /etc/audit/audit.rules
+  always_run: yes
+  changed_when: False
+  ignore_errors: yes
+  register: dynamic_kernel_loading_audit
+  tags:
+    - cat3
+    - low
+    - audit
+    - kernel
+    - auditd
+
+- name: "LOW | SV-50323r3_rule | PATCH | The audit system must be configured to audit all attempts to alter system time through settimeofday."
+  lineinfile:
+      backup: yes
+      line: "-a always,exit -F arch=b{{ansible_userspace_bits}} -S settimeofday -k audit_time_rules"
+      dest: /etc/audit/audit.rules
+      state: present
+  tags:
+    - cat3
+    - low
+    - patch
+    - kernel
+    - auditd
+
+- name: "LOW | V-38527 | AUDIT | The audit system must be configured to audit all attempts to alter system time through clock_settime."
+  shell: grep clock_settime /etc/audit/audit.rules
+  always_run: yes
+  changed_when: False
+  ignore_errors: yes
+  register: dynamic_kernel_loading_audit
+  tags:
+    - cat3
+    - low
+    - audit
+    - kernel
+    - auditd
+
+- name: "LOW | V-38527 | PATCH | The audit system must be configured to audit all attempts to alter system time through clock_settime."
+  lineinfile:
+      backup: yes
+      line: "-a always,exit -F arch=b{{ansible_userspace_bits}} -S clock_settime -k audit_time_rules"
+      dest: /etc/audit/audit.rules
+      state: present
+  tags:
+    - cat3
+    - low
+    - patch
+    - kernel
+    - auditd
+
+- name: "LOW | V-38530 | AUDIT | The audit system must be configured to audit all attempts to alter system time through /etc/localtime."
+  shell: grep localtime /etc/audit/audit.rules
+  always_run: yes
+  changed_when: False
+  ignore_errors: yes
+  register: dynamic_kernel_loading_audit
+  tags:
+    - cat3
+    - low
+    - audit
+    - kernel
+    - auditd
+
+- name: "LOW | V-38530 | PATCH | The audit system must be configured to audit all attempts to alter system time through /etc/localtime."
+  lineinfile:
+      backup: yes
+      line: "-w /etc/localtime -p wa -k audit_time_rules"
+      dest: /etc/audit/audit.rules
+      state: present
+  tags:
+    - cat3
+    - low
+    - patch
+    - kernel
+    - auditd
 
 # V-38528 log martians
 - name: "LOW | V-38528 | AUDIT The system must log Martian packets."
@@ -722,7 +800,7 @@
   yum:
       name: openldap-servers
       state: absent
-  when: rhel6stig_openldap_server_required is not defined 
+  when: rhel6stig_openldap_server_required is not defined
   tags:
       - cat3
       - low
@@ -1166,7 +1244,31 @@
 # V-38690 emergency accounts
 
 # V-38692 inactive acct set
+- name: "LOW | SV-50495r1_rule | AUDIT | The operating system must manage information system identifiers for users and devices by disabling the user identifier after an organization defined time period of inactivity."
+  shell: grep '^INACTIVE=' /etc/default/useradd | grep -v '\-'
+  ignore_errors: yes
+  register: useradd_audit
+  changed_when: false
+  always_run: yes
+  tags:
+      - cat3
+      - low
+      - passwords
+      - audit
 
+- name: "LOW | SV-50495r1_rule | PATCH | The operating system must manage information system identifiers for users and devices by disabling the user identifier after an organization defined time period of inactivity."
+  lineinfile:
+      state: present
+      backup: no
+      dest: /etc/default/useradd
+      regexp: '^INACTIVE'
+      line: 'INACTIVE=35'
+  tags:
+      - cat3
+      - low
+      - passwords
+      - patch
+      - bassie
 # V-38693 pam
 
 # V-38694 inactive acct set
