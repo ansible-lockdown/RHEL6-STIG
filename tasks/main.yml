@@ -15,23 +15,29 @@
       - always
 
 - include: prelim.yml
+  static: no
   tags:
       - prelim_tasks
       - always
 
 - include: cat1.yml
+  static: no
   when: rhel6stig_cat1
 
 - include: cat2.yml
+  static: no
   when: rhel6stig_cat2
 
 - include: cat3.yml
+  static: no
   when: rhel6stig_cat3
 
 - include: post.yml
+  static: no
   tags:
       - post_tasks
 
 - include: not_automated.yml
+  static: no
   tags:
       - not_auto_fixed
