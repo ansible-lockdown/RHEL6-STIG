@@ -1,5 +1,3 @@
----
-# CAT I Findings
 - name: "HIGH | V-38462 | AUDIT | The RPM package management tool must cryptographically verify the authenticity of all software packages during installation"
   command: grep nosignature /etc/rpmrc /usr/lib/rpm/rpmrc /usr/lib/rpm/redhat/rpmrc ~root/.rpmrc
   register: rpm_sig_audit
