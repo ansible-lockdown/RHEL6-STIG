@@ -1847,6 +1847,7 @@
   file:
       path: /etc/grub.conf
       group: root
+      state: file
       follow: yes
   tags:
       - cat2
@@ -1902,9 +1903,10 @@
       - services
       - patch
 
-- name: "MEDIUM | V-38583| PATCH | The system boot loader configuration file(s) must have mode 0600 or less permissive."
+- name: "MEDIUM | V-38583 | PATCH | The system boot loader configuration file(s) must have mode 0600 or less permissive."
   file:
       path: /etc/grub.conf
+      state: file
       mode: u-x,go-rwx
       follow: yes
   tags:
