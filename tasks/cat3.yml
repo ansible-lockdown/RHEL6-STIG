@@ -76,7 +76,7 @@
       - audit
 
 - name: "LOW | V-38447 | AUDIT | The system package management tool must verify contents of all files associated with packages."
-  command: rpm -qf {{ item | regex_replace('^..5......\\s+(/.+)$', '\\1') }}
+  command: rpm -qf {{ item | regex_replace('^..5......\s+(/.+)$', '\1') }}
   register: rpm_integrity_audit
   when: item | match("^..5......[^c]*/.+$")
   with_items: "{{ rpm_verify_packages.stdout_lines }}"
@@ -124,7 +124,7 @@
       - patch
 
 - name: "LOW | V-38453 | AUDIT | The system package management tool must verify group-ownership on all files and directories associated with packages."
-  command: rpm -qf {{ item | regex_replace('^......G..\\s+[a-z]?\\s*(/.+)$', '\\1') }}
+  command: rpm -qf {{ item | regex_replace('^......G..\s+[a-z]?\s*(/.+)$', '\1') }}
   when: item | match("^......G..\\s+.*?/.+$")
   register: rpm_group_ownership_audit
   with_items: "{{ rpm_verify_packages.stdout_lines }}"
