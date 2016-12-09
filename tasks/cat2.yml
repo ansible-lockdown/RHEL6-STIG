@@ -3320,6 +3320,7 @@
       - V-51875
       - pam
       - patch
+      - pam
 
 - name: 'MEDIUM | V-51391 | AUDIT | A file integrity baseline must be created.'
   stat:

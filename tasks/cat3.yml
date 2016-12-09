@@ -357,6 +357,7 @@
       - V-38693
       - passwords
       - patch
+      - pam
 
 - name: "LOW | V-38487 | AUDIT | The system package management tool must cryptographically verify the authenticity of all software packages during installation."
   command: find /etc/yum.repos.d/ -exec grep -ls '^gpgcheck=0' {} \;
