@@ -148,7 +148,7 @@
       - audit
 
 - name: "LOW | V-38454 | AUDIT | The system package management tool must verify ownership on all files and directories associated with packages."
-  command: rpm -qf {{ item | regex_replace('^.....U...\\s+[a-z]?\\s*(/.+)$', '\\1') }}
+  command: rpm -qf {{ item | regex_replace('^.....U...\s+[a-z]?\s*(/.+)$', '\1') }}
   when: item | match("^.....U...\\s+.*?/.+$")
   register: rpm_group_ownership_audit
   with_items: "{{ rpm_verify_packages.stdout_lines }}"
