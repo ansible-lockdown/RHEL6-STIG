@@ -2100,12 +2100,12 @@
       - medium
       - V-38593
       - logon_settings
-      - dod_logon_banner
+      - dod_login_banner
       - audit
 
 - name: "MEDIUM | V-38593 | PATCH |  The Department of Defense (DoD) login banner must be displayed immediately prior to or as part of console login prompts"
-  template:
-      src: issue.j2
+  copy:
+      content: "{{ rhel6stig_login_banner }}"
       dest: /etc/{{ item }}
       owner: root
       group: root
@@ -2119,7 +2119,7 @@
       - medium
       - V-38593
       - logon_settings
-      - dod_logon_banner
+      - dod_login_banner
       - patch
 
 # Not automated
@@ -2195,7 +2195,7 @@
       - medium
       - V-38599
       - vsftp
-      - dod_logon_banner
+      - dod_login_banner
       - logon_settings
       - audit
 
@@ -2213,7 +2213,7 @@
       - medium
       - V-38599
       - vsftp
-      - dod_logon_banner
+      - dod_login_banner
       - logon_settings
       - patch
 
@@ -2515,7 +2515,7 @@
       - V-38615
       - sshd
       - logon_settings
-      - dod_logon_banner
+      - dod_login_banner
 
 - name: "MEDIUM | V-38617 | AUDIT | The SSH daemon must be configured to use only FIPS 140-2 approved ciphers."
   command: grep Ciphers /etc/ssh/sshd_config
@@ -3222,7 +3222,7 @@
       - logon_settings
       - xwindows
       - gui
-      - dod_logon_banner
+      - dod_login_banner
       - patch
 
 - name: "MEDIUM | V-38689 | PATCH | The Department of Defense (DoD) login banner must be displayed immediately prior to, or as part of, graphical desktop environment login prompts"

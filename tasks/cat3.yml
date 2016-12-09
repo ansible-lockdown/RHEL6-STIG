@@ -2057,7 +2057,7 @@
       - cat3
       - low
       - V-38684
-      - logon_settings
+      - login_settings
       - audit
 
 - name: "LOW | V-38684 | PATCH | The system must limit users to 10 simultaneous system logins, or a site-defined number, in accordance with operational requirements."
@@ -2071,7 +2071,7 @@
       - cat3
       - low
       - V-38684
-      - logon_settings
+      - login_settings
       - patch
 
 - name: "LOW | V-38685 | AUDIT | Temporary accounts must be provisioned with an expiration date."
