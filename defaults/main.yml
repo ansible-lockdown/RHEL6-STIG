@@ -8,7 +8,7 @@ rhel6stig_cat3: no
 
 # Changing system defaults
 rhel6stig_snmp_community: B0re4lis
-rhel6stig_pass_min_length: 14
+rhel6stig_pass_min_length: 15
 rhel6stig_pass_min_days: 1
 rhel6stig_pass_max_days: 60
 rhel6stig_pass_reuse: 5         # V-38658 Number of passwords to remember to prevent reuse.
