@@ -8,11 +8,11 @@ Not all findings can be remediated automatically, or they require more complex a
 
 This role **will make changes to the system** that could break things. This is not an auditing tool but rather a remediation tool to be used after an audit has been conducted, though auditing functionality is in the works.
 
-## IMPORTANT INSTALL STEP ##
+## Installing from Ansible Galaxy ##
 
 To install this role with `ansible-galaxy` use the following command:
 
-`ansible-galaxy install -p roles nousdefions.STIG-RHEL6,$TAG` Where `$TAG` represents a git tag of this repo, for example `v0.9`
+`ansible-galaxy install -p roles nousdefions.STIG-RHEL6`
 
 Based on [Red Hat Enterprise Linux 6 STIG Version 1 Release 6 - 2015-01-23](http://iase.disa.mil/stigs/os/unix-linux/Pages/index.aspx).
 
@@ -25,22 +25,23 @@ You should have a general understanding of the nature of the changes this role w
 
 Role Variables
 --------------
-There are many role variables defined in defaults/main.yml. Here are the most important ones. Feel free to look through `defaults/main.yml` to see what other configuration options are available.
+There are many role variables defined in `defaults/main.yml`. Here are the most important ones. Feel free to look through `defaults/main.yml` to see what other configuration options are available.
 
 | Name              | Default Value       | Description          |
 |-------------------|---------------------|----------------------|
-| `rhel6stig_cat1` | `yes` | Correct CAT I findings |
-| `rhel6stig_cat2` | `no` | Correct CAT II findings |
-| `rhel6stig_cat3` | `no` | Correct CAT III findings |
+| `rhel6stig_cat1`  | `yes`               | Correct CAT I findings |
+| `rhel6stig_cat2`  | `no`                | Correct CAT II findings |
+| `rhel6stig_cat3`  | `no`                | Correct CAT III findings |
 | `rhel6stig_use_dhcp` | `yes` | Whether the system should use DHCP or Static IPs. |
-| `rhel6stig_system_is_router` | `no` | Whether on not the target system is acting as a router. Disables settings that would break the system if it is a acting as a router |
+| `rhel6stig_system_is_router` | `no` | Whether on not the target system is acting as a router. Skips tasks that would break the system if it is a acting as a router |
 | `rhel6stig_root_email_address` | `foo@baz.com` | Address where system email is sent. |
-| `rhel6stig_xwindows_required` | `no` | Whether or not X Windows is is use on taregt systems. Disables some changes if X Windows is not in use. |
-| `rhel6stig_ipv6_in_use` | `no` | Whether or not ipv6 is in use of the target system. This is set automatically to 'yes' if ipv6 is found to be in use. (Default: false) |
+| `rhel6stig_xwindows_required` | `no` | Whether or not X Windows is is use on target systems. Disables some changes if X Windows is not in use. |
+| `rhel6stig_ipv6_in_use` | `no` | Whether or not IPv6 is in use of the target system. This is set automatically to `yes` if IPv6 is found to be in use. (Default: `no`) |
 | `rhel6stig_tftp_required` | `no` |  Whether or not TFTP is required. If set to `yes`, this will prevent the removal of `tftp` and `tftp-server` packages. It will also  reconfigure the `tftp-server` to run securely. |
 | `rhel6stig_rhnsatellite_required` | `no` | Whether or not Red Hat Satellite is required in the environment. If not required, `rhnsd` will be stopped and disabled. |
-| `rhel6stig_bootloader_password` | [Randomly generated and encrypted string] | The new grub password to use if `rhel6stig_change_grub_password` is **True** |
+| `rhel6stig_bootloader_password` | [Randomly generated and encrypted string] | The new GRUB password to use if `rhel6stig_change_grub_password` is `yes` |
 | `rhel6stig_update_all_packages` | `yes` | Whether to install all system updates. |
+| `rhel6stig_login_banner` | `[DOD banner]` | Banner used in `/etc/issue` and `/etc/issue.net` |
 
 
 Dependencies
@@ -61,11 +62,13 @@ Correct CAT I and CAT II findings but don't apply all updates.
     rhel6stig_update_all_packages: no
 
   roles:
-    - { role: nousdefions.STIG-RHEL6,
-        rhel6stig_cat1: yes,
-        rhel6stig_cat2: yes,
-        rhel6stig_cat3: no
-      }
+    - role: nousdefions.STIG-RHEL6
+      rhel6stig_cat1: yes
+      rhel6stig_cat2: yes
+      rhel6stig_cat3: no
+      when:
+          - ansible_os_family == 'RedHat'
+          - ansible_distribution_major_version | version_compare('6', '=')
 ```
 
 Prompt for the GRUB password.
@@ -97,11 +100,11 @@ Tags
 ----
 Each task is tagged with its category, severity, whether or not it is a patch or audit task, and the finding ID, e.g., V-38462. In addition to these four basic tags that all tasks have, there are human-friendly tags such as "ssh" or "dod_logon_banner".
 
-A number of prilimary tasks that do things such as enumerate services on the system and check for the existence of various file will _always_ run unless explicitly skipped by using `--skip tags prelim_tasks`.
+A number of preliminary tasks that do things such as enumerate services on the system and check for the existence of various file will _always_ run unless explicitly skipped by using `--skip tags prelim_tasks`.
 
 Some examples of using tags:
 
-    # Only remediate ssh
+    # Only run tasks that secure ssh
     ansible-playbook site.yml --tags ssh
 
     # Don't change SNMP or postfix

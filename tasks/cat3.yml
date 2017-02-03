@@ -17,7 +17,7 @@
       name: autofs
       state: stopped
       enabled: no
-  when: "':on' in autofs_service_audit.stdout"
+  when: "'autofs' in sysv_services.stdout"
   tags:
       - cat3
       - low
