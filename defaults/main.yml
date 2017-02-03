@@ -8,7 +8,7 @@ rhel6stig_cat3: no
 
 # Changing system defaults
 rhel6stig_snmp_community: B0re4lis
-rhel6stig_pass_min_length: 14
+rhel6stig_pass_min_length: 15
 rhel6stig_pass_min_days: 1
 rhel6stig_pass_max_days: 60
 rhel6stig_pass_reuse: 5         # V-38658 Number of passwords to remember to prevent reuse.
@@ -163,3 +163,5 @@ rhel6stig_login_banner: |
     * ASSISTANTS.   SUCH   COMMUNICATIONS  AND  WORK   PRODUCT  ARE  PRIVATE  AND *
     * CONFIDENTIAL. SEE USER AGREEMENT FOR DETAILS.                               *
     *******************************************************************************
+
+rhel6stig_graphical_login_banner: 'You are accessing a U.S. Government (USG) Information System (IS) that is provided for USG-authorized use only.  By using this IS (which includes any device attached to this IS), you consent to the following conditions:  The USG routinely intercepts and monitors communications on this IS for purposes including, but not limited to, penetration testing, COMSEC monitoring, network operations and defense, personnel misconduct (PM), law enforcement (LE), and counterintelligence (CI) investigations.  At any time, the USG may inspect and seize data stored on this IS.  Communications using, or data stored on, this IS are not private, are subject to routine monitoring, interception, and search, and may be disclosed or used for any USG-authorized purpose.  This IS includes security measures (e.g., authentication and access controls) to protect USG interests -- not for your personal benefit or privacy.  Notwithstanding the above, using this IS does not constitute consent to PM, LE or CI investigative searching or monitoring of the content of privileged communications, or work product, related to personal representation or services by attorneys, psychotherapists, or clergy, and their assistants. Such communications and work product are private and confidential. See User Agreement for details.'

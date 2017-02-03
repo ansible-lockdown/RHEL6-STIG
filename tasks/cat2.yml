@@ -2100,12 +2100,12 @@
       - medium
       - V-38593
       - logon_settings
-      - dod_logon_banner
+      - dod_login_banner
       - audit
 
 - name: "MEDIUM | V-38593 | PATCH |  The Department of Defense (DoD) login banner must be displayed immediately prior to or as part of console login prompts"
-  template:
-      src: issue.j2
+  copy:
+      content: "{{ rhel6stig_login_banner }}"
       dest: /etc/{{ item }}
       owner: root
       group: root
@@ -2119,7 +2119,7 @@
       - medium
       - V-38593
       - logon_settings
-      - dod_logon_banner
+      - dod_login_banner
       - patch
 
 # Not automated
@@ -2195,7 +2195,7 @@
       - medium
       - V-38599
       - vsftp
-      - dod_logon_banner
+      - dod_login_banner
       - logon_settings
       - audit
 
@@ -2213,7 +2213,7 @@
       - medium
       - V-38599
       - vsftp
-      - dod_logon_banner
+      - dod_login_banner
       - logon_settings
       - patch
 
@@ -2515,7 +2515,7 @@
       - V-38615
       - sshd
       - logon_settings
-      - dod_logon_banner
+      - dod_login_banner
 
 - name: "MEDIUM | V-38617 | AUDIT | The SSH daemon must be configured to use only FIPS 140-2 approved ciphers."
   command: grep Ciphers /etc/ssh/sshd_config
@@ -3213,7 +3213,7 @@
       - scif_banner
 
 - name: "MEDIUM | V-38689 | PATCH | The Department of Defense (DoD) login banner must be displayed immediately prior to, or as part of, graphical desktop environment login prompts"
-  command: "gconftool-2 --direct --config-source xml:readwrite:/etc/gconf/gconf.xml.mandatory --type string --set /apps/gdm/simple-greeter/banner_message_text '  You are accessing a U.S. Government (USG) Information System (IS) that is provided for USG-authorized use only.  By using this IS (which includes any device attached to this IS), you consent to the following conditions:  The USG routinely intercepts and monitors communications on this IS for purposes including, but not limited to, penetration testing, COMSEC monitoring, network operations and defense, personnel misconduct (PM), law enforcement (LE), and counterintelligence (CI) investigations.  At any time, the USG may inspect and seize data stored on this IS.  Communications using, or data stored on, this IS are not private, are subject to routine monitoring, interception, and search, and may be disclosed or used for any USG-authorized purpose.  This IS includes security measures (e.g., authentication and access controls) to protect USG interests -- not for your personal benefit or privacy.  Notwithstanding the above, using this IS does not constitute consent to PM, LE or CI investigative searching or monitoring of the content of privileged communications, or work product, related to personal representation or services by attorneys, psychotherapists, or clergy, and their assistants. Such communications and work product are private and confidential. See User Agreement for details.'"
+  command: "gconftool-2 --direct --config-source xml:readwrite:/etc/gconf/gconf.xml.mandatory --type string --set /apps/gdm/simple-greeter/banner_message_text '  {{ rhel6stig_graphical_login_banner }}'"
   when: rhel6stig_xwindows_required
   notify: restart gdm
   tags:
@@ -3222,11 +3222,11 @@
       - logon_settings
       - xwindows
       - gui
-      - dod_logon_banner
+      - dod_login_banner
       - patch
 
 - name: "MEDIUM | V-38689 | PATCH | The Department of Defense (DoD) login banner must be displayed immediately prior to, or as part of, graphical desktop environment login prompts"
-  command: "gconftool-2 --direct --config-source xml:readwrite:/etc/gconf/gconf.xml.mandatory --type string --set /apps/gdm/simple-greeter/banner_message_text '  You are accessing a U.S. Government (USG) Information System (IS) that is provided for USG-authorized use only.  By using this IS (which includes any device attached to this IS), you consent to the following conditions:  The USG routinely intercepts and monitors communications on this IS for purposes including, but not limited to, penetration testing, COMSEC monitoring, network operations and defense, personnel misconduct (PM), law enforcement (LE), and counterintelligence (CI) investigations.  At any time, the USG may inspect and seize data stored on this IS.  Communications using, or data stored on, this IS are not private, are subject to routine monitoring, interception, and search, and may be disclosed or used for any USG-authorized purpose.  This IS includes security measures (e.g., authentication and access controls) to protect USG interests -- not for your personal benefit or privacy.  Notwithstanding the above, using this IS does not constitute consent to PM, LE or CI investigative searching or monitoring of the content of privileged communications, or work product, related to personal representation or services by attorneys, psychotherapists, or clergy, and their assistants. Such communications and work product are private and confidential. See User Agreement for details.'"
+  command: "gconftool-2 --direct --config-source xml:readwrite:/etc/gconf/gconf.xml.mandatory --type string --set /apps/gdm/simple-greeter/banner_message_text '  {{ rhel6stig_graphical_login_banner }}'"
   when: rhel6stig_xwindows_required
   notify: restart gdm
   tags:
@@ -3320,6 +3320,7 @@
       - V-51875
       - pam
       - patch
+      - pam
 
 - name: 'MEDIUM | V-51391 | AUDIT | A file integrity baseline must be created.'
   stat:
