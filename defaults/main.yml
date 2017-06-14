@@ -1,4 +1,4 @@
-rhel6stig_min_ansible_version: 2.1
+rhel6stig_min_ansible_version: 2.2
 
 # Generate an audit report
 make_audit_report: no
