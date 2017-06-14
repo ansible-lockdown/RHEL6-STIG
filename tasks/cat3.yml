@@ -1343,7 +1343,7 @@
       - V-38608
       - ssh
       - patch
-  notify: restart ssh
+  notify: restart sshd
 
 - name: "LOW | V-38610 | PATCH | The SSH daemon must set a timeout count on idle sessions."
   lineinfile:
@@ -1358,7 +1358,7 @@
       - V-38610
       - ssh
       - patch
-  notify: restart ssh
+  notify: restart sshd
 
 - name: "LOW | V-38616 | PATCH | The SSH daemon must not permit user environment settings."
   lineinfile:
@@ -1373,7 +1373,7 @@
       - V-38616
       - ssh
       - patch
-  notify: restart ssh
+  notify: restart sshd
 
 - name: "LOW | V-38618 | AUDIT | The avahi service must be disabled."
   command: chkconfig 'avahi-daemon' --list

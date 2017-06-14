@@ -3,7 +3,7 @@
       name: ntpd
       state: restarted
 
-- name: restart ssh
+- name: restart sshd
   service:
       name: sshd
       state: restarted

@@ -4,7 +4,7 @@
   register: nfs_insecure_locking_audit
   ignore_errors: yes
   changed_when: no
-  always_run: yes
+  check_mode: no
   tags:
       - cat1
       - high
@@ -16,7 +16,7 @@
 - name: "MEDIUM | V-38499 | AUDIT | The /etc/passwd file must not contain password hashes"
   shell: "awk -F: '($2 != \"x\") {print}' /etc/passwd"
   changed_when: false
-  always_run: yes
+  check_mode: no
   register: etc_password_hash_audit
   tags:
       - cat2
@@ -28,7 +28,7 @@
 - name: "MEDIUM | V-38500 | AUDIT | The root account must be the only account having a UID of 0"
   shell: "awk -F: '($3 == \"0\") {print}' /etc/passwd | grep -v root"
   changed_when: no
-  always_run: yes
+  check_mode: no
   ignore_errors: yes
   register: users_uid_0_audit
   tags:
@@ -43,7 +43,7 @@
   shell: grep -E '^\*\.\*\s*[@:]{1,2}[a-z.:]*' /etc/rsyslog.conf
   changed_when: no
   ignore_errors: yes
-  always_run: yes
+  check_mode: no
   register: rsyslog_log_mgmt_audit
   tags:
       - audit
@@ -102,24 +102,11 @@
       - V-38654
       - nfs
 
-- name: "MEDIUM | V-38660 | AUDIT | The snmpd service must use only SNMP protocol version 3 or newer."
-  shell: "grep -E 'v1|v2c|com2sec' /etc/snmp/snmpd.conf | grep -v '^#'"
-  changed_when: false
-  register: snmp_version_check
-  failed_when: '"FAIL" in snmp_version_check.stdout'
-  when: snmpconf_test.stat.exists
-  tags:
-      - cat2
-      - medium
-      - audit
-      - V-38660
-      - snmp
-
 # CAT III
 - name: "LOW | V-38455 | AUDIT | The system must use a separate file system for /tmp"
   shell: mount | grep "on /tmp "
   register: tmp_mounted_audit
-  always_run: yes
+  check_mode: no
   ignore_errors: yes
   changed_when: no
   tags:
@@ -134,7 +121,7 @@
   register: var_mounted_audit
   changed_when: no
   ignore_errors: yes
-  always_run: yes
+  check_mode: no
   tags:
       - cat3
       - V-38456
@@ -145,7 +132,7 @@
 - name: "LOW | V-38463 | AUDIT | The system must use a separate file system for /var/log"
   shell: mount | grep "on /var/log "
   register: varlog_mounted_audit
-  always_run: yes
+  check_mode: no
   changed_when: no
   ignore_errors: yes
   tags:
@@ -158,7 +145,7 @@
 - name: "LOW | V-38467 | AUDIT | The system must use a separate file system for /var/log/audit"
   shell: mount | grep "on /var/log/audit "
   register: varlogaudit_mounted_audit
-  always_run: yes
+  check_mode: no
   changed_when: no
   ignore_errors: yes
   tags:
@@ -171,7 +158,7 @@
 - name: "LOW | V-38473 | AUDIT | The system must use a separate file system for user home directories"
   shell: mount | grep "on /home "
   register: home_mounted_audit
-  always_run: yes
+  check_mode: no
   changed_when: no
   ignore_errors: yes
   tags:
@@ -186,7 +173,7 @@
   changed_when: false
   failed_when: false
   register: missing_group_audit
-  always_run: yes
+  check_mode: no
   tags:
       - cat3
       - low
@@ -199,7 +186,7 @@
   changed_when: false
   failed_when: false
   register: duplicate_account_audit
-  always_run: yes
+  check_mode: no
   tags:
       - cat3
       - low
@@ -211,7 +198,7 @@
   shell: "lsblk | awk '$6 == \"part\" && $7 ~ /\\// {print $NF}' | xargs -I{} find {} -xdev -type d -perm -0002 \\! -perm -1000"
   changed_when: false
   register: stick_bit_public_dir_audit
-  always_run: yes
+  check_mode: no
   tags:
       - cat3
       - low
@@ -224,7 +211,7 @@
   shell: "lsblk | awk '$6 == \"part\" && $7 ~ /\\// {print $NF}' | xargs -I{} find {} -xdev -type d -perm -0002 -uid +499 -print"
   changed_when: false
   register: system_account_public_dir_audit
-  always_run: yes
+  check_mode: no
   tags:
       - cat3
       - low

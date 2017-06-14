@@ -1,3 +1,5 @@
+rhel6stig_min_ansible_version: 2.1
+
 # Generate an audit report
 make_audit_report: no
 
@@ -18,6 +20,26 @@ rhel6stig_pam_cracklib_params: try_first_pass retry=3 maxrepeat=3 minlen={{ rhel
 
 # SELinux settings
 rhel6stig_selinux_pol: targeted
+
+# Only set this to true if you have a valid
+# antivirus solution in your repositories, else it will fail every time.
+rhel6stig_antivirus_required: no
+
+# AV settings
+rhel6stig_av_package:
+    package:
+        - clamav
+        - clamav-scanner
+        - clamav-server
+    service: clamav-daemon
+
+# GPG Key locations
+# These are the standard URL locations for GPG keys for RH and Cent.
+# If running this against offline systems then specify an accessible
+# location where the key is stored.
+rhel6stig_gpg_key_loc:
+    centos: http://mirror.centos.org/centos/RPM-GPG-KEY-CentOS-6
+    redhat: https://www.redhat.com/security/fd431d51.txt
 
 # Network Settings
 # WARNING!
