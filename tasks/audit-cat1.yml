@@ -1,0 +1,230 @@
+- name: "HIGH | V-38476 | AUDIT | Vendor-provided cryptographic certificates must be installed to verify the integrity of system software"
+  command: rpm -q gpg-pubkey
+  register: rpm_key_audit
+  always_run: yes
+  changed_when: no
+  tags:
+      - cat1
+      - high
+      - V-38476
+      - audit
+      - rpm
+
+- name: "HIGH | V-38491 | AUDIT | There must be no hosts.equiv on the system"
+  stat:
+      path: /etc/hosts.equiv
+  register: hosts_equiv_audit
+  always_run: yes
+  tags:
+      - cat1
+      - high
+      - V-38491
+      - audit
+      - hosts_equiv
+
+- name: "HIGH | V-38491 | AUDIT | There must be no .rhosts files on the system"
+  stat:
+      path: ~{{ item }}/.rhosts
+  register: rhosts_audit
+  always_run: yes
+  with_items: "{{ users.stdout_lines }}"
+  tags:
+      - cat1
+      - high
+      - V-38491
+      - audit
+      - hosts_equiv
+
+- name: "HIGH | V-38497 | AUDIT | The system must not have accounts configured with blank or null passwords"
+  command: grep nullok /etc/pam.d/system-auth
+  changed_when: false
+  always_run: yes
+  ignore_errors: yes
+  register: nullok_audit
+  tags:
+      - cat1
+      - high
+      - V-38497
+      - audit
+      - passwords
+
+- name: "HIGH | V-38587 | AUDIT | The telnet-server package must not be installed"
+  command: rpm -q telnet-server
+  ignore_errors: yes
+  always_run: yes
+  changed_when: no
+  register: telnet_server_audit
+  tags:
+      - cat1
+      - high
+      - V-38587
+      - audit
+      - telnet
+      - unsecure_services
+
+- name: "HIGH | V-38589 | AUDIT | The telnet daemon must not be running"
+  command: chkconfig telnet --list
+  register: telnet_service_audit
+  changed_when: false
+  always_run: yes
+  ignore_errors: yes
+  tags:
+      - cat1
+      - high
+      - V-38589
+      - audit
+      - telnet
+      - unsecure_services
+
+- name: "HIGH | V-38591 | AUDIT | The rsh-server package must not be installed"
+  command: rpm -q rsh-server
+  always_run: yes
+  register: rsh_server_audit
+  changed_when: no
+  ignore_errors: yes
+
+- name: "HIGH | V-38594 | AUDIT | The rshd service must not be running"
+  command: chkconfig rsh --list
+  register: rsh_service_audit
+  changed_when: false
+  always_run: yes
+  ignore_errors: yes
+  tags:
+      - cat1
+      - high
+      - V-38594
+      - audit
+      - rsh
+      - rlogin
+      - unsecure_services
+
+- name: "HIGH | V-38598 | AUDIT | The rexecd service must not be running"
+  command: service rexec status
+  ignore_errors: yes
+  register: rexec_status_audit
+  always_run: yes
+  changed_when: no
+  tags:
+      - cat1
+      - high
+      - V-38598
+      - audit
+      - rexec
+
+- name: "HIGH | V-38602 | AUDIT | The rlogind service must not be running"
+  command: service rlogin status
+  ignore_errors: yes
+  register: rlogin_status_audit
+  always_run: yes
+  changed_when: no
+  tags:
+      - cat1
+      - high
+      - V-38602
+      - audit
+      - rlogin
+
+- name: "HIGH | V-38607 | AUDIT | The SSH daemon must be configured to use only the SSHv2 protocol"
+  command: grep "Protocol 2" /etc/ssh/sshd_config
+  register: proto2_audit
+  ignore_errors: yes
+  always_run: yes
+  changed_when: no
+  tags:
+      - cat1
+      - high
+      - V-38607
+      - audit
+      - ssh
+
+- name: "HIGH | V-38614 | AUDIT | The SSH daemon must not allow authentication using an empty password"
+  command: grep "PermitEmptyPasswords yes" /etc/ssh/sshd_config
+  ignore_errors: yes
+  always_run: yes
+  changed_when: false
+  register: ssh_empty_pass_audit
+  tags:
+      - cat1
+      - high
+      - V-38614
+      - audit
+      - ssh
+
+- name: "HIGH | V-38653 | AUDIT | The snmpd service must not use a default password"
+  shell: grep -v "^#" /etc/snmp/snmpd.conf| grep public
+  register: snmpd_audit
+  failed_when: snmpd_audit.rc not in [0,1]
+  always_run: yes
+  when: snmpconf_test.stat.exists
+  changed_when: no
+  tags:
+      - cat1
+      - high
+      - V-38653
+      - audit
+      - snmp
+
+- name: "HIGH | V-38666 | AUDIT | The system must use and update a DoD-approved virus scan program"
+  command: /etc/init.d/nails status
+  ignore_errors: yes
+  always_run: yes
+  changed_when: no
+  register: av_nails_status_audit
+  tags:
+      - cat1
+      - high
+      - V-38666
+      - antivirus
+      - audit
+
+- name: "HIGH | V-38666 | AUDIT | The system must use and update a DoD-approved virus scan program"
+  shell: grep uvscan /etc/cron* /var/spool/cron/*
+  register: av_uvscan_cron_audit
+  ignore_errors: yes
+  always_run: yes
+  changed_when: no
+  tags:
+      - cat1
+      - V-38666
+      - antivirus
+      - audit
+      - high
+
+- name: "HIGH | V-38666 | AUDIT | The system must use and update a DoD-approved virus scan program. Looking for virus definitions older than seven days."
+  command: find /usr/local/uvscan -type f -mtime +7
+  register: av_defs_audit
+  changed_when: no
+  ignore_errors: yes
+  always_run: yes
+  tags:
+      - cat1
+      - V-38666
+      - antivirus
+      - high
+      - audit
+
+- name: "HIGH | V-38668 | AUDIT | The x86 Ctrl-Alt-Delete key sequence must be disabled"
+  command: grep "exec /sbin/shutdown" /etc/init/control-alt-delete.override
+  register: ctrl_alt_del_audit
+  ignore_errors: yes
+  always_run: yes
+  changed_when: no
+  tags:
+      - cat1
+      - high
+      - V-38668
+      - audit
+      - ctrl_alt_delete
+
+- name: "HIGH | V-38701 | AUDIT | The TFTP daemon must operate in secure mode which provides access only to a single directory on the host file system"
+  command: grep "server_args = -s" /etc/xinetd.d/tftp
+  register: tftp_audit
+  always_run: yes
+  when: "'tftp' in xinetd_services.stdout_lines"
+  ignore_errors: yes
+  tags:
+      - cat1
+      - high
+      - V-38701
+      - audit
+      - tftp
