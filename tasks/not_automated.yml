@@ -54,19 +54,6 @@
       - cat2
       - medium
 
-- name: "MEDIUM | V-38625 | AUDIT | If the system is using LDAP for authentication or account information the system must use a TLS connection using FIPS 140-2 approved cryptographic algorithms"
-  shell: ps -ef | grep [s]lapd
-  register: ldap_tls_audit
-  when: "'slapd' in sysv_services.stdout"
-  ignore_errors: yes
-  changed_when: no
-  tags:
-      - cat2
-      - medium
-      - audit
-      - V-38625
-      - ldap
-
 - name: "MEDIUM | V-38643 | AUDIT | There must be no world-writable files on the system."
   command: find / -xdev -type f -perm -002
   register: world_writable_files

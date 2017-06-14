@@ -3,7 +3,7 @@
   register: autofs_service_audit
   changed_when: false
   failed_when: false
-  always_run: yes
+  check_mode: no
   tags:
       - cat3
       - low
@@ -31,7 +31,7 @@
   register: grub_audit_audit
   changed_when: false
   failed_when: false
-  always_run: yes
+  check_mode: no
   tags:
       - cat3
       - low
@@ -65,7 +65,7 @@
   changed_when: false
   failed_when: false
   register: rpm_verify_packages
-  always_run: yes
+  check_mode: no
   tags:
       - cat3
       - low
@@ -80,7 +80,7 @@
   register: rpm_integrity_audit
   when: item | match("^..5......[^c]*/.+$")
   with_items: "{{ rpm_verify_packages.stdout_lines }}"
-  always_run: yes
+  check_mode: no
   tags:
       - cat3
       - low
@@ -104,7 +104,7 @@
   when: item | match("^.M.......\\s+.*?/.+$")
   register: rpm_file_permissions_audit
   with_items: "{{ rpm_verify_packages.stdout_lines }}"
-  always_run: yes
+  check_mode: no
   tags:
       - cat3
       - low
@@ -128,7 +128,7 @@
   when: item | match("^......G..\\s+.*?/.+$")
   register: rpm_group_ownership_audit
   with_items: "{{ rpm_verify_packages.stdout_lines }}"
-  always_run: yes
+  check_mode: no
   tags:
       - cat3
       - low
@@ -152,7 +152,7 @@
   when: item | match("^.....U...\\s+.*?/.+$")
   register: rpm_group_ownership_audit
   with_items: "{{ rpm_verify_packages.stdout_lines }}"
-  always_run: yes
+  check_mode: no
   tags:
       - cat3
       - low
@@ -176,7 +176,7 @@
   register: nfs_all_squash_disabled_audit
   failed_when: nfs_all_squash_disabled_audit.rc == 2
   changed_when: false
-  always_run: yes
+  check_mode: no
   tags:
       - cat3
       - low
@@ -202,7 +202,7 @@
   register: auditd_syslog_output_audit
   failed_when: auditd_syslog_output_audit.rc == 2
   changed_when: false
-  always_run: yes
+  check_mode: no
   tags:
       - cat3
       - low
@@ -229,7 +229,7 @@
   command: gconftool-2 --direct --config-source xml:readwrite:/etc/gconf/gconf.xml.mandatory --get /apps/gnome_settings_daemon/keybindings/screensaver
   when: rhel6stig_xwindows_required
   register: gui_screen_lock_hotkey_audit
-  always_run: yes
+  check_mode: no
   tags:
       - cat3
       - low
@@ -250,7 +250,7 @@
 - name: "LOW | V-38478 | AUDIT | The Red Hat Network Service (rhnsd) service must not be running, unless using RHN or an RHN Satellite."
   command: chkconfig 'rhnsd' --list
   register: rhnsd_service_audit
-  always_run: yes
+  check_mode: no
   changed_when: false
   ignore_errors: yes
   failed_when: no
@@ -281,7 +281,7 @@
   register: logindefs_pass_warn_age_audit
   failed_when: logindefs_pass_warn_age_audit.rc == 2
   changed_when: false
-  always_run: yes
+  check_mode: no
   tags:
       - cat3
       - low
@@ -313,7 +313,7 @@
         LOW | V-38693 | AUDIT | The system must require passwords to contain no more than three consecutive repeating characters.
   command: grep pam_cracklib /etc/pam.d/system-auth
   register: cracklib_audit
-  always_run: yes
+  check_mode: no
   changed_when: no
   failed_when: no
   tags:
@@ -362,7 +362,7 @@
 - name: "LOW | V-38487 | AUDIT | The system package management tool must cryptographically verify the authenticity of all software packages during installation."
   command: find /etc/yum.repos.d/ -exec grep -ls '^gpgcheck=0' {} \;
   changed_when: false
-  always_run: yes
+  check_mode: no
   register: repo_d_gpgcheck_check_audit
   tags:
       - cat3
@@ -392,7 +392,7 @@
   register: securetty_serial_consoles_audit
   failed_when: securetty_serial_consoles_audit.rc == 2
   changed_when: false
-  always_run: yes
+  check_mode: no
   tags:
       - cat3
       - low
@@ -418,7 +418,7 @@
   register: modprobe_disable_rds_audit
   failed_when: false
   changed_when: false
-  always_run: yes
+  check_mode: no
   tags:
       - cat3
       - low
@@ -505,7 +505,7 @@
   register: sysctl_log_martians_audit
   failed_when: false
   changed_when: false
-  always_run: yes
+  check_mode: no
   tags:
       - cat3
       - low
@@ -577,7 +577,7 @@
   register: sysctl_accept_redirects_audit
   failed_when: false
   changed_when: false
-  always_run: yes
+  check_mode: no
   tags:
       - cat3
       - low
@@ -609,7 +609,7 @@
   register: sysctl_ignore_broadcasts_audit
   failed_when: false
   changed_when: false
-  always_run: yes
+  check_mode: no
   tags:
       - cat3
       - low
@@ -641,7 +641,7 @@
   register: sysctl_ignore_bogus_error_responses_audit
   failed_when: false
   changed_when: false
-  always_run: yes
+  check_mode: no
   tags:
       - cat3
       - low
@@ -691,7 +691,7 @@
   register: mac_policy_audit
   changed_when: false
   failed_when: false
-  always_run: yes
+  check_mode: no
   tags:
       - cat3
       - low
@@ -1171,7 +1171,7 @@
   command: grep -w "mount" /etc/audit/audit.rules
   register: auditd_mount_audit
   changed_when: no
-  always_run: yes
+  check_mode: no
   failed_when: no
   tags:
     - cat3
@@ -1197,7 +1197,7 @@
 
 - name: "LOW | V-38575 | AUDIT | The audit system must be configured to audit user deletions of files and programs."
   command: grep -w "rmdir" /etc/audit/audit.rules
-  always_run: yes
+  check_mode: no
   changed_when: no
   failed_when: no
   register: auditd_rmdir_audit
@@ -1231,7 +1231,7 @@
   register: auditd_sudoers_audit
   changed_when: no
   failed_when: no
-  always_run: yes
+  check_mode: no
   tags:
       - cat3
       - low
@@ -1258,7 +1258,7 @@
   register: pkgs_xinetd_installed_audit
   changed_when: false
   failed_when: false
-  always_run: yes
+  check_mode: no
   tags:
       - cat3
       - low
@@ -1271,7 +1271,7 @@
   register: pkgs_xinetd_services_audit
   changed_when: false
   failed_when: false
-  always_run: yes
+  check_mode: no
   tags:
       - cat3
       - low
@@ -1296,7 +1296,7 @@
   register: pkgs_screen_installed_audit
   changed_when: false
   failed_when: false
-  always_run: yes
+  check_mode: no
   tags:
       - cat3
       - low
@@ -1320,7 +1320,7 @@
 - name: "LOW | V-38608 | AUDIT | The SSH daemon must set a timeout interval on idle sessions."
   shell: grep ClientAliveInterval /etc/ssh/sshd_config | awk '{print $2}'
   register: sshd_client_alive_interval_audit
-  always_run: yes
+  check_mode: no
   changed_when: no
   tags:
       - cat3
@@ -1380,7 +1380,7 @@
   register: avahi_service_enabled_audit
   changed_when: false
   failed_when: false
-  always_run: yes
+  check_mode: no
   tags:
       - cat3
       - low
@@ -1394,7 +1394,7 @@
   register: avahi_service_running_audit
   changed_when: false
   failed_when: false
-  always_run: yes
+  check_mode: no
   tags:
       - cat3
       - low
@@ -1422,7 +1422,7 @@
   register: pkgs_openldap_server_installed_audit
   changed_when: false
   failed_when: false
-  always_run: yes
+  check_mode: no
   tags:
       - cat3
       - low
@@ -1458,7 +1458,7 @@
 - name: "LOW | V-38639 | AUDIT | The system must display a publicly-viewable pattern during a graphical desktop environment session lock."
   command: gconftool-2 --direct --config-source xml:readwrite:/etc/gconf/gconf.xml.mandatory --get /apps/gnome-screensaver/mode
   register: gconftool_pattern_audit
-  always_run: yes
+  check_mode: no
   changed_when: no
   when: rhel6stig_xwindows_required
   tags:
@@ -1485,7 +1485,7 @@
   register: abrtd_service_enabled_audit
   changed_when: false
   failed_when: false
-  always_run: yes
+  check_mode: no
   tags:
       - cat3
       - low
@@ -1499,7 +1499,7 @@
   register: abrtd_service_running_audit
   changed_when: false
   failed_when: false
-  always_run: yes
+  check_mode: no
   tags:
       - cat3
       - low
@@ -1527,7 +1527,7 @@
   register: atd_service_enabled_audit
   changed_when: false
   failed_when: false
-  always_run: yes
+  check_mode: no
   tags:
       - cat3
       - low
@@ -1541,7 +1541,7 @@
   register: atd_service_running_audit
   changed_when: false
   failed_when: false
-  always_run: yes
+  check_mode: no
   tags:
       - cat3
       - low
@@ -1567,7 +1567,7 @@
 - name: "LOW | V-38642 | AUDIT | The system default umask for daemons must be 027 or 022."
   shell: grep -e '^umask' /etc/init.d/functions | awk '{print $2}'
   register: daemon_umask_audit
-  always_run: yes
+  check_mode: no
   failed_when: no
   changed_when: no
   tags:
@@ -1594,7 +1594,7 @@
   register: ntpdate_service_enabled_audit
   changed_when: false
   failed_when: false
-  always_run: yes
+  check_mode: no
   tags:
       - cat3
       - low
@@ -1608,7 +1608,7 @@
   register: ntpdate_service_running_audit
   changed_when: false
   failed_when: false
-  always_run: yes
+  check_mode: no
   tags:
       - cat3
       - low
@@ -1635,7 +1635,7 @@
   shell: grep UMASK /etc/login.defs | awk '{print $2}'
   register: login_defs_umask_audit
   changed_when: no
-  always_run: yes
+  check_mode: no
   failed_when: no
   tags:
       - cat3
@@ -1661,7 +1661,7 @@
   register: oddjobd_service_enabled_audit
   changed_when: false
   failed_when: false
-  always_run: yes
+  check_mode: no
   tags:
       - cat3
       - low
@@ -1675,7 +1675,7 @@
   register: oddjobd_service_running_audit
   changed_when: false
   failed_when: false
-  always_run: yes
+  check_mode: no
   tags:
       - cat3
       - low
@@ -1703,7 +1703,7 @@
   register: sys_default_umask_audit
   changed_when: no
   failed_when: no
-  always_run: yes
+  check_mode: no
   tags:
       - cat3
       - low
@@ -1728,7 +1728,7 @@
   register: qpidd_service_enabled_audit
   changed_when: false
   failed_when: false
-  always_run: yes
+  check_mode: no
   tags:
       - cat3
       - low
@@ -1742,7 +1742,7 @@
   register: qpidd_service_running_audit
   changed_when: false
   failed_when: false
-  always_run: yes
+  check_mode: no
   tags:
       - cat3
       - low
@@ -1770,7 +1770,7 @@
   register: csh_umask_audit
   failed_when: no
   changed_when: no
-  always_run: yes
+  check_mode: no
   tags:
       - cat3
       - low
@@ -1797,7 +1797,7 @@
   register: rdisc_service_enabled_audit
   changed_when: false
   failed_when: false
-  always_run: yes
+  check_mode: no
   tags:
       - cat3
       - low
@@ -1811,7 +1811,7 @@
   register: rdisc_service_running_audit
   changed_when: false
   failed_when: false
-  always_run: yes
+  check_mode: no
   tags:
       - cat3
       - low
@@ -1860,7 +1860,7 @@
 
 - name: "LOW | V-38655 | AUDIT | The noexec option must be added to removable media partitions."
   command: grep noexec /etc/fstab
-  always_run: yes
+  check_mode: no
   changed_when: no
   failed_when: no
   tags:
@@ -1902,7 +1902,7 @@
   register: postfix_service_enabled_audit
   changed_when: false
   failed_when: false
-  always_run: yes
+  check_mode: no
   tags:
       - cat3
       - low
@@ -1916,7 +1916,7 @@
   register: postfix_service_running_audit
   changed_when: false
   failed_when: false
-  always_run: yes
+  check_mode: no
   tags:
       - cat3
       - low
@@ -1944,7 +1944,7 @@
   register: netconsole_service_enabled_audit
   changed_when: false
   failed_when: false
-  always_run: yes
+  check_mode: no
   tags:
       - cat3
       - low
@@ -1958,7 +1958,7 @@
   register: netconsole_service_running_audit
   changed_when: false
   failed_when: false
-  always_run: yes
+  check_mode: no
   tags:
       - cat3
       - low
@@ -1984,7 +1984,7 @@
 - name: "LOW | V-38675 | AUDIT | Process core dumps must be disabled unless needed."
   shell: grep -E "^\*\s*hard\s*core\s*" /etc/security/limits.conf | awk '{print $4}'
   register: processor_dumps_audit
-  always_run: yes
+  check_mode: no
   failed_when: no
   changed_when: no
   tags:
@@ -2013,7 +2013,7 @@
   register: pkgs_xwindows_installed_audit
   changed_when: false
   failed_when: false
-  always_run: yes
+  check_mode: no
   tags:
       - cat3
       - low
@@ -2051,7 +2051,7 @@
 - name: "LOW | V-38684 | AUDIT | The system must limit users to 10 simultaneous system logins, or a site-defined number, in accordance with operational requirements."
   shell: grep -E "^\*\s*hard\s*maxlogins\s*" /etc/security/limits.conf | awk '{print $4}'
   register: max_logins_audit
-  always_run: yes
+  check_mode: no
   failed_when: no
   changed_when: no
   tags:
@@ -2081,7 +2081,7 @@
   when: rhel6stig_temporary_users | length > 0
   register: temporary_account_expiry_audit
   changed_when: no
-  always_run: yes
+  check_mode: no
   tags:
       - cat3
       - low
@@ -2107,7 +2107,7 @@
   register: pkgs_vpn_installed_audit
   changed_when: false
   failed_when: false
-  always_run: yes
+  check_mode: no
   tags:
       - cat3
       - low
@@ -2134,7 +2134,7 @@
   when: rhel6stig_emergency_accounts | length > 0
   register: emergency_account_expiry_audit
   changed_when: no
-  always_run: yes
+  check_mode: no
   tags:
       - cat3
       - low
@@ -2163,7 +2163,7 @@
   register: inactive_useradd_audit
   changed_when: no
   failed_when: no
-  always_run: yes
+  check_mode: no
   tags:
       - cat3
       - low
@@ -2206,7 +2206,7 @@
   register: vsftpd_service_installed_audit
   changed_when: false
   failed_when: false
-  always_run: yes
+  check_mode: no
   tags:
       - cat3
       - low
@@ -2220,7 +2220,7 @@
   register: vsftpd_xinetd_startup_file_audit
   changed_when: false
   failed_when: false
-  always_run: yes
+  check_mode: no
   when: vsftpd_service_installed_audit.stdout.find('not installed') == -1
   tags:
       - cat3
@@ -2236,7 +2236,7 @@
   changed_when: false
   failed_when: false
   when: vsftpd_service_installed_audit.stdout.find('not installed') == -1 and vsftpd_xinetd_startup_file_audit.stdout
-  always_run: yes
+  check_mode: no
   tags:
       - cat3
       - low
@@ -2250,7 +2250,7 @@
   register: vsftpd_xinetd_config_file_audit
   changed_when: false
   failed_when: false
-  always_run: yes
+  check_mode: no
   when: vsftpd_service_installed_audit.stdout.find('not installed') == -1
   tags:
       - cat3
@@ -2282,7 +2282,7 @@
   register: selinux_policy_audit
   failed_when: selinux_policy_audit.rc == 2
   changed_when: false
-  always_run: yes
+  check_mode: no
   tags:
       - cat3
       - low
@@ -2306,7 +2306,7 @@
   register: selinux_device_file_context_audit
   failed_when: false
   changed_when: false
-  always_run: yes
+  check_mode: no
   tags:
       - cat3
       - low

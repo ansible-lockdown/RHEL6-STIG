@@ -1,0 +1,28 @@
+- name: "MEDIUM | V-38512 | AUDIT | The operating system must prevent public IPv4 access into an organizations internal networks except as appropriately mediated by managed interfaces employing boundary protection devices"
+  command: service iptables status
+  check_mode: no
+  changed_when: no
+  failed_when: no
+  register: iptables_audit
+  tags:
+      - cat2
+      - medium
+      - audit
+      - V-38512
+      - ipv4
+      - network
+      - firewall
+
+- name: "MEDIUM | V-38513 | AUDIT | The systems local IPv4 firewall must implement a deny-all, allow-by-exception policy for inbound packets."
+  shell: "grep ':INPUT' /etc/sysconfig/iptables | awk '{print $2}'"
+  changed_when: no
+  check_mode: no
+  register: ipv4_fw_deny_all_audit
+  tags:
+      - V-38513
+      - ipv4
+      - network
+      - firewall
+      - medium
+      - cat2
+      - audit

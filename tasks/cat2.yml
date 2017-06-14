@@ -205,7 +205,7 @@
   shell: grep disk_error_action /etc/audit/auditd.conf | cut -d = -f 2 | xargs basename
   register:  disk_err_action_audit
   changed_when: no
-  always_run: yes
+  check_mode: no
   tags:
       - cat2
       - medium
@@ -282,7 +282,7 @@
   shell: grep disk_full_action /etc/audit/auditd.conf | cut -d = -f 2 | xargs basename
   register:  disk_full_action_audit
   changed_when: no
-  always_run: yes
+  check_mode: no
   tags:
       - cat2
       - medium
@@ -308,7 +308,7 @@
   become_user: root
   register: system_files_perms_audit
   changed_when: no
-  always_run: yes
+  check_mode: no
   tags:
       - cat2
       - medium
@@ -334,7 +334,7 @@
   shell: grep space_left_action /etc/audit/auditd.conf | cut -d = -f 2 | xargs basename
   register:  space_left_action_audit
   changed_when: no
-  always_run: yes
+  check_mode: no
   tags:
       - cat2
       - medium
@@ -359,7 +359,7 @@
   script: sys_command_files_with_bad_owner.sh
   become_user: root
   register: sys_commands_owner_audit
-  always_run: yes
+  check_mode: no
   changed_when: no
   tags:
       - cat2
@@ -385,7 +385,7 @@
   shell: grep -E '^PASS_MIN_LEN' /etc/login.defs | awk '{print $2}'
   register: min_pwd_len_audit
   changed_when: no
-  always_run: yes
+  check_mode: no
   tags:
       - cat2
       - medium
@@ -410,7 +410,7 @@
   shell: grep -E '^PASS_MIN_DAYS' /etc/login.defs | awk '{print $2}'
   register: pwd_min_days_audit
   changed_when: no
-  always_run: yes
+  check_mode: no
   tags:
       - cat2
       - medium
@@ -435,7 +435,7 @@
   shell: "grep -E '^PASS_MAX_DAYS' /etc/login.defs | awk '{print $2}'"
   register: pwd_max_days_audit
   changed_when: no
-  always_run: yes
+  check_mode: no
   tags:
       - cat2
       - medium
@@ -487,7 +487,7 @@
 - name: "MEDIUM | V-38483 | AUDIT | The system package management tool must cryptographically verify the authenticity of system software packages during installation."
   shell: find /etc/yum{.conf,.repos.d/} -exec grep -ls '^gpgcheck=0' {} \;
   changed_when: false
-  always_run: yes
+  check_mode: no
   register: repo_crypto_check_audit
   tags:
       - cat2
@@ -519,7 +519,7 @@
   shell: "grep -i '^PrintLastLog' /etc/ssh/sshd_config | awk '{ print $2 }'"
   register: last_log_audit
   changed_when: no
-  always_run: yes
+  check_mode: no
   tags:
       - cat2
       - medium
@@ -552,7 +552,7 @@
   failed_when: no
   register: aide_installed_audit
   changed_when: no
-  always_run: yes
+  check_mode: no
   tags:
       - cat2
       - medium
@@ -577,7 +577,7 @@
   command: grep -rs usb-storage /etc/modprobe.conf /etc/modprobe.d
   register: usb_reqs_audit
   failed_when: no
-  always_run: yes
+  check_mode: no
   changed_when: no
   tags:
       - cat2
@@ -608,7 +608,7 @@
   command: grep '^vc/[0-9]' /etc/securetty
   register: vc_root_login_audit
   failed_when: no
-  always_run: yes
+  check_mode: no
   changed_when: no
   tags:
     - cat2
@@ -640,7 +640,7 @@
 - name: "MEDIUM | V-38493 | AUDIT | Audit log directories must have mode 0755 or less permissive."
   shell: grep "^log_file" /etc/audit/auditd.conf|sed 's/^[^/]*//; s/[^/]*$//' | xargs -I % find % -type d -perm /022
   changed_when: no
-  always_run: yes
+  check_mode: no
   failed_when: no
   register: audit_log_dir_perms_audit
   tags:
@@ -672,7 +672,7 @@
 - name: "MEDIUM | V-38495 | AUDIT | Audit log files must be owned by root."
   shell: grep "^log_file" /etc/audit/auditd.conf|sed 's/^[^/]*//; s/[^/]*$//' | xargs -I % find % -type f ! -user root
   changed_when: no
-  always_run: yes
+  check_mode: no
   failed_when: no
   register: audit_log_dir_owner_audit
   tags:
@@ -705,7 +705,7 @@
    awk -F: '$1 !~ /^root$/ && $2 !~ /^[!*]/ {print $1}' /etc/shadow | xargs -I{} grep {} /etc/passwd | awk -F: '$3 < 500 {print $1}'
   register: unlocked_sys_accounts_audit
   changed_when: false
-  always_run: yes
+  check_mode: no
   tags:
       - cat2
       - medium
@@ -733,7 +733,7 @@
   shell: grep "^log_file" /etc/audit/auditd.conf|sed s/^[^\/]*//|xargs stat -c %n | xargs -I % find % -perm /137
   register: audit_log_file_perms_audit
   changed_when: no
-  always_run: yes
+  check_mode: no
   tags:
       - cat2
       - medium
@@ -766,7 +766,7 @@
 - name: "MEDIUM | V-38501 | AUDIT | The system must disable accounts after excessive login failures within a 15-minute interval."
   shell: "grep -h pam_faillock /etc/pam.d/system-auth /etc/pam.d/password-auth | grep fail_interval | awk -F'=' '{print $NF}'"
   changed_when: no
-  always_run: yes
+  check_mode: no
   failed_when: no
   register: login_failures_interval_audit
   tags:
@@ -780,7 +780,7 @@
 - name: "MEDIUM | V-38501 | AUDIT | The system must disable accounts after excessive login failures within a 15-minute interval."
   shell: grep -h '^account\s*required\s*pam_faillock\.so' /etc/pam.d/system-auth /etc/pam.d/password-auth
   changed_when: no
-  always_run: yes
+  check_mode: no
   failed_when: no
   register: login_failures_account_require
   tags:
@@ -927,7 +927,7 @@
 - name: "MEDIUM | V-38511 | AUDIT | IP forwarding for IPv4 must not be enabled, unless the system is a router."
   shell: "sysctl net.ipv4.ip_forward | awk '{print $3}'"
   changed_when: no
-  always_run: yes
+  check_mode: no
   register: ipv4_ip_forwarding_audit
   tags:
       - V-38511
@@ -940,7 +940,7 @@
 - name: "MEDIUM | V-38511 | AUDIT | IP forwarding for IPv4 must not be enabled, unless the system is a router."
   shell: "sysctl net.ipv4.ip_forward | awk '{print $3}'"
   changed_when: no
-  always_run: yes
+  check_mode: no
   register: ipv4_ip_forwarding_audit
   tags:
       - V-38511
@@ -967,26 +967,38 @@
       - medium
       - patch
 
-- name: "MEDIUM | V-38512 | AUDIT | The operating system must prevent public IPv4 access into an organizations internal networks except as appropriately mediated by managed interfaces employing boundary protection devices"
-  command: service iptables status
-  always_run: yes
-  changed_when: no
-  failed_when: no
-  register: iptables_audit
-  tags:
-      - cat2
-      - medium
-      - audit
-      - V-38512
-      - ipv4
-      - network
-      - firewall
+- block:
+    - name: "MEDIUM | V-38512 | Make sure IPTables is installed."
+      yum:
+          name: iptables
+          state: present
 
-- name: "MEDIUM | V-38512 | PATCH | The operating system must prevent public IPv4 access into an organizations internal networks except as appropriately mediated by managed interfaces employing boundary protection devices"
-  service:
-      name: iptables
-      enabled: yes
-      state: started
+    - name: "MEDIUM | V-38512 | Stat iptables config file"
+      stat:
+          path: /etc/sysconfig/iptables
+      register: iptables_config
+
+    - name: "MEDIUM | V-38512 | Create a blank iptables rule file so the service can start."
+      file:
+          path: /etc/sysconfig/iptables
+          state: touch
+          owner: root
+          group: root
+          mode: 0644
+      when: not iptables_config.stat.exists
+
+    - name: "MEDIUM | V-38512 | Persist iptables rules to disk"
+      command: service iptables save
+      args:
+          warn: no
+      changed_when: no
+      failed_when: no
+
+    - name: "MEDIUM | V-38512 | PATCH | The operating system must prevent public IPv4 access into an organizations internal networks except as appropriately mediated by managed interfaces employing boundary protection devices"
+      service:
+          name: iptables
+          enabled: yes
+          state: started
   tags:
       - V-38512
       - ipv4
@@ -996,27 +1008,39 @@
       - cat2
       - patch
 
-- name: "MEDIUM | V-38513 | AUDIT | The systems local IPv4 firewall must implement a deny-all, allow-by-exception policy for inbound packets."
-  shell: "grep ':INPUT' /etc/sysconfig/iptables | awk '{print $2}'"
-  changed_when: no
-  always_run: yes
-  register: ipv4_fw_deny_all_audit
-  tags:
-      - V-38513
-      - ipv4
-      - network
-      - firewall
-      - medium
-      - cat2
-      - audit
+- block:
+    - name: "MEDIUM | V-38513 | Apply sensible default rules so that apply the deny-all policy does not lock the user out."
+      iptables:
+          chain: INPUT
+          ip_version: ipv4
+          ctstate: ESTABLISHED,RELATED
+          protocol: all
+          jump: ACCEPT
+          state: present
 
-- name: "MEDIUM | V-38513 | PATCH | The systems local IPv4 firewall must implement a deny-all, allow-by-exception policy for inbound packets."
-  lineinfile:
-      state: present
-      dest: /etc/sysconfig/iptables
-      regexp: ':INPUT'
-      line: ':INPUT DROP [0:0]'
-  notify: restart iptables
+    - name: "MEDIUM | V-38513 | Apply sensible default rules so that apply the deny-all policy does not lock the user out."
+      iptables:
+          chain: INPUT
+          ip_version: ipv4
+          ctstate: NEW
+          protocol: "{{ item.proto }}"
+          destination_port: "{{ item.port }}"
+          jump: ACCEPT
+          state: present
+      with_items: "{{ rhel6stig_firewall_services }}"
+
+    - name: "MEDIUM | V-38513 | PATCH | The systems local IPv4 firewall must implement a deny-all, allow-by-exception policy for inbound packets."
+      iptables:
+          chain: INPUT
+          ip_version: ipv4
+          policy: DROP
+
+    - name: "MEDIUM | V-38513 | Persist iptables rules to disk"
+      command: service iptables save
+      args:
+          warn: no
+      changed_when: no
+      failed_when: no
   tags:
       - cat2
       - medium
@@ -1025,11 +1049,27 @@
       - firewall
       - network
       - patch
+
+# - name: "MEDIUM | V-38513 | PATCH | The systems local IPv4 firewall must implement a deny-all, allow-by-exception policy for inbound packets."
+#   lineinfile:
+#       state: present
+#       dest: /etc/sysconfig/iptables
+#       regexp: ':INPUT'
+#       line: ':INPUT DROP [0:0]'
+#   notify: restart iptables
+#   tags:
+#       - cat2
+#       - medium
+#       - V-38513
+#       - ipv4
+#       - firewall
+#       - network
+#       - patch
 
 - name: "MEDIUM | V-38514 | AUDIT | The Datagram Congestion Control Protocol (DCCP) must be disabled unless required."
   command: grep -rse "^install\s*dccp\s*/bin/true$" /etc/modprobe.conf /etc/modprobe.d
   changed_when: no
-  always_run: yes
+  check_mode: no
   failed_when: no
   register: dccp_audit
   tags:
@@ -1060,7 +1100,7 @@
 - name: "MEDIUM | V-38515 | AUDIT | The Stream Control Transmission Protocol (SCTP) must be disabled unless required."
   command: grep -rse "^install\s*sctp\s*/bin/true$" /etc/modprobe.conf /etc/modprobe.d
   changed_when: no
-  always_run: yes
+  check_mode: no
   failed_when: no
   register: sctp_audit
   tags:
@@ -1091,7 +1131,7 @@
 - name: "MEDIUM | V-38516 | AUDIT | The Transparent Inter-Process Communication (TIPC) protocol must be disabled unless required."
   command: grep -rse "^install\s*tipc\s*/bin/true$" /etc/modprobe.conf /etc/modprobe.d
   changed_when: no
-  always_run: yes
+  check_mode: no
   failed_when: no
   register: tipc_audit
   tags:
@@ -1124,7 +1164,7 @@
   register: tipc_audit
   changed_when: false
   failed_when: false
-  always_run: yes
+  check_mode: no
   tags:
       - cat2
       - medium
@@ -1199,7 +1239,7 @@
 - name: "MEDIUM | V-38523 | AUDIT | The system must not accept IPv4 source-routed packets on any interface."
   shell: "sysctl net.ipv4.conf.all.accept_source_route | awk '{print $3}'"
   changed_when: no
-  always_run: yes
+  check_mode: no
   register: ipv4_source_routed_packets_any_int_audit
   tags:
       - cat2
@@ -1232,7 +1272,7 @@
 - name: "MEDIUM | V-38524 | AUDIT | The system must not accept ICMPv4 redirect packets on any interface."
   shell: "sysctl net.ipv4.conf.all.accept_redirects | awk '{print $3}'"
   changed_when: no
-  always_run: yes
+  check_mode: no
   register: icmpv4_redirect_packets_any_int_audit
   tags:
       - cat2
@@ -1265,7 +1305,7 @@
 - name: "MEDIUM | V-38526 | AUDIT | The system must not accept ICMPv4 secure redirect packets on any interface."
   shell: "sysctl net.ipv4.conf.all.secure_redirects | awk '{print $3}'"
   changed_when: no
-  always_run: yes
+  check_mode: no
   register: icmpv4_secure_redirect_packets_any_int_audit
   tags:
       - cat2
@@ -1298,7 +1338,7 @@
 - name: "MEDIUM | V-38529 | AUDIT | The system must not accept IPv4 source-routed packets by default."
   shell: "sysctl net.ipv4.conf.default.accept_source_route | awk '{print $3}'"
   changed_when: no
-  always_run: yes
+  check_mode: no
   register: ipv4_source_routed_packets_default_audit
   tags:
       - cat2
@@ -1331,7 +1371,7 @@
 - name: "MEDIUM | V-38532 | AUDIT | The system must not accept ICMPv4 secure redirect packets by default."
   shell: "sysctl net.ipv4.conf.default.secure_redirects | awk '{print $3}'"
   changed_when: no
-  always_run: yes
+  check_mode: no
   register: icmpv4_secure_redirects_default_audit
   tags:
       - medium
@@ -1364,7 +1404,7 @@
 - name: "MEDIUM | V-38539 | AUDIT | The system must be configured to use TCP syncookies when experiencing a TCP SYN flood."
   shell: "sysctl net.ipv4.tcp_syncookies | awk '{print $3}'"
   changed_when: no
-  always_run: yes
+  check_mode: no
   register: tcp_syncookies_audit
   tags:
       - cat2
@@ -1397,7 +1437,7 @@
 - name: "MEDIUM | V-38542 | AUDIT | The system must use a reverse-path filter for IPv4 network traffic when possible on all interfaces."
   shell: "sysctl net.ipv4.conf.all.rp_filter | awk '{print $3}'"
   changed_when: no
-  always_run: yes
+  check_mode: no
   register: ipv4_reverse_path_filter_all_int_audit
   tags:
       - cat2
@@ -1431,7 +1471,7 @@
 - name: "MEDIUM | V-38544 | AUDIT | The system must use a reverse-path filter for IPv4 network traffic when possible by default."
   shell: "sysctl net.ipv4.conf.default.rp_filter | awk '{print $3}'"
   changed_when: no
-  always_run: yes
+  check_mode: no
   register: ipv4_reverse_path_filter_default_audit
   tags:
       - cat2
@@ -1461,41 +1501,10 @@
       - kernel_parameters
       - network
 
-- name: "MEDIUM | V-38546 | AUDIT | The IPv6 protocol handler must not be bound to the network stack unless needed."
-  shell: 'grep -rsE ''^options\s*ipv6\s*disable=1'' /etc/modprobe.conf /etc/modprobe.d | awk -F '':'' ''{print $2}'' | awk -F ''='' ''{print $2}'''
-  register: ipv6_protocol_handler_bound_network_stack_audit
-  changed_when: no
-  always_run: yes
-  tags:
-      - V-38546
-      - cat2
-      - medium
-      - ipv6
-      - network
-      - audit
-
-- name: "MEDIUM | V-38546 | PATCH | The IPv6 protocol handler must not be bound to the network stack unless needed."
-  lineinfile:
-      state: present
-      create: yes
-      regexp: '^options ipv6 disable='
-      line: options ipv6 disable={{ (not rhel6stig_ipv6_required) | bool | int }}
-      dest: /etc/modprobe.d/disable-ipv6.conf
-  when:
-      - ipv6_protocol_handler_bound_network_stack_audit is defined
-      - ipv6_protocol_handler_bound_network_stack_audit.stdout != 1
-  tags:
-      - cat2
-      - medium
-      - patch
-      - V-38546
-      - ipv6
-      - network
-
 - name: "MEDIUM | V-38548 | AUDIT | The system must ignore ICMPv6 redirects by default."
   shell: "sysctl net.ipv6.conf.default.accept_redirects | awk '{print $3}'"
   changed_when: no
-  always_run: yes
+  check_mode: no
   register: icmpv6_ignore_redirects_default_audit
   tags:
       - cat2
@@ -1535,7 +1544,7 @@
   when: rhel6stig_ipv6_required
   failed_when: no
   changed_when: no
-  always_run: yes
+  check_mode: no
   register: ip6tables_audit
   tags:
       - cat2
@@ -1571,7 +1580,7 @@
   command: service iptables status
   failed_when: no
   changed_when: no
-  always_run: yes
+  check_mode: no
   register: iptables_audit
   tags:
       - cat2
@@ -1602,7 +1611,7 @@
 - name: "MEDIUM | V-38573 | AUDIT | The system must disable accounts after three consecutive unsuccessful logon attempts."
   shell: grep -h pam_faillock /etc/pam.d/system-auth /etc/pam.d/password-auth | grep deny=3
   changed_when: no
-  always_run: yes
+  check_mode: no
   register: logon_attempts_audit
   tags:
       - cat2
@@ -1694,7 +1703,7 @@
 - name: "MEDIUM | V-38574 | AUDIT | The system must use a FIPS 140-2 approved cryptographic hashing algorithm for generating account password hashes (system-auth)."
   shell: "grep password -h /etc/pam.d/* | grep pam_unix.so | awk '{print $4}'"
   changed_when: no
-  always_run: yes
+  check_mode: no
   register: pam_pwd_hash_audit
   tags:
       - cat2
@@ -1725,7 +1734,7 @@
 
 - name: "MEDIUM | V-38576 | AUDIT | The system must use a FIPS 140-2 approved cryptographic hashing algorithm for generating account password hashes (login.defs)"
   shell: "grep ENCRYPT_METHOD /etc/login.defs | awk '{print $2}'"
-  always_run: yes
+  check_mode: no
   changed_when: no
   register: login_defs_audit
   tags:
@@ -1751,7 +1760,7 @@
 
 - name: "MEDIUM | V-38577 | AUDIT | The system must use a FIPS 140-2 approved cryptographic hashing algorithm for generating account password hashes (libuser.conf)"
   shell: "grep crypt_style /etc/libuser.conf | awk '{print $3}'"
-  always_run: yes
+  check_mode: no
   changed_when: no
   register: libuser_audit
   tags:
@@ -1785,7 +1794,7 @@
   stat:
       path: /etc/grub.conf
   register: grub_conf_audit
-  always_run: yes
+  check_mode: no
   tags:
       - cat2
       - medium
@@ -1812,7 +1821,7 @@
 
 - name: "MEDIUM | V-38580 | AUDIT | The audit system must be configured to audit the loading and unloading of dynamic kernel modules."
   shell: egrep -e "(-w |-F path=)/sbin/insmod" /etc/audit/audit.rules; egrep -e "(-w |-F path=)/sbin/modprobe" /etc/audit/audit.rules; egrep -e "(-w |-F path=)/sbin/rmmod" /etc/audit/audit.rules;grep -w "init_module" /etc/audit/audit.rules; grep -w "init_module" /etc/audit/audit.rules
-  always_run: yes
+  check_mode: no
   changed_when: False
   failed_when: no
   register: dynamic_kernel_loading_audit
@@ -1862,7 +1871,7 @@
 - name: "MEDIUM | V-38582 | AUDIT | The xinetd service must be disabled if no network services utilizing it are enabled"
   shell: "chkconfig --list | sed -n '/xinetd based services/,$p'"
   changed_when: no
-  always_run: yes
+  check_mode: no
   register: xinetd_services
   tags:
       - cat2
@@ -1874,7 +1883,7 @@
 
 - name: "MEDIUM | V-38582 | AUDIT | The xinetd service must be disabled if no network services utilizing it are enabled"
   command: chkconfig "xinetd" --list
-  always_run: yes
+  check_mode: no
   failed_when: no
   changed_when: no
   register: xinetd_audit
@@ -1919,7 +1928,7 @@
 
 - name: "MEDIUM | V-38585 | AUDIT | The system boot loader must require authentication."
   command: grep password /etc/grub.conf
-  always_run: yes
+  check_mode: no
   failed_when: no
   changed_when: no
   register: grub_auth_audit
@@ -1964,7 +1973,7 @@
 - name: "MEDIUM | V-38586 | AUDIT | The system must require authentication upon booting into single-user and maintenance modes."
   command: grep SINGLE /etc/sysconfig/init
   changed_when: no
-  always_run: yes
+  check_mode: no
   register: single_user_mode_auth_audit
   tags:
       - cat2
@@ -1990,7 +1999,7 @@
 
 - name: "MEDIUM | V-38588 | AUDIT | The system must not permit interactive boot."
   command: grep PROMPT /etc/sysconfig/init
-  always_run: yes
+  check_mode: no
   changed_when: no
   failed_when: no
   register: interactive_boot_audit
@@ -2018,7 +2027,7 @@
 - name: "MEDIUM | V-38592 | AUDIT | The system must require administrator action to unlock an account locked by excessive failed login attempts."
   shell: grep -h pam_faillock /etc/pam.d/system-auth /etc/pam.d/password-auth | grep unlock_time
   changed_when: no
-  always_run: yes
+  check_mode: no
   register: admin_unlock_audit
   tags:
       - cat2
@@ -2093,7 +2102,7 @@
 - name: "MEDIUM | V-38593 | AUDIT |  The Department of Defense (DoD) login banner must be displayed immediately prior to or as part of console login prompts"
   command: cat /etc/issue
   changed_when: no
-  always_run: yes
+  check_mode: no
   register: login_banner_audit
   tags:
       - cat2
@@ -2128,7 +2137,7 @@
 - name: "MEDIUM | V-38596 | AUDIT | The system must implement virtual address space randomization."
   shell: "sysctl kernel.randomize_va_space | awk '{print $3}'"
   changed_when: no
-  always_run: yes
+  check_mode: no
   register: virt_addr_space_randomization_audit
   tags:
       - cat2
@@ -2157,7 +2166,7 @@
 - name: "MEDIUM | V-38597 | AUDIT | The system must limit the ability of processes to have simultaneous write and execute access to memory."
   shell: "sysctl kernel.exec-shield | awk '{print $3}'"
   changed_when: no
-  always_run: yes
+  check_mode: no
   register: simultaneous_wr_memory_audit
   tags:
       - cat2
@@ -2188,7 +2197,7 @@
   shell: grep banner_file /etc/vsftpd/vsftpd.conf | cut -f2- -d'=' | xargs cat
   failed_when: no
   changed_when: no
-  always_run: yes
+  check_mode: no
   register: vsftpd_banner_audit
   tags:
       - cat2
@@ -2221,7 +2230,7 @@
 - name: "MEDIUM | V-38600 | AUDIT | The system must not send ICMPv4 redirects by default."
   shell: "sysctl net.ipv4.conf.default.send_redirects | awk '{print $3}'"
   changed_when: no
-  always_run: yes
+  check_mode: no
   register: icmpv4_redirects_audit
   tags:
       - cat2
@@ -2249,7 +2258,7 @@
 - name: "MEDIUM | V-38601 | AUDIT | The system must not send ICMPv4 redirects from any interface."
   shell: "sysctl net.ipv4.conf.all.send_redirects | awk '{print $3}'"
   changed_when: no
-  always_run: yes
+  check_mode: no
   register: any_iface_icmp_redirect_audit
   tags:
       - medium
@@ -2276,7 +2285,7 @@
 
 - name: "MEDIUM | V-38603 | AUDIT | The ypserv package must not be installed."
   command: rpm -q ypserv
-  always_run: yes
+  check_mode: no
   changed_when: no
   register: ypserv_audit
   failed_when: no
@@ -2304,7 +2313,7 @@
   command: chkconfig ypbind --list
   changed_when: no
   failed_when: no
-  always_run: yes
+  check_mode: no
   register: ypbind_service_audit
   when: "'ypbind' in sysv_services.stdout"
   tags:
@@ -2332,7 +2341,7 @@
 - name: "MEDIUM | V-38605 | AUDIT | The cron service must be running"
   command: service crond status
   changed_when: no
-  always_run: yes
+  check_mode: no
   failed_when: no
   register: crond_status_audit
   when: "'crond' in sysv_services.stdout"
@@ -2362,7 +2371,7 @@
 - name: "MEDIUM | V-38606 | AUDIT | The tftp-server package must not be installed unless required."
   command: rpm -q tftp-server
   failed_when: no
-  always_run: yes
+  check_mode: no
   changed_when: no
   register: tftp_server_install_audit
   when: not rhel6stig_tftp_required
@@ -2390,7 +2399,7 @@
 - name: "MEDIUM | V-38609 | AUDIT | The TFTP service must not be running."
   command: chkconfig tftp --list
   failed_when: no
-  always_run: yes
+  check_mode: no
   changed_when: no
   register: tftp_service_audit
   when: not rhel6stig_tftp_required and 'tftp' in xinetd_services.stdout
@@ -2417,7 +2426,7 @@
 
 - name: "MEDIUM | V-38611 | AUDIT | The SSH daemon must ignore .rhosts files."
   command: grep -i IgnoreRhosts /etc/ssh/sshd_config
-  always_run: yes
+  check_mode: no
   failed_when: no
   changed_when: no
   register: sshd_rhosts_ignore_audit
@@ -2715,36 +2724,6 @@
       - logrotate
       - syslog
 
-# V-38625 is checked but not automatically patched, please see not_automated.yml
-
-- name: "MEDIUM | V-38626 | AUDIT | The LDAP client must use a TLS connection using trust certificates signed by the site CA."
-  command: grep tls_cacert /etc/pam_ldap.conf
-  register: ldap_tls_audit
-  when: pam_ldap_test.stat.exists
-  failed_when: no
-  changed_when: no
-  tags:
-      - cat2
-      - medium
-      - audit
-      - V-38626
-      - ldap
-
-- name: "MEDIUM | V-38626 | PATCH | The LDAP client must use a TLS connection using trust certificates signed by the site CA."
-  lineinfile:
-    state: present
-    backup: yes
-    dest: /etc/pam_ldap.conf
-    regexp: '^#?tls_cacertdir'
-    line: 'tls_cacertdir /etc/ssl/certs'
-  when: pam_ldap_test.stat.exists
-  tags:
-      - cat2
-      - medium
-      - patch
-      - V-38626
-      - ldap
-
 - name: "MEDIUM | V-38627 | PATCH | The openldap-servers package must not be installed unless required."
   yum:
       name: openldap-servers
@@ -2756,7 +2735,6 @@
       - patch
       - V-38627
       - ldap
-
 
 - name: |
 
@@ -3243,7 +3221,7 @@
   register: bluetooth_service_audit
   changed_when: false
   failed_when: false
-  always_run: yes
+  check_mode: no
   tags:
       - cat2
       - medium
@@ -3360,7 +3338,7 @@
   register: fstab_tmp_audit
   changed_when: no
   failed_when: no
-  always_run: yes
+  check_mode: no
   tags:
       - cat2
       - medium
@@ -3390,7 +3368,7 @@
   # find included configs
   shell: cat /etc/sudoers | grep -w '^#include' | awk '{print $2}'
   register: sudoers_include_audit
-  always_run: yes
+  check_mode: no
   changed_when: no
   tags:
       - cat2
@@ -3404,7 +3382,7 @@
   # Find files found in the dirs of  #includedir directives
   shell: cat /etc/sudoers | grep -w '^#includedir' | awk '{print $2}' | xargs -i find {} -type f
   register: sudoers_includedirs_files
-  always_run: yes
+  check_mode: no
   changed_when: no
   tags:
       - cat2
@@ -3437,3 +3415,15 @@
       - V-58901
       - sudoers
       - patch
+
+- name: 'MEDIUM | V-72817 | PATCH | Wireless network adapters must be disabled.'
+  command: "true"
+  changed_when: no
+  failed_when: no
+  tags:
+      - cat2
+      - medium
+      - V-72817
+      - wireless
+      - patch
+      - notimplemented
