@@ -1,5 +1,78 @@
 ---
 # Preliminary tasks that should always be run
+- block:
+    - name: "PRELIM | Make sure iptables is installed."
+      yum:
+          name: iptables
+          state: present
+
+    - name: "PRELIM | See if a default iptables config file exists"
+      stat:
+          path: /etc/sysconfig/iptables
+      register: iptables_config
+
+    - name: "PRELIM | Copy up a sensible default firewall config"
+      copy:
+          src: etc_sysconfig_iptables
+          dest: /etc/sysconfig/iptables
+          owner: root
+          group: root
+          mode: 0644
+      when: not iptables_config.stat.exists
+      notify: restart iptables
+
+    - name: Flush handlers
+      meta: flush_handlers
+
+  tags:
+      - V-38512
+      - V-38513
+      - V-38555
+      - V-38560
+      - V-38686
+      - ipv4
+      - network
+      - firewall
+      - cat2
+      - medium
+      - patch
+
+- block:
+    - name: "PRELIM | Make sure ip6tables is installed."
+      yum:
+          name: iptables-ipv6
+          state: present
+
+    - name: "PRELIM | See if a default ip6tables config file exists"
+      stat:
+          path: /etc/sysconfig/ip6tables
+      register: ip6tables_config
+
+    - name: "PRELIM | Copy up a sensible default firewall config"
+      copy:
+          src: etc_sysconfig_ip6tables
+          dest: /etc/sysconfig/ip6tables
+          owner: root
+          group: root
+          mode: 0644
+      when: not ip6tables_config.stat.exists and rhel6stig_ipv6_required
+      notify: restart ip6tables
+
+    - name: Flush handlers
+      meta: flush_handlers
+
+  tags:
+      - cat2
+      - medium
+      - ipv6
+      - V-38444
+      - V-38549
+      - V-38551
+      - V-38553
+      - firewall
+      - network
+      - patch
+
 # List users in order to look files inside each home directory
 - name: "PRELIM | List users accounts"
   command: "awk -F: '{print $1}' /etc/passwd"
@@ -137,18 +210,6 @@
       - auditd
       - patch
 
-- name: "PRELIM | List interface config files"
-  shell: ls /etc/sysconfig/network-scripts/ifcfg-eth* | grep -v $(date +%Y)
-  changed_when: false
-  register: interface_config_files
-  tags:
-      - cat2
-      - medium
-      - V-38679
-      - network
-      - dhcp
-      - patch
-
 - name: "PRELIM | List setuid / setgid programs on all mounted filesystems"
   shell: find $(lsblk -o MOUNTPOINT -n | grep '^/') -xdev -type f -perm /6000 2>/dev/null
   changed_when: false
@@ -176,6 +237,7 @@
       paths: /etc/sysconfig/network-scripts
       file_type: file
       patterns: ifcfg-eth*
+  check_mode: no
   register: interface_config_files
   tags:
       - cat2
