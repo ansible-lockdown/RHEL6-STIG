@@ -1,12 +1,9 @@
 rhel6stig_min_ansible_version: 2.2
 
-# Generate an audit report
-make_audit_report: no
-
 # Enable or disable remediation for each category
-rhel6stig_cat1: true
-rhel6stig_cat2: false
-rhel6stig_cat3: false
+rhel6stig_cat1: yes
+rhel6stig_cat2: no
+rhel6stig_cat3: no
 
 # Changing system defaults
 rhel6stig_snmp_community: B0re4lis
