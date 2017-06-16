@@ -63,7 +63,16 @@ rhel6stig_xwindows_required: no
 
 # Assume ipv6 is not needed on the target system and disable it.
 # This will also skip tasks related to configuring ip6tables.
-rhel6stig_ipv6_required: no
+rhel6stig_ipv6_required: yes
+
+# If wireless interface is required and documented then enalbe this
+# to avoid removing all wireless interfaces
+rhel6stig_wireless_required: no
+
+# Whether or not XINETD is required
+# If you are using tftp-server or other xinetd services
+# THIS MUST ALSO be ENABLED
+rhel6stig_xinetd_required: no
 
 # Whether or not TFTP is required
 # This will prevent the removal of tftp and tftp-server packages
@@ -124,6 +133,12 @@ rhel6stig_temporary_users: []
   # - user: foo
   #   expiration: 1632441600    # 2021-09-24. Time mush be in epoch.
 
+# V-58901 The sudo command must require authentication
+# This fix requires passwords when using sudo and breaks many use-cases
+# Cloud images, Vagrant boxes, etc will no longer allow sudo without a password
+# Set this to "no" to enable the fix for V-58901
+rhel6stig_allow_sudo_without_password: yes
+
 # Auditd.conf settings
 rhel6stig_auditd_config:
   # V-38464 - compliant options SYSLOG|EXEC|SINGLE|HALT
@@ -159,6 +174,10 @@ rhel6stig_auditd_config:
   auditd_failure_flag: 2
 
 # AIDE settings
+rhel6stig_aide_dbdir: /var/lib/aide
+rhel6stig_aide_dbfile: aide.db.gz
+rhel6stig_aide_dbnewfile: aide.db.new.gz
+
 rhel6stig_aide_cron:
   cron_user: root
   cron_file: /etc/crontab
@@ -171,11 +190,6 @@ rhel6stig_aide_cron:
 
 # Firewall settings
 rhel6stig_firewall: iptables
-
-rhel6stig_firewall_services:
-    - name: ssh
-      port: 22
-      proto: tcp
 
 rhel6stig_login_banner: |
     *******************************************************************************
