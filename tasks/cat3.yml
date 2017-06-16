@@ -1391,6 +1391,8 @@
 
 - name: "LOW | V-38618 | AUDIT | The avahi service must be disabled."
   command: service avahi-daemon status
+  args:
+      warn: no
   register: avahi_service_running_audit
   changed_when: false
   failed_when: false
@@ -1416,6 +1418,18 @@
       - avahi
       - services
       - patch
+
+- name: "LOW | V-38624 | PATCH | System logs must be rotated daily."
+  yum:
+      name: logrotate
+      state: present
+  tags:
+      - cat3
+      - low
+      - patch
+      - V-38624
+      - logrotate
+      - syslog
 
 - name: "LOW | V-38627 | AUDIT | The openldap-servers package must not be installed unless required."
   command: rpm -q openldap-servers
