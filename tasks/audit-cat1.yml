@@ -216,6 +216,19 @@
       - audit
       - ctrl_alt_delete
 
+- name: "HIGH | V-38677 | AUDIT | The NFS server must not have the insecure file locking option enabled"
+  command: grep insecure_locks /etc/exports
+  register: nfs_insecure_locking_audit
+  ignore_errors: yes
+  changed_when: no
+  check_mode: no
+  tags:
+      - cat1
+      - high
+      - V-38677
+      - audit
+      - nfs
+
 - name: "HIGH | V-38701 | AUDIT | The TFTP daemon must operate in secure mode which provides access only to a single directory on the host file system"
   command: grep "server_args = -s" /etc/xinetd.d/tftp
   register: tftp_audit
