@@ -242,7 +242,8 @@
       - patch
       - ctrl_alt_delete
 
-# V-38677 can be found in not_automated.yml
+# Not automated
+# - name: "HIGH | V-38677 | AUDIT | The NFS server must not have the insecure file locking option enabled"
 
 - block:
     - name: "HIGH | V-38701 | PATCH | The TFTP daemon must operate in secure mode which provides access only to a single directory on the host file system"
