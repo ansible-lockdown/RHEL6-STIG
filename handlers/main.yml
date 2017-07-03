@@ -3,7 +3,7 @@
       name: ntpd
       state: restarted
 
-- name: restart ssh
+- name: restart sshd
   service:
       name: sshd
       state: restarted
@@ -49,10 +49,22 @@
       name: iptables
       state: restarted
 
+- name: save iptables rules
+  shell: iptables-save > /etc/sysconfig/iptables
+  args:
+      warn: no
+  notify: restart iptables
+
 - name: restart ip6tables
   service:
       name: ip6tables
       state: restarted
+
+- name: save ip6tables rules
+  shell: ip6tables-save  > /etc/sysconfig/ip6tables
+  args:
+      warn: no
+  notify: restart ip6tables
 
 - name: restart vsftpd
   service:
@@ -71,9 +83,13 @@
       state: restarted
 
 - name: init aide
-  command: /usr/sbin/aide --init -B 'database_out=file:/var/lib/aide/aide.db.gz'
+  command: "/usr/sbin/aide --init -B 'database_out=file:{{rhel6stig_aide_dbdir}}/{{rhel6stig_aide_dbnewfile}}'"
   async: 45
   poll: 0
+  notify: move new aide db into place
+
+- name: move new aide db into place
+  command: "mv {{rhel6stig_aide_dbdir}}/{{rhel6stig_aide_dbnewfile}} {{rhel6stig_aide_dbdir}}/{{rhel6stig_aide_dbfile}}"
 
 - name: reset audit pkg ugids
   command: rpm --setugids audit

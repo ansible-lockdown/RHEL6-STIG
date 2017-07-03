@@ -1,5 +1,4 @@
-# Generate an audit report
-make_audit_report: no
+rhel6stig_min_ansible_version: 2.2
 
 # Enable or disable remediation for each category
 rhel6stig_cat1: yes
@@ -11,13 +10,34 @@ rhel6stig_snmp_community: B0re4lis
 rhel6stig_pass_min_length: 15
 rhel6stig_pass_min_days: 1
 rhel6stig_pass_max_days: 60
-rhel6stig_pass_reuse: 5         # V-38658 Number of passwords to remember to prevent reuse.
+# V-38658 Number of passwords to remember to prevent reuse.
+rhel6stig_pass_reuse: 5
 rhel6stig_pam_unix_params: sha512 shadow try_first_pass use_authtok remember=24
 rhel6stig_pam_auth_sufficient: pam_unix.so try_first_pass
 rhel6stig_pam_cracklib_params: try_first_pass retry=3 maxrepeat=3 minlen={{ rhel6stig_pass_min_length }} dcredit=-1 ucredit=-1 ocredit=-1 lcredit=-1 difok=4
 
 # SELinux settings
 rhel6stig_selinux_pol: targeted
+
+# Only set this to true if you have a valid
+# antivirus solution in your repositories, else it will fail every time.
+rhel6stig_antivirus_required: no
+
+# AV settings
+rhel6stig_av_package:
+    package:
+        - clamav
+        - clamav-scanner
+        - clamav-server
+    service: clamav-daemon
+
+# GPG Key locations
+# These are the standard URL locations for GPG keys for RH and Cent.
+# If running this against offline systems then specify an accessible
+# location where the key is stored.
+rhel6stig_gpg_key_loc:
+    centos: http://mirror.centos.org/centos/RPM-GPG-KEY-CentOS-6
+    redhat: https://www.redhat.com/security/fd431d51.txt
 
 # Network Settings
 # WARNING!
@@ -40,7 +60,16 @@ rhel6stig_xwindows_required: no
 
 # Assume ipv6 is not needed on the target system and disable it.
 # This will also skip tasks related to configuring ip6tables.
-rhel6stig_ipv6_required: no
+rhel6stig_ipv6_required: yes
+
+# If wireless interface is required and documented then enalbe this
+# to avoid removing all wireless interfaces
+rhel6stig_wireless_required: no
+
+# Whether or not XINETD is required
+# If you are using tftp-server or other xinetd services
+# THIS MUST ALSO be ENABLED
+rhel6stig_xinetd_required: no
 
 # Whether or not TFTP is required
 # This will prevent the removal of tftp and tftp-server packages
@@ -101,23 +130,37 @@ rhel6stig_temporary_users: []
   # - user: foo
   #   expiration: 1632441600    # 2021-09-24. Time mush be in epoch.
 
+# V-58901 The sudo command must require authentication
+# This fix requires passwords when using sudo and breaks many use-cases
+# Cloud images, Vagrant boxes, etc will no longer allow sudo without a password
+# Set this to "no" to enable the fix for V-58901
+rhel6stig_allow_sudo_without_password: yes
+
 # Auditd.conf settings
 rhel6stig_auditd_config:
-  disk_error_action: syslog     # V-38464 - compliant options SYSLOG|EXEC|SINGLE|HALT
-  disk_full_action: syslog      # V-38468 - compliant options SYSLOG|EXEC|SINGLE|HALT
-  space_left_action: email      # V-38470 - compliant options EMAIL|SYSLOG
-  max_log_file: 6               # V-38633 - compliant options 6 or higher (MB)
-  max_log_file_action: rotate   # V-38634 - compliant options ROTATE
-  num_logs: 5                   # V-38636 - compliant options 5 or higher
-  space_left: 75                # V-38678 - must be set to locally defined value - default 75 MB
-  action_mail_acct: root        # V-38680 - compliant options - admin account to email
-
+  # V-38464 - compliant options SYSLOG|EXEC|SINGLE|HALT
+  disk_error_action: syslog
+  # V-38468 - compliant options SYSLOG|EXEC|SINGLE|HALT
+  disk_full_action: syslog
+  # V-38470 - compliant options EMAIL|SYSLOG
+  space_left_action: email
+  # V-38633 - compliant options 6 or higher (MB)
+  max_log_file: 6
+  # V-38634 - compliant options ROTATE
+  max_log_file_action: rotate
+  # V-38636 - compliant options 5 or higher
+  num_logs: 5
+  # V-38678 - must be set to locally defined value - default 75 MB
+  space_left: 75
+  # V-38680 - compliant options - admin account to email
+  action_mail_acct: root
   # Guidance says that anything but SINGLE results in finding
   # then says SUSPEND or HALT are acceptable and that
   # system where availability need is high will need to set this to
   # something else entirely.
   # NOTE: SINGLE user mode setting will break cloud systems.
-  admin_space_left_action: halt # V-54381 - compliant options SINGLE|SUSPEND|HALT|EXEC|SYSLOG
+  # V-54381 - compliant options SINGLE|SUSPEND|HALT|EXEC|SYSLOG
+  admin_space_left_action: halt
   # auditd_failure_flag
   # 2    Tells your system to perform an immediate shutdown without
   #      flushing any pending data to disk when the limits of your
@@ -128,6 +171,10 @@ rhel6stig_auditd_config:
   auditd_failure_flag: 2
 
 # AIDE settings
+rhel6stig_aide_dbdir: /var/lib/aide
+rhel6stig_aide_dbfile: aide.db.gz
+rhel6stig_aide_dbnewfile: aide.db.new.gz
+
 rhel6stig_aide_cron:
   cron_user: root
   cron_file: /etc/crontab
@@ -137,6 +184,9 @@ rhel6stig_aide_cron:
   aide_day: '*'
   aide_month: '*'
   aide_weekday: '*'
+
+# Firewall settings
+rhel6stig_firewall: iptables
 
 rhel6stig_login_banner: |
     *******************************************************************************
