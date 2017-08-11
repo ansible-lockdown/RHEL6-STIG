@@ -259,7 +259,7 @@
           backup: yes
           dest: /etc/xinetd.d/tftp
           regexp: 'server_args\s+=\s+(/.*$)'
-          line: '\tserver_args\t\t= -s \1'
+          line: "\tserver_args\t\t= -s \\1"
           backrefs: yes
       when: "rhel6stig_tftp_required and 'tftp' in tftp_service_check.rc == 0"
       notify: reload xinetd

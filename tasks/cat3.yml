@@ -295,7 +295,7 @@
       backup: no
       dest: /etc/login.defs
       regexp: '^#?PASS_WARN_AGE'
-      line: 'PASS_WARN_AGE\t7'
+      line: "PASS_WARN_AGE\t7"
   tags:
       - cat3
       - low
