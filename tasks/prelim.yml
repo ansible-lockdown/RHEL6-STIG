@@ -164,7 +164,7 @@
       - smb
 
 - name: "PRELIM | Get list of rsyslog genarated log files"
-  shell: "grep -e '/' /etc/rsyslog.conf /etc/rsyslog.d/* | grep -v IncludeConfig | sed 's/-//'| awk 'NF==2 {print $2}'"
+  shell: "grep -P '^(?!#).*/' /etc/rsyslog.conf /etc/rsyslog.d/* | grep -v IncludeConfig | sed 's/-//'| awk 'NF==2 {print $2}'"
   changed_when: no
   check_mode: no
   register: rsyslog_logfiles
