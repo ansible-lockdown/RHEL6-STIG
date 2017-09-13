@@ -86,6 +86,7 @@
   command: "/usr/sbin/aide --init -B 'database_out=file:{{rhel6stig_aide_dbdir}}/{{rhel6stig_aide_dbnewfile}}'"
   async: 45
   poll: 0
+  when: not ansible_check_mode
   notify: move new aide db into place
 
 - name: move new aide db into place
