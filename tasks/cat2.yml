@@ -1061,6 +1061,7 @@
       changed_when: no
       failed_when: no
       register: pamd_files
+      check_mode: no
 
     - name: "MEDIUM | V-38574 | PATCH | The system must use a FIPS 140-2 approved cryptographic hashing algorithm for generating account password hashes (system-auth)."
       # The PAM module doesn't make sense for this particular rule. Lineinfile works perfectly here.
@@ -1794,6 +1795,7 @@
       changed_when: no
       failed_when: audit_package_integrity_check_audit.stderr
       register: audit_package_integrity_check_audit
+      check_mode: no
 
     - name: "MEDIUM | V-38637 | PATCH | The system package management tool must verify contents of all files associated with the audit package."
       command: yum -y reinstall audit
@@ -1852,6 +1854,7 @@
       changed_when: no
       failed_when: no
       register: snmpd_version_audit
+      check_mode: no
 
     - name: "MEDIUM | V-38660 | PATCH | The snmpd service must use only SNMP protocol version 3 or newer."
       lineinfile:
@@ -1875,6 +1878,7 @@
       register: audit_package_permissions_audit
       failed_when: no
       changed_when: no
+      check_mode: no
 
     - name: "MEDIUM | V-38663 | PATCH | The system package management tool must verify permissions on all files and directories associated with the audit package."
       command: rpm --setperms audit
@@ -1896,6 +1900,7 @@
       failed_when: no
       changed_when: no
       register: audit_package_ownership_audit
+      check_mode: no
 
     - name: "MEDIUM | V-38664 | PATCH | The system package management tool must verify ownership on all files and directories associated with the audit package."
       command: rpm --setugids audit
@@ -1915,6 +1920,7 @@
       failed_when: no
       changed_when: no
       register: audit_package_group_ownership_audit
+      check_mode: no
 
     - name: "MEDIUM | V-38665 | PATCH | The system package management tool must verify group-ownership on all files and directories associated with the audit package."
       command: rpm --setugids audit

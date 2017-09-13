@@ -1157,6 +1157,7 @@
     - name: "LOW | V-38567 | PATCH | The audit system must be configured to audit all use of setuid and setgid programs."
       shell: find $(lsblk -o MOUNTPOINT -n | grep '^/') -xdev -type f -perm /6000 2>/dev/null
       changed_when: false
+      check_mode: no
       register: setugid_programs
 
     - name: "LOW | V-38567 | PATCH | The audit system must be configured to audit all use of setuid and setgid programs."

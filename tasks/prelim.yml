@@ -152,6 +152,7 @@
   changed_when: false
   failed_when: false
   when: rhel6stig_cat3
+  check_mode: no
   tags:
       - selinux
 
@@ -214,6 +215,7 @@
   shell: 'awk ''/^[^#]/ { print $2; }'' /etc/fstab'
   changed_when: false
   register: fstab_mountpoints
+  check_mode: no
   tags:
       - cat2
       - medium
