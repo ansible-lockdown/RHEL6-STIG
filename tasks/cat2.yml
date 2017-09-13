@@ -1813,9 +1813,9 @@
       service: system-auth
       backup: yes
       type: password
-      control: sufficient
-      pam_module: pam_unix.so
-      arguments: sha512 shadow try_first_pass use_authtok remember={{ rhel6stig_pass_reuse }}
+      control: requisite
+      pam_module: pam_pwhistory.so
+      arguments: use_authtok remember={{ rhel6stig_pass_reuse }}
       after_line: password requisite pam_cracklib.so
       state: present
   tags:
