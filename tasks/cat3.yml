@@ -225,20 +225,16 @@
       - auditd
       - patch
 
-- name: "LOW | V-38474 | AUDIT | Low  The system must allow locking of graphical desktop sessions."
-  command: gconftool-2 --direct --config-source xml:readwrite:/etc/gconf/gconf.xml.mandatory --get /apps/gnome_settings_daemon/keybindings/screensaver
-  when: rhel6stig_xwindows_required
-  register: gui_screen_lock_hotkey_audit
-  check_mode: no
-  tags:
-      - cat3
-      - low
-      - V-38474
-      - screen_lock
-      - audit
+- block:
+    - name: "LOW | V-38474 | AUDIT | The system must allow locking of graphical desktop sessions."
+      command: gconftool-2 --direct --config-source xml:readwrite:/etc/gconf/gconf.xml.mandatory --get /apps/gnome_settings_daemon/keybindings/screensaver
+      changed_when: gui_screen_lock_hotkey_audit.stdout != "<Ctrl><Alt>l" or gui_screen_lock_hotkey_audit.stderr != ""
+      register: gui_screen_lock_hotkey_audit
+      check_mode: no
 
-- name: "LOW | V-38474 | PATCH | The system must allow locking of graphical desktop sessions."
-  command: gconftool-2 --direct --config-source xml:readwrite:/etc/gconf/gconf.xml.mandatory --type string --set /apps/gnome_settings_daemon/keybindings/screensaver "<Ctrl><Alt>l"
+    - name: "LOW | V-38474 | PATCH | The system must allow locking of graphical desktop sessions."
+      command: gconftool-2 --direct --config-source xml:readwrite:/etc/gconf/gconf.xml.mandatory --type string --set /apps/gnome_settings_daemon/keybindings/screensaver "<Ctrl><Alt>l"
+      when: gui_screen_lock_hotkey_audit.changed
   when: rhel6stig_xwindows_required
   tags:
       - cat3
@@ -1462,22 +1458,16 @@
       - openldap_server
       - audit
 
-- name: "LOW | V-38639 | AUDIT | The system must display a publicly-viewable pattern during a graphical desktop environment session lock."
-  command: gconftool-2 --direct --config-source xml:readwrite:/etc/gconf/gconf.xml.mandatory --get /apps/gnome-screensaver/mode
-  register: gconftool_pattern_audit
-  check_mode: no
-  changed_when: no
-  when: rhel6stig_xwindows_required
-  tags:
-      - cat3
-      - low
-      - V-38639
-      - screensaver
-      - gconftool
-      - audit
+- block:
+    - name: "LOW | V-38639 | AUDIT | The system must display a publicly-viewable pattern during a graphical desktop environment session lock."
+      command: gconftool-2 --direct --config-source xml:readwrite:/etc/gconf/gconf.xml.mandatory --get /apps/gnome-screensaver/mode
+      register: gconftool_pattern_audit
+      check_mode: no
+      changed_when: gconftool_pattern_audit.stdout != "blank-only" or gconftool_pattern_audit.stderr != ""
 
-- name: "LOW | V-38639 | PATCH | The system must display a publicly-viewable pattern during a graphical desktop environment session lock."
-  command: gconftool-2 --direct --config-source xml:readwrite:/etc/gconf/gconf.xml.mandatory --type string --set /apps/gnome-screensaver/mode blank-only
+    - name: "LOW | V-38639 | PATCH | The system must display a publicly-viewable pattern during a graphical desktop environment session lock."
+      command: gconftool-2 --direct --config-source xml:readwrite:/etc/gconf/gconf.xml.mandatory --type string --set /apps/gnome-screensaver/mode blank-only
+      when: gconftool_pattern_audit.changed
   when: rhel6stig_xwindows_required
   tags:
       - cat3

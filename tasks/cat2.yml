@@ -1720,8 +1720,16 @@
       - V-38632
       - auditd
 
-- name: "MEDIUM | V-38629 | PATCH | The graphical desktop environment must set the idle timeout to no more than 15 minutes"
-  command: gconftool-2 --direct --config-source xml:readwrite:/etc/gconf/gconf.xml.mandatory --type int --set /apps/gnome-screensaver/idle_delay 15
+- block:
+    - name: MEDIUM | V-38629 | AUDIT | The graphical desktop environment must set the idle timeout to no more than 15 minutes
+      command: gconftool-2 --direct --config-source xml:readwrite:/etc/gconf/gconf.xml.mandatory --get /apps/gnome-screensaver/idle_delay
+      changed_when: idle_timeout_gconf_audit.stdout != "15" or idle_timeout_gconf_audit.stderr != ""
+      check_mode: no
+      register: idle_timeout_gconf_audit
+
+    - name: MEDIUM | V-38629 | PATCH | The graphical desktop environment must set the idle timeout to no more than 15 minutes
+      command: gconftool-2 --direct --config-source xml:readwrite:/etc/gconf/gconf.xml.mandatory --type int --set /apps/gnome-screensaver/idle_delay 15
+      when: idle_timeout_gconf_audit.changed
   when: rhel6stig_xwindows_required
   tags:
       - cat2
@@ -1731,8 +1739,16 @@
       - gui
       - screen_lock
 
-- name: "MEDIUM | V-38630 | PATCH | The graphical desktop environment must automatically lock after 15 minutes of inactivity and the system must require user to re-authenticate to unlock the environment"
-  command: gconftool-2 --direct --config-source xml:readwrite:/etc/gconf/gconf.xml.mandatory --type bool --set /apps/gnome-screensaver/idle_activation_enabled true
+- block:
+    - name: "MEDIUM | V-38630 | AUDIT | The graphical desktop environment must automatically lock after 15 minutes of inactivity and the system must require user to re-authenticate to unlock the environment"
+      command: gconftool-2 --direct --config-source xml:readwrite:/etc/gconf/gconf.xml.mandatory --get /apps/gnome-screensaver/idle_activation_enabled
+      changed_when: idle_lock_audit.stdout != "true" or idle_lock_audit.stderr != ""
+      check_mode: no
+      register: idle_lock_audit
+
+    - name: "MEDIUM | V-38630 | PATCH | The graphical desktop environment must automatically lock after 15 minutes of inactivity and the system must require user to re-authenticate to unlock the environment"
+      command: gconftool-2 --direct --config-source xml:readwrite:/etc/gconf/gconf.xml.mandatory --type bool --set /apps/gnome-screensaver/idle_activation_enabled true
+      when: idle_lock_audit.changed
   when: rhel6stig_xwindows_required
   tags:
       - cat2
@@ -1810,12 +1826,23 @@
       - auditd
       - rpm
 
-- name: "MEDIUM | V-38638 | PATCH | The graphical desktop environment must have automatic lock enabled"
-  command: >
-      gconftool-2 --direct
-                --config-source xml:readwrite:/etc/gconf/gconf.xml.mandatory
-                --type bool
-                --set /apps/gnome-screensaver/lock_enabled true
+- block:
+    - name: "MEDIUM | V-38638 | AUDIT | The graphical desktop environment must have automatic lock enabled"
+      command: >
+          gconftool-2 --direct
+                    --config-source xml:readwrite:/etc/gconf/gconf.xml.mandatory
+                    --get /apps/gnome-screensaver/lock_enabled
+      check_mode: no
+      changed_when: auto_lock_enable_audit.stdout != "true" or auto_lock_enable_audit.stderr != ""
+      register: auto_lock_enable_audit
+
+    - name: "MEDIUM | V-38638 | PATCH | The graphical desktop environment must have automatic lock enabled"
+      command: >
+          gconftool-2 --direct
+                    --config-source xml:readwrite:/etc/gconf/gconf.xml.mandatory
+                    --type bool
+                    --set /apps/gnome-screensaver/lock_enabled true
+      when: auto_lock_enable_audit.changed
   when: rhel6stig_xwindows_required
   tags:
       - cat2
