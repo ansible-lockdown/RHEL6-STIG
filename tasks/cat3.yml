@@ -1456,19 +1456,6 @@
       - openldap_server
       - audit
 
-- name: "LOW | V-38635 | PATCH | The audit system must be configured to audit all attempts to alter system time through adjtimex."
-  lineinfile:
-      line: -a always,exit -F arch={{ audit_arch }} -S adjtimex -k audit_time_rules
-      dest: /etc/audit/audit.rules
-      state: present
-  tags:
-      - cat3
-      - low
-      - V-38627
-      - auditd
-      - system_time
-      - patch
-
 - name: "LOW | V-38639 | AUDIT | The system must display a publicly-viewable pattern during a graphical desktop environment session lock."
   command: gconftool-2 --direct --config-source xml:readwrite:/etc/gconf/gconf.xml.mandatory --get /apps/gnome-screensaver/mode
   register: gconftool_pattern_audit
