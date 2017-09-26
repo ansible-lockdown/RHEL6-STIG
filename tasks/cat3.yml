@@ -1154,12 +1154,18 @@
       - access
       - patch
 
-- name: "LOW | V-38567 | PATCH | The audit system must be configured to audit all use of setuid and setgid programs."
-  lineinfile:
-      line: "-a always,exit -F path={{ item }} -F perm=x -F auid>=500 -F auid!=4294967295 -k privileged"
-      state: present
-      dest: /etc/audit/audit.rules
-  with_items: "{{ setugid_programs.stdout_lines }}"
+- block:
+    - name: "LOW | V-38567 | PATCH | The audit system must be configured to audit all use of setuid and setgid programs."
+      shell: find $(lsblk -o MOUNTPOINT -n | grep '^/') -xdev -type f -perm /6000 2>/dev/null
+      changed_when: false
+      register: setugid_programs
+
+    - name: "LOW | V-38567 | PATCH | The audit system must be configured to audit all use of setuid and setgid programs."
+      lineinfile:
+          line: "-a always,exit -F path={{ item }} -F perm=x -F auid>=500 -F auid!=4294967295 -k privileged"
+          state: present
+          dest: /etc/audit/audit.rules
+      with_items: "{{ setugid_programs.stdout_lines }}"
   tags:
       - cat3
       - low
@@ -2293,6 +2299,7 @@
 
 - name: "LOW | V-51369 | PATCH | The system must use a Linux Security Module configured to limit the privileges of system services."
   selinux:
+      conf: /etc/selinux/config
       policy: "{{ rhel6stig_selinux_pol }}"
       state: enforcing
   tags:
