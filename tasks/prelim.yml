@@ -210,17 +210,6 @@
       - auditd
       - patch
 
-- name: "PRELIM | List setuid / setgid programs on all mounted filesystems"
-  shell: find $(lsblk -o MOUNTPOINT -n | grep '^/') -xdev -type f -perm /6000 2>/dev/null
-  changed_when: false
-  register: setugid_programs
-  tags:
-      - cat3
-      - low
-      - V-38567
-      - auditd
-      - patch
-
 - name: "PRELIM | List /etc/fstab mount points"
   shell: 'awk ''/^[^#]/ { print $2; }'' /etc/fstab'
   changed_when: false

@@ -1,0 +1,11 @@
+- name: Red Hat subscription state
+  hosts: all
+  become: yes
+
+  vars:
+    rhsub_state: absent
+
+  tasks:
+    - include_role:
+        name: redhat-subscription
+      when: ansible_distribution == 'RedHat'
