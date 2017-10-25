@@ -1,0 +1,5 @@
+rhel6stig_cat1: yes
+rhel6stig_cat2: yes
+rhel6stig_cat3: yes
+
+rhel6stig_antivirus_required: no

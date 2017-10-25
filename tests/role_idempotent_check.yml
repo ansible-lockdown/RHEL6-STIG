@@ -1,0 +1,34 @@
+- name: Tets role idempotence
+  hosts: baseline_hosts
+  become: yes
+
+  vars:
+    extra_vars_file: extra_vars_vagrant.yml
+
+  tasks:
+    - name: Apply STIG - idempotence test - SILENT OUTPUT
+      shell: "ansible-playbook -i vagrant-inventory apply_role.yml -e @{{extra_vars_file}}"
+      environment:
+        ANSIBLE_STDOUT_CALLBACK: json
+      delegate_to: localhost
+      become: no
+      register: run_result
+
+    - set_fact:
+        play_output: "{{run_result.stdout|from_json}}"
+
+    - set_fact:
+        centos6_changed: "{{play_output|json_query('plays[].tasks[?hosts.centos6.changed].task.name')}}"
+
+    - set_fact:
+        rhel6_changed: "{{play_output|json_query('plays[].tasks[?hosts.centos6.changed].task.name')}}"
+
+    - assert:
+        that:
+          - "play_output.stats.centos6.changed == 0"
+        msg: "Role FAILED idempotent test on CentOS6: {{centos6_changed|join('\n')}} tasks reported change on second run."
+
+    - assert:
+        that:
+          - "play_output.stats.rhel6.changed == 0"
+        msg: "Role FAILED idempotent test on RHEL6: {{rhel6_changed|join('\n')}} tasks reported change on second run."
