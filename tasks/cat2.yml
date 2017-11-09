@@ -294,7 +294,7 @@
       - patch
       - passwords
 
-- name: "MEDIUM | V-38477 | PATCH | The system must require passwords to contain a minimum of 14 characters."
+- name: "MEDIUM | V-38477 | PATCH | Users must not be able to change passwords more than once every 24 hours."
   lineinfile:
       regexp: '(^PASS_MIN_DAYS)\s*(\d*)'
       line: '\1 {{ rhel6stig_pass_min_days }}'
