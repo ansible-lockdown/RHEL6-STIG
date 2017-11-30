@@ -152,6 +152,8 @@ rhel6stig_auditd_config:
   num_logs: 5
   # V-38678 - must be set to locally defined value - default 75 MB
   space_left: 75
+  # must be less than space_left
+  admin_space_left: 50
   # V-38680 - compliant options - admin account to email
   action_mail_acct: root
   # Guidance says that anything but SINGLE results in finding
