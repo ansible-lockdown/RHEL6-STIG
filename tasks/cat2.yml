@@ -554,10 +554,10 @@
       new_control: '[default=die]'
       new_module_path: pam_faillock.so
       module_arguments: authfail deny=3 unlock_time=604800 fail_interval=900
-      state: after
+      state: before
       type: auth
-      control: sufficient
-      module_path: pam_unix.so
+      control: required
+      module_path: pam_deny.so
   with_items:
       - password-auth
       - system-auth
@@ -1022,10 +1022,10 @@
       new_control: '[default=die]'
       new_module_path: pam_faillock.so
       module_arguments: authfail deny=3 unlock_time=604800 fail_interval=900
-      state: after
+      state: before
       type: auth
-      control: sufficient
-      module_path: pam_unix.so
+      control: required
+      module_path: pam_deny.so
   with_items:
       - system-auth
       - password-auth
@@ -1299,10 +1299,10 @@
       new_control: '[default=die]'
       new_module_path: pam_faillock.so
       module_arguments: authfail deny=3 unlock_time=604800 fail_interval=900
-      state: after
+      state: before
       type: auth
-      control: sufficient
-      module_path: pam_unix.so
+      control: required
+      module_path: pam_deny.so
   with_items:
       - system-auth
       - password-auth
