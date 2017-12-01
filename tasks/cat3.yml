@@ -336,13 +336,12 @@
         LOW | V-38571 | PATCH | The system must require passwords to contain at least one lower-case alphabetic character.
         LOW | V-38572 | PATCH | The system must require at least eight characters be changed between the old and new passwords during a password change.
         LOW | V-38693 | PATCH | The system must require passwords to contain no more than three consecutive repeating characters.
-  pam:
-      service: "{{ item }}"
+  pamd:
+      name: "{{ item }}"
       type: password
       control: requisite
-      pam_module: pam_cracklib.so
-      arguments: "{{ rhel6stig_pam_cracklib_params }}"
-      state: present
+      module_path: pam_cracklib.so
+      module_arguments: "{{ rhel6stig_pam_cracklib_params }}"
   with_items:
       - system-auth
       - password-auth
