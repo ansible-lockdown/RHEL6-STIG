@@ -27,6 +27,8 @@
           policy: DROP
       when: "ip6tables_input_chain_policy_check.stdout != 'DROP'"
       notify: save ip6tables rules
+  when:
+      - rhel6stig_ipv6_required
   tags:
       - cat2
       - medium
