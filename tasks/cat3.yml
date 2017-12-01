@@ -344,8 +344,8 @@
       arguments: "{{ rhel6stig_pam_cracklib_params }}"
       state: present
   with_items:
-      - system-auth-ac
-      - password-auth-ac
+      - system-auth
+      - password-auth
   tags:
       - cat3
       - low
