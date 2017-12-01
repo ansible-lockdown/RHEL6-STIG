@@ -2166,7 +2166,7 @@
 
 - name: "MEDIUM | V-51875 | PATCH  | The operating system, upon successful logon/access, must display to the user the number of unsuccessful logon/access attempts since the last successful logon/access."
   pam:
-      service: system-auth-ac
+      service: system-auth
       type: session
       control: required
       pam_module: pam_lastlog.so
