@@ -529,14 +529,16 @@
 # - name: "MEDIUM | V-38500 | AUDIT | The root account must be the only account having a UID of 0"
 
 - name: "MEDIUM | V-38501 | PATCH | The system must disable accounts after excessive login failures within a 15-minute interval."
-  pam:
-      service: "{{ item }}"
+  pamd:
+      name: "{{ item }}"
+      new_type: auth
+      new_control: required
+      new_module_path: pam_faillock.so
+      module_arguments: preauth silent deny=3 unlock_time=604800 fail_interval=900
+      state: before
       type: auth
-      control: required
-      pam_module: pam_faillock.so
-      before_line: auth sufficient pam_unix.so
-      arguments: preauth silent deny=3 unlock_time=604800 fail_interval=900
-      state: present
+      control: sufficient
+      module_path: pam_unix.so
   with_items:
       - password-auth
       - system-auth
@@ -549,14 +551,16 @@
       - pam
 
 - name: "MEDIUM | V-38501 | PATCH | The system must disable accounts after excessive login failures within a 15-minute interval."
-  pam:
-      service: "{{ item }}"
+  pamd:
+      name: "{{ item }}"
+      new_type: auth
+      new_control: '[default=die]'
+      new_module_path: pam_faillock.so
+      module_arguments: authfail deny=3 unlock_time=604800 fail_interval=900
+      state: after
       type: auth
-      control: '[default=die]'
-      pam_module: pam_faillock.so
-      after_line: auth sufficient pam_unix.so
-      arguments: authfail deny=3 unlock_time=604800 fail_interval=900
-      state: present
+      control: sufficient
+      module_path: pam_unix.so
   with_items:
       - password-auth
       - system-auth
@@ -569,13 +573,15 @@
       - pam
 
 - name: "MEDIUM | V-38501 | PATCH | The system must disable accounts after excessive login failures within a 15-minute interval."
-  pam:
-      service: "{{ item }}"
+  pamd:
+      name: "{{ item }}"
+      new_type: account
+      new_control: required
+      new_module_path: pam_faillock.so
+      state: before
       type: account
       control: required
-      pam_module: pam_faillock.so
-      before_line: account required pam_unix.so
-      state: present
+      module_path: pam_unix.so
   with_items:
       - password-auth
       - system-auth
@@ -982,14 +988,16 @@
       - patch
 
 - name: "MEDIUM | V-38573 | PATCH | The system must disable accounts after three consecutive unsuccessful logon attempts."
-  pam:
-      service: "{{ item }}"
+  pamd:
+      name: "{{ item }}"
+      new_type: auth
+      new_control: required
+      new_module_path: pam_faillock.so
+      module_arguments: preauth silent deny=3 unlock_time=604800 fail_interval=900
+      state: before
       type: auth
-      control: required
-      pam_module: pam_faillock.so
-      arguments: preauth silent deny=3 unlock_time=604800 fail_interval=900
-      before_line: auth sufficient pam_unix.so
-      state: present
+      control: sufficient
+      module_path: pam_unix.so
   with_items:
       - system-auth
       - password-auth
@@ -1003,14 +1011,16 @@
       - pam
 
 - name: "MEDIUM | V-38573 | PATCH | The system must disable accounts after three consecutive unsuccessful logon attempts."
-  pam:
-      service: "{{ item }}"
+  pamd:
+      name: "{{ item }}"
+      new_type: auth
+      new_control: '[default=die]'
+      new_module_path: pam_faillock.so
+      module_arguments: authfail deny=3 unlock_time=604800 fail_interval=900
+      state: after
       type: auth
-      control: '[default=die]'
-      pam_module: pam_faillock.so
-      arguments: authfail deny=3 unlock_time=604800 fail_interval=900
-      after_line: auth sufficient pam_unix.so
-      state: present
+      control: sufficient
+      module_path: pam_unix.so
   with_items:
       - system-auth
       - password-auth
@@ -1024,13 +1034,15 @@
       - pam
 
 - name: "MEDIUM | V-38573 | PATCH | The system must disable accounts after three consecutive unsuccessful logon attempts."
-  pam:
-      service: "{{ item }}"
+  pamd:
+      name: "{{ item }}"
+      new_type: account
+      new_control: required
+      new_module_path: pam_faillock.so
+      state: before
       type: account
       control: required
-      pam_module: pam_faillock.so
-      before_line: account required pam_unix.so
-      state: present
+      module_path: pam_unix.so
   with_items:
       - system-auth
       - password-auth
@@ -1252,14 +1264,16 @@
       - patch
 
 - name: "MEDIUM | V-38592 | PATCH | The system must require administrator action to unlock an account locked by excessive failed login attempts."
-  pam:
-      service: "{{ item }}"
+  pamd:
+      name: "{{ item }}"
+      new_type: auth
+      new_control: required
+      new_module_path: pam_faillock.so
+      module_arguments: preauth silent deny=3 unlock_time=604800 fail_interval=900
+      state: before
       type: auth
-      control: required
-      pam_module: pam_faillock.so
-      arguments: preauth silent deny=3 unlock_time=604800 fail_interval=900
-      before_line: auth sufficient pam_unix.so
-      state: present
+      control: sufficient
+      module_path: pam_unix.so
   with_items:
       - system-auth
       - password-auth
@@ -1273,14 +1287,16 @@
       - pam
 
 - name: "MEDIUM | V-38592 | PATCH | The system must require administrator action to unlock an account locked by excessive failed login attempts."
-  pam:
-      service: "{{ item }}"
+  pamd:
+      name: "{{ item }}"
+      new_type: auth
+      new_control: '[default=die]'
+      new_module_path: pam_faillock.so
+      module_arguments: authfail deny=3 unlock_time=604800 fail_interval=900
+      state: after
       type: auth
-      control: '[default=die]'
-      pam_module: pam_faillock.so
-      arguments: authfail deny=3 unlock_time=604800 fail_interval=900
-      after_line: auth sufficient pam_unix.so
-      state: present
+      control: sufficient
+      module_path: pam_unix.so
   with_items:
       - system-auth
       - password-auth
@@ -1294,13 +1310,15 @@
       - pam
 
 - name: "MEDIUM | V-38592 | PATCH | The system must require administrator action to unlock an account locked by excessive failed login attempts."
-  pam:
-      service: "{{ item }}"
+  pamd:
+      name: "{{ item }}"
+      new_type: account
+      new_control: required
+      new_module_path: pam_faillock.so
+      state: before
       type: account
       control: required
-      pam_module: pam_faillock.so
-      before_line: account required pam_unix.so
-      state: present
+      module_path: pam_unix.so
   with_items:
       - system-auth
       - password-auth
@@ -1811,15 +1829,16 @@
 # - name: "MEDIUM | V-38654 | AUDIT | Remote file systems must be mounted with the nosuid option"
 
 - name: "MEDIUM | V-38658 | PATCH | The system must prohibit the reuse of passwords within five iterations."
-  pam:
-      service: system-auth
-      backup: yes
+  pamd:
+      name: system-auth
+      new_type: password
+      new_control: requisite
+      new_module_path: pam_pwhistory.so
+      module_arguments: use_authtok remember={{ rhel6stig_pass_reuse }}
+      state: after
       type: password
       control: requisite
-      pam_module: pam_pwhistory.so
-      arguments: use_authtok remember={{ rhel6stig_pass_reuse }}
-      after_line: password requisite pam_cracklib.so
-      state: present
+      module_path: pam_cracklib.so
   tags:
       - cat2
       - medium
@@ -2165,14 +2184,16 @@
       - patch
 
 - name: "MEDIUM | V-51875 | PATCH  | The operating system, upon successful logon/access, must display to the user the number of unsuccessful logon/access attempts since the last successful logon/access."
-  pam:
-      service: system-auth
+  pamd:
+      name: system-auth
+      new_type: session
+      new_control: required
+      new_module_path: pam_lastlog.so
+      module_arguments: showfailed
+      state: after
       type: session
       control: required
-      pam_module: pam_lastlog.so
-      arguments: showfailed
-      after_line: session required pam_limits.so
-      state: present
+      module_path: pam_limits.so
   tags:
       - cat2
       - medium
