@@ -42,7 +42,7 @@
   replace:
       dest: /etc/pam.d/system-auth
       follow: yes
-      regexp: '(\s+)nullok\s*'
+      regexp: '([ \t]+)nullok[ \t]*'
       replace: '\1'
   tags:
       - cat1
