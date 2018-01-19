@@ -2065,7 +2065,7 @@
       state: present
       dest: /etc/security/limits.conf
       regexp: '^#?\\*.*maxlogins'
-      line: '*                hard    maxlogins       {{ rhel6stig_maxlogins }}'
+      line: '*               hard    maxlogins       {{ rhel6stig_maxlogins }}'
       insertbefore: '^# End of file'
   tags:
       - cat3
