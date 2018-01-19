@@ -89,9 +89,9 @@
       - audit
 
 - name: "LOW | V-38447 | PATCH | The system package management tool must verify contents of all files associated with packages."
-  command: yum reinstall -y {{ item.stdout }}
-  when: item | changed
-  with_items: "{{ rpm_integrity_audit.results }}"
+  command: yum reinstall -y {{ item }}
+  failed_when: no
+  with_items: "{{ rpm_integrity_audit.results | json_query('[?changed].stdout') | unique }}"
   tags:
       - cat3
       - low
