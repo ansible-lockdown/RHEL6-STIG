@@ -775,6 +775,10 @@
           follow: yes
           state: file
       with_items: "{{ rsyslog_logfiles.stdout_lines }}"
+      register: result
+      failed_when:
+          - result | failed
+          - not result.state == 'absent'
       tags:
           - V-38518
 
@@ -785,6 +789,10 @@
           state: file
           follow: yes
       with_items: "{{ rsyslog_logfiles.stdout_lines }}"
+      register: result
+      failed_when:
+          - result | failed
+          - not result.state == 'absent'
       tags:
           - V-38519
   tags:
@@ -1673,6 +1681,10 @@
           mode: 0600
           state: file
       with_items: "{{ rsyslog_logfiles.stdout_lines }}"
+      register: result
+      failed_when:
+          - result | failed
+          - not result.state == 'absent'
 
     # As described in https://access.redhat.com/solutions/66805, the
     # permissions for /var/log/boot.log have to be changed each time the
@@ -1681,6 +1693,10 @@
       lineinfile:
           dest: /etc/rc.d/rc.local
           line: chmod u-x,go-rwx /var/log/boot.log
+      register: result
+      failed_when:
+          - result | failed
+          - not result.state == 'absent'
   tags:
       - cat2
       - medium
