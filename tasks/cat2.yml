@@ -478,16 +478,13 @@
     - name: "MEDIUM | V-38496 | AUDIT | Default system accounts, other than root, must be locked"
       shell: >
        awk -F: '$1 !~ /^root$/ && $2 !~ /^[!*]/ {print $1}' /etc/shadow | xargs -I{} grep {} /etc/passwd | awk -F: '$3 < 500 {print $1}'
-      changed_when: no
+      changed_when: unlocked_sys_accounts_audit.stdout
       failed_when: no
       check_mode: no
       register: unlocked_sys_accounts_audit
 
     - name: "MEDIUM | V-38496 | PATCH | Default system accounts, other than root, must be locked"
-      user:
-          name: "{{ item }}"
-          state: present
-          expires: 1412541480
+      command: passwd -l {{ item }}
       with_items: "{{ unlocked_sys_accounts_audit.stdout_lines }}"
       when: unlocked_sys_accounts_audit.stdout
   tags:
