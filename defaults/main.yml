@@ -5,6 +5,9 @@ rhel6stig_cat1: yes
 rhel6stig_cat2: no
 rhel6stig_cat3: no
 
+# workarounds for benchmarks that don't exactly match the STIG
+rhel6stig_workaround_for_ssg_benchmark: true
+
 # Changing system defaults
 rhel6stig_snmp_community: B0re4lis
 rhel6stig_pass_min_length: 15

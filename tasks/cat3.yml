@@ -459,7 +459,9 @@
       state: present
       dest: /etc/audit/audit.rules
       line: "-a always,exit -F arch=b32 -S stime -k audit_time_rules"
-  when: audit_arch == 'b32'
+  when:
+      - audit_arch == 'b32' or
+        rhel6stig_workaround_for_ssg_benchmark
   tags:
       - cat3
       - low
