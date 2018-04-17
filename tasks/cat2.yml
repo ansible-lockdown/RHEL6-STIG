@@ -1961,6 +1961,26 @@
       - file_perms
       - rpm
 
+- block:
+    - name: MEDIUM | V-38666 | PATCH | The system must use and update a virus scan program"
+      yum:
+          name: "{{ rhel6stig_av_package.package }}"
+          state: present
+
+    - name: MEDIUM | V-38666 | PATCH | The system must use and update a virus scan program"
+      service:
+          name: "{{ rhel6stig_av_package.service }}"
+          state: started
+          enabled: yes
+  when:
+      - rhel6stig_antivirus_required
+  tags:
+      - cat2
+      - medium
+      - patch
+      - V-38666
+      - antivirus
+
 # Not automated
 # - name: "MEDIUM |  V-38667 | Inspect the system to determine if intrusion detection software has been installed."
 
