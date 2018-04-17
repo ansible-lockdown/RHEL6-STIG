@@ -210,26 +210,6 @@
       - patch
       - snmp
 
-- block:
-    - name: HIGH | V-38666 | AUDIT | The system must use and update a DoD-approved virus scan program"
-      yum:
-          name: "{{ rhel6stig_av_package.package }}"
-          state: present
-
-    - name: HIGH | V-38666 | AUDIT | The system must use and update a DoD-approved virus scan program"
-      service:
-          name: "{{ rhel6stig_av_package.service }}"
-          state: started
-          enabled: yes
-  when:
-      - rhel6stig_antivirus_required
-  tags:
-      - cat1
-      - high
-      - patch
-      - V-38666
-      - antivirus
-
 - name: "HIGH | V-38668 | PATCH | The x86 Ctrl-Alt-Delete key sequence must be disabled"
   copy:
       src: control-alt-delete.override
