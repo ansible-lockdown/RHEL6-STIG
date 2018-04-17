@@ -14,7 +14,7 @@ To install this role with `ansible-galaxy` use the following command:
 
 `ansible-galaxy install -p roles nousdefions.STIG-RHEL6`
 
-Based on [Red Hat Enterprise Linux 6 STIG Version 1 Release 16 - 2017-07-28](http://iasecontent.disa.mil/stigs/zip/U_RedHat_6_V1R16_STIG.zip).
+Based on [Red Hat Enterprise Linux 6 STIG Version 1 Release 18 - 2018-01-26](http://iasecontent.disa.mil/stigs/zip/U_RedHat_6_V1R18_STIG.zip).
 
 This repo originated from work done by [Sam Doran](https://github.com/samdoran/ansible-role-rhel6stig)
 
