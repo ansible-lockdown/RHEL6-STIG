@@ -21,7 +21,7 @@ This repo originated from work done by [Sam Doran](https://github.com/samdoran/a
 Requirements
 ------------
 
-You should have a general understanding of the nature of the changes this role will make to the system. See the [DISA  IASE site](http://iase.disa.mil/stigs/os/unix-linux/Pages/index.aspx) for details<a href="#fn1" id="note1">[1]</a>.
+You should have a general understanding of the nature of the changes this role will make to the system. See the [DISA  IASE site](http://iase.disa.mil/stigs/os/unix-linux/Pages/index.aspx) for details.
 
 Role Variables
 --------------
@@ -113,7 +113,7 @@ Tags
 ----
 Each task is tagged with its category, severity, whether or not it is a patch or audit task, and the finding ID, e.g., V-38462. In addition to these four basic tags that all tasks have, there are human-friendly tags such as "ssh" or "dod_logon_banner".
 
-A number of preliminary tasks that do things such as enumerate services on the system and check for the existence of various file will _always_ run unless explicitly skipped by using `--skip tags prelim_tasks`.
+A number of preliminary tasks that do things such as enumerate services on the system and check for the existence of various files will _always_ run unless explicitly skipped by using `--skip tags prelim_tasks`.
 
 Some examples of using tags:
 
