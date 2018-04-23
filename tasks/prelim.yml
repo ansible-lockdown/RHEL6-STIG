@@ -199,6 +199,61 @@
       - auditd
       - patch
 
+- name: "PRELIM | V-38573 V-38592 V-38501 | Configure pam_faillock."
+  block:
+      - name: "PRELIM | V-38573 V-38592 V-38501 | Place pam_faillock preauth."
+        pamd:
+            name: "{{ item }}"
+            new_type: auth
+            new_control: required
+            new_module_path: pam_faillock.so
+            module_arguments: preauth silent
+            state: before
+            type: auth
+            control: sufficient
+            module_path: pam_unix.so
+        with_items:
+            - password-auth
+            - system-auth
+
+      - name: "PRELIM | V-38573 V-38592 V-38501 | Place pam_faillock authfail."
+        pamd:
+            name: "{{ item }}"
+            new_type: auth
+            new_control: '[default=die]'
+            new_module_path: pam_faillock.so
+            module_arguments: authfail
+            state: before
+            type: auth
+            control: required
+            module_path: pam_deny.so
+        with_items:
+            - password-auth
+            - system-auth
+
+      - name: "PRELIM | V-38573 V-38592 V-38501 | Place pam_faillock account module."
+        pamd:
+            name: "{{ item }}"
+            new_type: account
+            new_control: required
+            new_module_path: pam_faillock.so
+            state: before
+            type: account
+            control: required
+            module_path: pam_unix.so
+        with_items:
+            - password-auth
+            - system-auth
+  tags:
+      - medium
+      - cat2
+      - logon_settings
+      - patch
+      - V-38573
+      - V-38592
+      - V-38501
+      - pam
+
 - name: "PRELIM | List /etc/fstab mount points"
   shell: 'awk ''/^[^#]/ { print $2; }'' /etc/fstab'
   changed_when: false

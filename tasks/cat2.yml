@@ -527,61 +527,19 @@
 
 - name: "MEDIUM | V-38501 | PATCH | The system must disable accounts after excessive login failures within a 15-minute interval."
   pamd:
-      name: "{{ item }}"
-      new_type: auth
-      new_control: required
-      new_module_path: pam_faillock.so
-      module_arguments: preauth silent deny=3 unlock_time=604800 fail_interval=900
-      state: before
+      name: "{{ item.0 }}"
       type: auth
-      control: sufficient
-      module_path: pam_unix.so
-  with_items:
-      - password-auth
-      - system-auth
-  tags:
-      - medium
-      - cat2
-      - logon_settings
-      - patch
-      - V-38501
-      - pam
-
-- name: "MEDIUM | V-38501 | PATCH | The system must disable accounts after excessive login failures within a 15-minute interval."
-  pamd:
-      name: "{{ item }}"
-      new_type: auth
-      new_control: '[default=die]'
-      new_module_path: pam_faillock.so
-      module_arguments: authfail deny=3 unlock_time=604800 fail_interval=900
-      state: before
-      type: auth
-      control: required
-      module_path: pam_deny.so
-  with_items:
-      - password-auth
-      - system-auth
-  tags:
-      - medium
-      - cat2
-      - logon_settings
-      - patch
-      - V-38501
-      - pam
-
-- name: "MEDIUM | V-38501 | PATCH | The system must disable accounts after excessive login failures within a 15-minute interval."
-  pamd:
-      name: "{{ item }}"
-      new_type: account
-      new_control: required
-      new_module_path: pam_faillock.so
-      state: before
-      type: account
-      control: required
-      module_path: pam_unix.so
-  with_items:
-      - password-auth
-      - system-auth
+      control: "{{ item.1 }}"
+      module_path: pam_faillock.so
+      module_arguments: fail_interval=900
+      state: args_present
+  with_nested:
+      -
+          - password-auth
+          - system-auth
+      -
+          - required
+          - '[default=die]'
   tags:
       - medium
       - cat2
@@ -994,63 +952,19 @@
 
 - name: "MEDIUM | V-38573 | PATCH | The system must disable accounts after three consecutive unsuccessful logon attempts."
   pamd:
-      name: "{{ item }}"
-      new_type: auth
-      new_control: required
-      new_module_path: pam_faillock.so
-      module_arguments: preauth silent deny=3 unlock_time=604800 fail_interval=900
-      state: before
+      name: "{{ item.0 }}"
       type: auth
-      control: sufficient
-      module_path: pam_unix.so
-  with_items:
-      - system-auth
-      - password-auth
-  tags:
-      - cat2
-      - medium
-      - V-38573
-      - logon_settings
-      - accounts
-      - patch
-      - pam
-
-- name: "MEDIUM | V-38573 | PATCH | The system must disable accounts after three consecutive unsuccessful logon attempts."
-  pamd:
-      name: "{{ item }}"
-      new_type: auth
-      new_control: '[default=die]'
-      new_module_path: pam_faillock.so
-      module_arguments: authfail deny=3 unlock_time=604800 fail_interval=900
-      state: before
-      type: auth
-      control: required
-      module_path: pam_deny.so
-  with_items:
-      - system-auth
-      - password-auth
-  tags:
-      - cat2
-      - medium
-      - V-38573
-      - logon_settings
-      - accounts
-      - patch
-      - pam
-
-- name: "MEDIUM | V-38573 | PATCH | The system must disable accounts after three consecutive unsuccessful logon attempts."
-  pamd:
-      name: "{{ item }}"
-      new_type: account
-      new_control: required
-      new_module_path: pam_faillock.so
-      state: before
-      type: account
-      control: required
-      module_path: pam_unix.so
-  with_items:
-      - system-auth
-      - password-auth
+      control: "{{ item.1 }}"
+      module_path: pam_faillock.so
+      module_arguments: deny=3
+      state: args_present
+  with_nested:
+      -
+          - password-auth
+          - system-auth
+      -
+          - required
+          - '[default=die]'
   tags:
       - cat2
       - medium
@@ -1271,63 +1185,19 @@
 
 - name: "MEDIUM | V-38592 | PATCH | The system must require administrator action to unlock an account locked by excessive failed login attempts."
   pamd:
-      name: "{{ item }}"
-      new_type: auth
-      new_control: required
-      new_module_path: pam_faillock.so
-      module_arguments: preauth silent deny=3 unlock_time=604800 fail_interval=900
-      state: before
+      name: "{{ item.0 }}"
       type: auth
-      control: sufficient
-      module_path: pam_unix.so
-  with_items:
-      - system-auth
-      - password-auth
-  tags:
-      - cat2
-      - medium
-      - V-38592
-      - logon_settings
-      - accounts
-      - patch
-      - pam
-
-- name: "MEDIUM | V-38592 | PATCH | The system must require administrator action to unlock an account locked by excessive failed login attempts."
-  pamd:
-      name: "{{ item }}"
-      new_type: auth
-      new_control: '[default=die]'
-      new_module_path: pam_faillock.so
-      module_arguments: authfail deny=3 unlock_time=604800 fail_interval=900
-      state: before
-      type: auth
-      control: required
-      module_path: pam_deny.so
-  with_items:
-      - system-auth
-      - password-auth
-  tags:
-      - cat2
-      - medium
-      - V-38592
-      - logon_settings
-      - accounts
-      - patch
-      - pam
-
-- name: "MEDIUM | V-38592 | PATCH | The system must require administrator action to unlock an account locked by excessive failed login attempts."
-  pamd:
-      name: "{{ item }}"
-      new_type: account
-      new_control: required
-      new_module_path: pam_faillock.so
-      state: before
-      type: account
-      control: required
-      module_path: pam_unix.so
-  with_items:
-      - system-auth
-      - password-auth
+      control: "{{ item.1 }}"
+      module_path: pam_faillock.so
+      module_arguments: unlock_time=604800
+      state: args_present
+  with_nested:
+      -
+          - password-auth
+          - system-auth
+      -
+          - required
+          - '[default=die]'
   tags:
       - cat2
       - medium
