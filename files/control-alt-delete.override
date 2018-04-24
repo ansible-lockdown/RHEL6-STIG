@@ -5,4 +5,4 @@
 
 start on control-alt-delete
 
-exec /usr/bin/logger -p security.info "Ctrl-Alt-Delete pressed"
+exec /usr/bin/logger -p authpriv.notice "Ctrl-Alt-Delete pressed"

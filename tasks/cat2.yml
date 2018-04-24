@@ -1870,17 +1870,34 @@
 # - name: "MEDIUM | V-38652 | AUDIT | Remote file systems must be mounted with the 'nodev' option"
 # - name: "MEDIUM | V-38654 | AUDIT | Remote file systems must be mounted with the nosuid option"
 
-- name: "MEDIUM | V-38658 | PATCH | The system must prohibit the reuse of passwords within five iterations."
-  pamd:
-      name: system-auth
-      new_type: password
-      new_control: requisite
-      new_module_path: pam_pwhistory.so
-      module_arguments: use_authtok remember={{ rhel6stig_pass_reuse }}
-      state: after
-      type: password
-      control: requisite
-      module_path: pam_cracklib.so
+- name: "MEDIUM | V-38658 | The system must prohibit the reuse of passwords within five iterations."
+  block:
+      - name: "MEDIUM | V-38658 | PATCH | The system must prohibit the reuse of passwords within five iterations."
+        pamd:
+            name: "{{ item }}"
+            new_type: password
+            new_control: requisite
+            new_module_path: pam_pwhistory.so
+            module_arguments: use_authtok remember={{ rhel6stig_pass_reuse }}
+            state: after
+            type: password
+            control: requisite
+            module_path: pam_cracklib.so
+        with_items:
+            - system-auth
+            - password-auth
+
+      - name: "MEDIUM | V-38658 | PATCH | The system must prohibit the reuse of passwords within five iterations."
+        pamd:
+            name: "{{ item }}"
+            type: password
+            control: requisite
+            module_path: pam_pwhistory.so
+            module_arguments: remember={{ rhel6stig_pass_reuse }}
+            state: args_present
+        with_items:
+            - system-auth
+            - password-auth
   tags:
       - cat2
       - medium
@@ -1973,26 +1990,6 @@
       - auditd
       - file_perms
       - rpm
-
-- block:
-    - name: MEDIUM | V-38666 | PATCH | The system must use and update a virus scan program"
-      yum:
-          name: "{{ rhel6stig_av_package.package }}"
-          state: present
-
-    - name: MEDIUM | V-38666 | PATCH | The system must use and update a virus scan program"
-      service:
-          name: "{{ rhel6stig_av_package.service }}"
-          state: started
-          enabled: yes
-  when:
-      - rhel6stig_antivirus_required
-  tags:
-      - cat2
-      - medium
-      - patch
-      - V-38666
-      - antivirus
 
 # Not automated
 # - name: "MEDIUM |  V-38667 | Inspect the system to determine if intrusion detection software has been installed."
