@@ -40,10 +40,13 @@
 
 - name: "HIGH | V-38497 | PATCH | The system must not have accounts configured with blank or null passwords"
   replace:
-      dest: /etc/pam.d/system-auth
+      dest: /etc/pam.d/{{ item }}
       follow: yes
       regexp: '([ \t]+)nullok[ \t]*'
       replace: '\1'
+  with_items:
+      - system-auth
+      - password-auth
   tags:
       - cat1
       - high
