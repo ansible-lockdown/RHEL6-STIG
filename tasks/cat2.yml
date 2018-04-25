@@ -525,29 +525,6 @@
 # Not automated
 # - name: "MEDIUM | V-38500 | AUDIT | The root account must be the only account having a UID of 0"
 
-- name: "MEDIUM | V-38501 | PATCH | The system must disable accounts after excessive login failures within a 15-minute interval."
-  pamd:
-      name: "{{ item.0 }}"
-      type: auth
-      control: "{{ item.1 }}"
-      module_path: pam_faillock.so
-      module_arguments: fail_interval=900
-      state: args_present
-  with_nested:
-      -
-          - password-auth
-          - system-auth
-      -
-          - required
-          - '[default=die]'
-  tags:
-      - medium
-      - cat2
-      - logon_settings
-      - patch
-      - V-38501
-      - pam
-
 - name: "MEDIUM | V-38502 | PATCH | The /etc/shadow file must be owned by root."
   file:
       state: file
@@ -1205,6 +1182,29 @@
       - logon_settings
       - accounts
       - patch
+      - pam
+
+- name: "MEDIUM | V-38501 | PATCH | The system must disable accounts after excessive login failures within a 15-minute interval."
+  pamd:
+      name: "{{ item.0 }}"
+      type: auth
+      control: "{{ item.1 }}"
+      module_path: pam_faillock.so
+      module_arguments: fail_interval=900
+      state: args_present
+  with_nested:
+      -
+          - password-auth
+          - system-auth
+      -
+          - required
+          - '[default=die]'
+  tags:
+      - medium
+      - cat2
+      - logon_settings
+      - patch
+      - V-38501
       - pam
 
 - name: "MEDIUM | V-38593 | PATCH |  The Department of Defense (DoD) login banner must be displayed immediately prior to or as part of console login prompts"
