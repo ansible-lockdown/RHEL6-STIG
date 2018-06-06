@@ -60,7 +60,7 @@ There are many role variables defined in `defaults/main.yml`. Here are the most 
 Dependencies
 ------------
 
-None.
+python-jmespath
 
 Example Playbooks
 -----------------
