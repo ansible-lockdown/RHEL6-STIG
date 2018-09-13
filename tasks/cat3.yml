@@ -264,7 +264,7 @@
       enabled: no
   when:
       - "'rhnsd' in sysv_services.stdout"
-      - rhel6stig_rhnsatellite_required
+      - not rhel6stig_rhnsatellite_required
   tags:
       - cat3
       - low
