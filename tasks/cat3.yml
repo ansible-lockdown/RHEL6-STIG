@@ -262,6 +262,8 @@
       name: rhnsd
       state: stopped
       enabled: no
+  # rhnsd has broken initscripts, fails every time
+  ignore_errors: yes
   when:
       - "'rhnsd' in sysv_services.stdout"
       - not rhel6stig_rhnsatellite_required
