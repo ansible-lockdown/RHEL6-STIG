@@ -1023,6 +1023,26 @@
 - name: "MEDIUM | V-38580 | PATCH | The audit system must be configured to audit the loading and unloading of dynamic kernel modules."
   lineinfile:
       backup: yes
+      line: -a always,exit -F arch={{ item }} -S init_module -S delete_module -k modules
+      dest: /etc/audit/audit.rules
+      state: present
+  when:
+      - audit_arch == item or
+        item == 'b32' and rhel6stig_workaround_for_ssg_benchmark
+  with_items:
+      - b32
+      - b64
+  tags:
+      - cat2
+      - medium
+      - patch
+      - kernel
+      - auditd
+      - V-38580
+
+- name: "MEDIUM | V-38580 | PATCH | The audit system must be configured to audit the loading and unloading of dynamic kernel modules."
+  lineinfile:
+      backup: yes
       line: '{{ item }}'
       dest: /etc/audit/audit.rules
       state: present
@@ -1030,7 +1050,6 @@
       - -w /sbin/insmod -p x -k modules
       - -w /sbin/rmmod -p x -k modules
       - -w /sbin/modprobe -p x -k modules
-      - -a always,exit -F arch=b{{ ansible_architecture.split('_')[1] }} -S init_module -S delete_module -k modules
   tags:
     - cat2
     - medium
