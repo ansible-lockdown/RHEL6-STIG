@@ -680,7 +680,7 @@
       dest: /etc/audit/audit.rules
   when:
       - audit_arch == item or
-        item == 'b32' and rhel6stig_workaround_for_ssg_benchmark
+        item == 'b32'
   with_items:
       - b32
       - b64
