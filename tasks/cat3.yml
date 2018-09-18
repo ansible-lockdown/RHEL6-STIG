@@ -113,9 +113,8 @@
       - audit
 
 - name: "LOW | V-38452 | PATCH | The system package management tool must verify permissions on all files and directories associated with packages."
-  command: rpm --setperms {{ item.stdout }}
-  when: item | changed
-  with_items: "{{ rpm_file_permissions_audit.results }}"
+  command: rpm --setperms {{ item }}
+  with_items: "{{ rpm_file_permissions_audit.results | json_query('[?changed].stdout') | unique }}"
   tags:
       - cat3
       - low
@@ -137,9 +136,8 @@
       - audit
 
 - name: "LOW | V-38453 | PATCH | The system package management tool must verify group-ownership on all files and directories associated with packages."
-  command: rpm --setugids {{ item.stdout }}
-  when: item | changed
-  with_items: "{{ rpm_group_ownership_audit.results }}"
+  command: rpm --setugids {{ item }}
+  with_items: "{{ rpm_group_ownership_audit.results | json_query('[?changed].stdout') | unique }}"
   tags:
       - cat3
       - low
@@ -161,9 +159,8 @@
       - audit
 
 - name: "LOW | V-38454 | PATCH | The system package management tool must verify ownership on all files and directories associated with packages."
-  command: rpm --setugids {{ item.stdout }}
-  when: item | changed
-  with_items: "{{ rpm_group_ownership_audit.results }}"
+  command: rpm --setugids {{ item }}
+  with_items: "{{ rpm_group_ownership_audit.results | json_query('[?changed].stdout') | unique }}"
   tags:
       - cat3
       - low
