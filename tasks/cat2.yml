@@ -966,7 +966,7 @@
           backrefs: yes
           regexp: (^password\s*.*pam_unix.so.*)(md5|sha256|blowfish|bigcrypt)(.*)
           line: \1sha512\3
-          backup: yes
+          backup: "{{ not rhel6stig_workaround_for_ssg_benchmark }}"
       with_items: "{{ pamd_files.stdout_lines }}"
   tags:
       - cat2
