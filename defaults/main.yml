@@ -1,4 +1,5 @@
 rhel6stig_min_ansible_version: 2.3
+rhel6stig_system_is_container: false
 
 # Enable or disable remediation for each category
 rhel6stig_cat1: yes

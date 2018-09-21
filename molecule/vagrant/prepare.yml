@@ -1,0 +1,15 @@
+---
+- name: Prepare
+  hosts: all
+  gather_facts: false
+  become: yes
+  tasks:
+    - name: Install python for Ansible
+      raw: test -e /usr/bin/python || (yum -y update && yum install -y python)
+      become: true
+      changed_when: false
+
+    - name: install selinux binding
+      yum:
+        name: libselinux-python
+        state: present
