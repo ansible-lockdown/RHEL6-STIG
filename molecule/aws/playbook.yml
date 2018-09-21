@@ -1,0 +1,9 @@
+---
+- name: Converge
+  hosts: all
+  become: yes
+  roles:
+    - role: RHEL6-STIG
+      rhel6stig_cat2: true
+      rhel6stig_cat3: true
+      rhel6stig_using_password_auth: false
