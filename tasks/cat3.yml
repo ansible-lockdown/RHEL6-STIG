@@ -198,6 +198,7 @@
   command: grep '^active' /etc/audisp/plugins.d/syslog.conf
   register: auditd_syslog_output_audit
   failed_when: auditd_syslog_output_audit.rc == 2
+  when: not rhel6stig_system_is_container
   changed_when: false
   check_mode: no
   tags:
@@ -214,6 +215,7 @@
       dest: /etc/audisp/plugins.d/syslog.conf
       regexp: '^#?active'
       line: 'active = yes'
+  when: not rhel6stig_system_is_container
   notify: restart auditd
   tags:
       - cat3
@@ -439,68 +441,70 @@
       - kernel_modules
       - patch
 
-- name: "LOW | V-38522 | PATCH | The audit system must be configured to audit all attempts to alter system time through settimeofday."
-  lineinfile:
-      state: present
-      dest: /etc/audit/audit.rules
-      line: "-a always,exit -F arch={{ item }} -S settimeofday -k audit_time_rules"
-  when:
-      - audit_arch == item or
-        item == 'b32' and rhel6stig_workaround_for_ssg_benchmark
-  with_items:
-      - b32
-      - b64
-  tags:
-      - cat3
-      - low
-      - V-38522
-      - auditd
-      - settimeofday
-      - patch
+- block:
+  - name: "LOW | V-38522 | PATCH | The audit system must be configured to audit all attempts to alter system time through settimeofday."
+    lineinfile:
+        state: present
+        dest: /etc/audit/audit.rules
+        line: "-a always,exit -F arch={{ item }} -S settimeofday -k audit_time_rules"
+    when:
+        - audit_arch == item or
+          item == 'b32' and rhel6stig_workaround_for_ssg_benchmark
+    with_items:
+        - b32
+        - b64
+    tags:
+        - cat3
+        - low
+        - V-38522
+        - auditd
+        - settimeofday
+        - patch
 
-# this audit rule only works on and applies to 32-bit systems
-- name: "LOW | V-38525 | PATCH | The audit system must be configured to audit all attempts to alter system time through stime."
-  lineinfile:
-      state: present
-      dest: /etc/audit/audit.rules
-      line: "-a always,exit -F arch=b32 -S stime -k audit_time_rules"
-  when:
-      - audit_arch == 'b32' or
-        rhel6stig_workaround_for_ssg_benchmark
-  tags:
-      - cat3
-      - low
-      - V-38525
-      - auditd
-      - stime
-      - patch
+  # this audit rule only works on and applies to 32-bit systems
+  - name: "LOW | V-38525 | PATCH | The audit system must be configured to audit all attempts to alter system time through stime."
+    lineinfile:
+        state: present
+        dest: /etc/audit/audit.rules
+        line: "-a always,exit -F arch=b32 -S stime -k audit_time_rules"
+    when:
+        - audit_arch == 'b32' or
+          rhel6stig_workaround_for_ssg_benchmark
+    tags:
+        - cat3
+        - low
+        - V-38525
+        - auditd
+        - stime
+        - patch
 
-- name: "LOW | V-38527 | PATCH | The audit system must be configured to audit all attempts to alter system time through clock_settime."
-  lineinfile:
-      state: present
-      dest: /etc/audit/audit.rules
-      line: "-a always,exit -F arch=b32 -S clock_settime -F a0=0x0 -k time-change"
-  tags:
-      - cat3
-      - low
-      - V-38527
-      - auditd
-      - clock_settime
-      - patch
+  - name: "LOW | V-38527 | PATCH | The audit system must be configured to audit all attempts to alter system time through clock_settime."
+    lineinfile:
+        state: present
+        dest: /etc/audit/audit.rules
+        line: "-a always,exit -F arch=b32 -S clock_settime -F a0=0x0 -k time-change"
+    tags:
+        - cat3
+        - low
+        - V-38527
+        - auditd
+        - clock_settime
+        - patch
 
-- name: "LOW | V-38527 | PATCH | The audit system must be configured to audit all attempts to alter system time through clock_settime."
-  lineinfile:
-      state: present
-      dest: /etc/audit/audit.rules
-      line: "-a always,exit -F arch=b64 -S clock_settime -F a0=0x0 -k time-change"
-  when: audit_arch == 'b64'
-  tags:
-      - cat3
-      - low
-      - V-38527
-      - auditd
-      - clock_settime
-      - patch
+  - name: "LOW | V-38527 | PATCH | The audit system must be configured to audit all attempts to alter system time through clock_settime."
+    lineinfile:
+        state: present
+        dest: /etc/audit/audit.rules
+        line: "-a always,exit -F arch=b64 -S clock_settime -F a0=0x0 -k time-change"
+    when: audit_arch == 'b64'
+    tags:
+        - cat3
+        - low
+        - V-38527
+        - auditd
+        - clock_settime
+        - patch
+  when: not rhel6stig_system_is_container
 
 - name: "LOW | V-38528 | AUDIT The system must log Martian packets."
   command: sysctl net.ipv4.conf.all.log_martians
@@ -534,45 +538,47 @@
       - log_martians
       - patch
 
-- name: "LOW | V-38530 | PATCH | The audit system must be configured to audit all attempts to alter system time through /etc/localtime."
-  lineinfile:
-      state: present
-      dest: /etc/audit/audit.rules
-      line: '-w /etc/localtime -p wa -k audit_localtime_rules'
-  tags:
-      - cat3
-      - low
-      - V-38530
-      - auditd
-      - localtime
-      - patch
+- block:
+  - name: "LOW | V-38530 | PATCH | The audit system must be configured to audit all attempts to alter system time through /etc/localtime."
+    lineinfile:
+        state: present
+        dest: /etc/audit/audit.rules
+        line: '-w /etc/localtime -p wa -k audit_localtime_rules'
+    tags:
+        - cat3
+        - low
+        - V-38530
+        - auditd
+        - localtime
+        - patch
 
-- name: |
+  - name: |
 
-        LOW | V-38531 | PATCH | The operating system must automatically audit account creation.
-        LOW | V-38534 | PATCH | The operating system must automatically audit account modification.
-        LOW | V-38536 | PATCH | The operating system must automatically audit account disabling actions.
-        LOW | V-38538 | PATCH | The operating system must automatically audit account termination.
-  lineinfile:
-      line: "{{ item }}"
-      state: present
-      dest: /etc/audit/audit.rules
-  with_items:
-      - "-w /etc/group -p wa -k audit_account_changes"
-      - "-w /etc/passwd -p wa -k audit_account_changes"
-      - "-w /etc/gshadow -p wa -k audit_account_changes"
-      - "-w /etc/shadow -p wa -k audit_account_changes"
-      - "-w /etc/security/opasswd -p wa -k audit_account_changes"
-  tags:
-      - cat3
-      - low
-      - V-38531
-      - V-38534
-      - V-38536
-      - V-38538
-      - auditd
-      - account_changes
-      - patch
+          LOW | V-38531 | PATCH | The operating system must automatically audit account creation.
+          LOW | V-38534 | PATCH | The operating system must automatically audit account modification.
+          LOW | V-38536 | PATCH | The operating system must automatically audit account disabling actions.
+          LOW | V-38538 | PATCH | The operating system must automatically audit account termination.
+    lineinfile:
+        line: "{{ item }}"
+        state: present
+        dest: /etc/audit/audit.rules
+    with_items:
+        - "-w /etc/group -p wa -k audit_account_changes"
+        - "-w /etc/passwd -p wa -k audit_account_changes"
+        - "-w /etc/gshadow -p wa -k audit_account_changes"
+        - "-w /etc/shadow -p wa -k audit_account_changes"
+        - "-w /etc/security/opasswd -p wa -k audit_account_changes"
+    tags:
+        - cat3
+        - low
+        - V-38531
+        - V-38534
+        - V-38536
+        - V-38538
+        - auditd
+        - account_changes
+        - patch
+  when: not rhel6stig_system_is_container
 
 - name: "LOW | V-38533 | AUDIT | The system must ignore ICMPv4 redirect messages by default."
   command: sysctl net.ipv4.conf.default.accept_redirects
@@ -670,508 +676,510 @@
       - ignore_bogus_error
       - patch
 
-- name: "LOW | V-38540 | PATCH | The audit system must be configured to audit modifications to the systems network configuration."
-  lineinfile:
-      line: "-a always,exit -F arch={{ item }} -S sethostname -S setdomainname -k audit_network_modifications"
-      state: present
-      dest: /etc/audit/audit.rules
-  when:
-      - audit_arch == item or
-        item == 'b32'
-  with_items:
-      - b32
-      - b64
-  tags:
-      - cat3
-      - low
-      - V-38540
-      - auditd
-      - network
+- block:
+  - name: "LOW | V-38540 | PATCH | The audit system must be configured to audit modifications to the systems network configuration."
+    lineinfile:
+        line: "-a always,exit -F arch={{ item }} -S sethostname -S setdomainname -k audit_network_modifications"
+        state: present
+        dest: /etc/audit/audit.rules
+    when:
+        - audit_arch == item or
+          item == 'b32'
+    with_items:
+        - b32
+        - b64
+    tags:
+        - cat3
+        - low
+        - V-38540
+        - auditd
+        - network
 
-- name: "LOW | V-38540 | PATCH | The audit system must be configured to audit modifications to the systems network configuration."
-  lineinfile:
+  - name: "LOW | V-38540 | PATCH | The audit system must be configured to audit modifications to the systems network configuration."
+    lineinfile:
+        line: "{{ item }}"
+        state: present
+        dest: /etc/audit/audit.rules
+    with_items:
+        - "-w /etc/issue -p wa -k audit_network_modifications"
+        - "-w /etc/issue.net -p wa -k audit_network_modifications"
+        - "-w /etc/hosts -p wa -k audit_network_modifications"
+        - "-w /etc/sysconfig/network -p wa -k audit_network_modifications"
+    tags:
+        - cat3
+        - low
+        - V-38540
+        - auditd
+        - network
+
+  - name: "LOW | V-38541 | AUDIT | The audit system must be configured to audit modifications to the systems Mandatory Access Control (MAC) configuration (SELinux)."
+    command: grep -e '-k MAC-policy' /etc/audit/audit.rules
+    register: mac_policy_audit
+    changed_when: false
+    failed_when: false
+    check_mode: no
+    tags:
+        - cat3
+        - low
+        - V-38541
+        - auditd
+        - selinux
+        - audit
+
+  - name: "LOW | V-38541 | PATCH | The audit system must be configured to audit modifications to the systems Mandatory Access Control (MAC) configuration (SELinux)."
+    lineinfile:
+        state: present
+        dest: /etc/audit/audit.rules
+        line: '-w /etc/selinux/ -p wa -k MAC-policy'
+    when: mac_policy_audit.rc == 1
+    tags:
+        - cat3
+        - low
+        - V-38541
+        - auditd
+        - selinux
+        - patch
+
+  - name: "LOW | V-38543 | PATCH | The audit system must be configured to audit all discretionary access control permission modifications using chmod."
+    lineinfile:
       line: "{{ item }}"
       state: present
       dest: /etc/audit/audit.rules
-  with_items:
-      - "-w /etc/issue -p wa -k audit_network_modifications"
-      - "-w /etc/issue.net -p wa -k audit_network_modifications"
-      - "-w /etc/hosts -p wa -k audit_network_modifications"
-      - "-w /etc/sysconfig/network -p wa -k audit_network_modifications"
-  tags:
+    with_items:
+      - "-a always,exit -F arch=b32 -S chmod -F auid>=500 -F auid!=4294967295 -k perm_mod"
+      - "-a always,exit -F arch=b32 -S chmod -F auid=0 -k perm_mod"
+    tags:
       - cat3
       - low
-      - V-38540
+      - V-38543
       - auditd
-      - network
-
-- name: "LOW | V-38541 | AUDIT | The audit system must be configured to audit modifications to the systems Mandatory Access Control (MAC) configuration (SELinux)."
-  command: grep -e '-k MAC-policy' /etc/audit/audit.rules
-  register: mac_policy_audit
-  changed_when: false
-  failed_when: false
-  check_mode: no
-  tags:
-      - cat3
-      - low
-      - V-38541
-      - auditd
-      - selinux
-      - audit
-
-- name: "LOW | V-38541 | PATCH | The audit system must be configured to audit modifications to the systems Mandatory Access Control (MAC) configuration (SELinux)."
-  lineinfile:
-      state: present
-      dest: /etc/audit/audit.rules
-      line: '-w /etc/selinux/ -p wa -k MAC-policy'
-  when: mac_policy_audit.rc == 1
-  tags:
-      - cat3
-      - low
-      - V-38541
-      - auditd
-      - selinux
       - patch
 
-- name: "LOW | V-38543 | PATCH | The audit system must be configured to audit all discretionary access control permission modifications using chmod."
-  lineinfile:
-    line: "{{ item }}"
-    state: present
-    dest: /etc/audit/audit.rules
-  with_items:
-    - "-a always,exit -F arch=b32 -S chmod -F auid>=500 -F auid!=4294967295 -k perm_mod"
-    - "-a always,exit -F arch=b32 -S chmod -F auid=0 -k perm_mod"
-  tags:
-    - cat3
-    - low
-    - V-38543
-    - auditd
-    - patch
-
-- name: "LOW | V-38543 | PATCH | The audit system must be configured to audit all discretionary access control permission modifications using chmod."
-  lineinfile:
-    line: "{{ item }}"
-    state: present
-    dest: /etc/audit/audit.rules
-  with_items:
-    - "-a always,exit -F arch=b64 -S chmod -F auid>=500 -F auid!=4294967295 -k perm_mod"
-    - "-a always,exit -F arch=b64 -S chmod -F auid=0 -k perm_mod"
-  when: audit_arch == 'b64'
-  tags:
-    - cat3
-    - low
-    - V-38543
-    - auditd
-    - patch
-
-- name: "LOW | V-38545 | PATCH | The audit system must be configured to audit all discretionary access control permission modifications using chown."
-  lineinfile:
-    line: "{{ item }}"
-    state: present
-    dest: /etc/audit/audit.rules
-  with_items:
-    - "-a always,exit -F arch=b32 -S chown -F auid>=500 -F auid!=4294967295 -k perm_mod"
-    - "-a always,exit -F arch=b32 -S chown -F auid=0 -k perm_mod"
-  tags:
-    - cat3
-    - low
-    - V-38545
-    - auditd
-    - patch
-
-- name: "LOW | V-38545 | PATCH | The audit system must be configured to audit all discretionary access control permission modifications using chown."
-  lineinfile:
-    line: "{{ item }}"
-    state: present
-    dest: /etc/audit/audit.rules
-  with_items:
-    - "-a always,exit -F arch=b64 -S chown -F auid>=500 -F auid!=4294967295 -k perm_mod"
-    - "-a always,exit -F arch=b64 -S chown -F auid=0 -k perm_mod"
-  when: audit_arch == 'b64'
-  tags:
-    - cat3
-    - low
-    - V-38545
-    - auditd
-    - patch
-
-- name: "LOW | V-38547 | PATCH | The audit system must be configured to audit all discretionary access control permission modifications using fchmod."
-  lineinfile:
-    line: "{{ item }}"
-    state: present
-    dest: /etc/audit/audit.rules
-  with_items:
-    - "-a always,exit -F arch=b32 -S fchmod -F auid>=500 -F auid!=4294967295 -k perm_mod"
-    - "-a always,exit -F arch=b32 -S fchmod -F auid=0 -k perm_mod"
-  tags:
-    - cat3
-    - low
-    - V-38547
-    - auditd
-    - patch
-
-- name: "LOW | V-38547 | PATCH | The audit system must be configured to audit all discretionary access control permission modifications using fchmod."
-  lineinfile:
-    line: "{{ item }}"
-    state: present
-    dest: /etc/audit/audit.rules
-  with_items:
-    - "-a always,exit -F arch=b64 -S fchmod -F auid>=500 -F auid!=4294967295 -k perm_mod"
-    - "-a always,exit -F arch=b64 -S fchmod -F auid=0 -k perm_mod"
-  when: audit_arch == 'b64'
-  tags:
-    - cat3
-    - low
-    - V-38547
-    - auditd
-    - patch
-
-- name: "LOW | V-38550 | PATCH | The audit system must be configured to audit all discretionary access control permission modifications using fchmodat."
-  lineinfile:
-    line: "{{ item }}"
-    state: present
-    dest: /etc/audit/audit.rules
-  with_items:
-    - "-a always,exit -F arch=b32 -S fchmodat -F auid>=500 -F auid!=4294967295 -k perm_mod"
-    - "-a always,exit -F arch=b32 -S fchmodat -F auid=0 -k perm_mod"
-  tags:
-    - cat3
-    - low
-    - V-38550
-    - auditd
-    - patch
-
-- name: "LOW | V-38550 | PATCH | The audit system must be configured to audit all discretionary access control permission modifications using fchmodat."
-  lineinfile:
-    line: "{{ item }}"
-    state: present
-    dest: /etc/audit/audit.rules
-  with_items:
-    - "-a always,exit -F arch=b64 -S fchmodat -F auid>=500 -F auid!=4294967295 -k perm_mod"
-    - "-a always,exit -F arch=b64 -S fchmodat -F auid=0 -k perm_mod"
-  when: audit_arch == 'b64'
-  tags:
-    - cat3
-    - low
-    - V-38550
-    - auditd
-    - patch
-
-- name: "LOW | V-38552 | PATCH | The audit system must be configured to audit all discretionary access control permission modifications using fchown."
-  lineinfile:
-    line: "{{ item }}"
-    state: present
-    dest: /etc/audit/audit.rules
-  with_items:
-    - "-a always,exit -F arch=b32 -S fchown -F auid>=500 -F auid!=4294967295 -k perm_mod"
-    - "-a always,exit -F arch=b32 -S fchown -F auid=0 -k perm_mod"
-  tags:
-    - cat3
-    - low
-    - V-38552
-    - auditd
-    - patch
-
-- name: "LOW | V-38552 | PATCH | The audit system must be configured to audit all discretionary access control permission modifications using fchown."
-  lineinfile:
-    line: "{{ item }}"
-    state: present
-    dest: /etc/audit/audit.rules
-  with_items:
-    - "-a always,exit -F arch=b64 -S fchown -F auid>=500 -F auid!=4294967295 -k perm_mod"
-    - "-a always,exit -F arch=b64 -S fchown -F auid=0 -k perm_mod"
-  when: audit_arch == 'b64'
-  tags:
-    - cat3
-    - low
-    - V-38552
-    - auditd
-    - patch
-
-- name: "LOW | V-38554 | PATCH | The audit system must be configured to audit all discretionary access control permission modifications using fchownat."
-  lineinfile:
-    line: "{{ item }}"
-    state: present
-    dest: /etc/audit/audit.rules
-  with_items:
-    - "-a always,exit -F arch=b32 -S fchownat -F auid>=500 -F auid!=4294967295 -k perm_mod"
-    - "-a always,exit -F arch=b32 -S fchownat -F auid=0 -k perm_mod"
-  tags:
-    - cat3
-    - low
-    - V-38554
-    - auditd
-    - patch
-
-- name: "LOW | V-38554 | PATCH | The audit system must be configured to audit all discretionary access control permission modifications using fchownat."
-  lineinfile:
-    line: "{{ item }}"
-    state: present
-    dest: /etc/audit/audit.rules
-  with_items:
-    - "-a always,exit -F arch=b64 -S fchownat -F auid>=500 -F auid!=4294967295 -k perm_mod"
-    - "-a always,exit -F arch=b64 -S fchownat -F auid=0 -k perm_mod"
-  when: audit_arch == 'b64'
-  tags:
-    - cat3
-    - low
-    - V-38554
-    - auditd
-    - patch
-
-- name: "LOW | V-38556 | PATCH | The audit system must be configured to audit all discretionary access control permission modifications using fremovexattr."
-  lineinfile:
-    line: "{{ item }}"
-    state: present
-    dest: /etc/audit/audit.rules
-  with_items:
-    - "-a always,exit -F arch=b32 -S fremovexattr -F auid>=500 -F auid!=4294967295 -k perm_mod"
-    - "-a always,exit -F arch=b32 -S fremovexattr -F auid=0 -k perm_mod"
-  tags:
-    - cat3
-    - low
-    - V-38556
-    - auditd
-    - patch
-
-- name: "LOW | V-38556 | PATCH | The audit system must be configured to audit all discretionary access control permission modifications using fremovexattr."
-  lineinfile:
-    line: "{{ item }}"
-    state: present
-    dest: /etc/audit/audit.rules
-  with_items:
-    - "-a always,exit -F arch=b64 -S fremovexattr -F auid>=500 -F auid!=4294967295 -k perm_mod"
-    - "-a always,exit -F arch=b64 -S fremovexattr -F auid=0 -k perm_mod"
-  when: audit_arch == 'b64'
-  tags:
-    - cat3
-    - low
-    - V-38556
-    - auditd
-    - patch
-
-- name: "LOW | V-38557 | PATCH | The audit system must be configured to audit all discretionary access control permission modifications using fsetxattr."
-  lineinfile:
-    line: "{{ item }}"
-    state: present
-    dest: /etc/audit/audit.rules
-  with_items:
-    - "-a always,exit -F arch=b32 -S fsetxattr -F auid>=500 -F auid!=4294967295 -k perm_mod"
-    - "-a always,exit -F arch=b32 -S fsetxattr -F auid=0 -k perm_mod"
-  tags:
-    - cat3
-    - low
-    - V-38557
-    - auditd
-    - patch
-
-- name: "LOW | V-38557 | PATCH | The audit system must be configured to audit all discretionary access control permission modifications using fsetxattr."
-  lineinfile:
-    line: "{{ item }}"
-    state: present
-    dest: /etc/audit/audit.rules
-  with_items:
-    - "-a always,exit -F arch=b64 -S fsetxattr -F auid>=500 -F auid!=4294967295 -k perm_mod"
-    - "-a always,exit -F arch=b64 -S fsetxattr -F auid=0 -k perm_mod"
-  when: audit_arch == 'b64'
-  tags:
-    - cat3
-    - low
-    - V-38557
-    - auditd
-    - patch
-
-- name: "LOW | V-38558 | PATCH | The audit system must be configured to audit all discretionary access control permission modifications using lchown."
-  lineinfile:
-    line: "{{ item }}"
-    state: present
-    dest: /etc/audit/audit.rules
-  with_items:
-    - "-a always,exit -F arch=b32 -S lchown -F auid>=500 -F auid!=4294967295 -k perm_mod"
-    - "-a always,exit -F arch=b32 -S lchown -F auid=0 -k perm_mod"
-  tags:
-    - cat3
-    - low
-    - V-38558
-    - auditd
-    - patch
-
-- name: "LOW | V-38558 | PATCH | The audit system must be configured to audit all discretionary access control permission modifications using lchown."
-  lineinfile:
-    line: "{{ item }}"
-    state: present
-    dest: /etc/audit/audit.rules
-  with_items:
-    - "-a always,exit -F arch=b64 -S lchown -F auid>=500 -F auid!=4294967295 -k perm_mod"
-    - "-a always,exit -F arch=b64 -S lchown -F auid=0 -k perm_mod"
-  when: audit_arch == 'b64'
-  tags:
-    - cat3
-    - low
-    - V-38558
-    - auditd
-    - patch
-
-- name: "LOW | V-38559 | PATCH | The audit system must be configured to audit all discretionary access control permission modifications using lremovexattr."
-  lineinfile:
-    line: "{{ item }}"
-    state: present
-    dest: /etc/audit/audit.rules
-  with_items:
-    - "-a always,exit -F arch=b32 -S lremovexattr -F auid>=500 -F auid!=4294967295 -k perm_mod"
-    - "-a always,exit -F arch=b32 -S lremovexattr -F auid=0 -k perm_mod"
-  tags:
-    - cat3
-    - low
-    - V-38559
-    - auditd
-    - patch
-
-- name: "LOW | V-38559 | PATCH | The audit system must be configured to audit all discretionary access control permission modifications using lremovexattr."
-  lineinfile:
-    line: "{{ item }}"
-    state: present
-    dest: /etc/audit/audit.rules
-  with_items:
-    - "-a always,exit -F arch=b64 -S lremovexattr -F auid>=500 -F auid!=4294967295 -k perm_mod"
-    - "-a always,exit -F arch=b64 -S lremovexattr -F auid=0 -k perm_mod"
-  when: audit_arch == 'b64'
-  tags:
-    - cat3
-    - low
-    - V-38559
-    - auditd
-    - patch
-
-- name: "LOW | V-38561 | PATCH | The audit system must be configured to audit all discretionary access control permission modifications using lsetxattr."
-  lineinfile:
-    line: "{{ item }}"
-    state: present
-    dest: /etc/audit/audit.rules
-  with_items:
-    - "-a always,exit -F arch=b32 -S lsetxattr -F auid>=500 -F auid!=4294967295 -k perm_mod"
-    - "-a always,exit -F arch=b32 -S lsetxattr -F auid=0 -k perm_mod"
-  tags:
-    - cat3
-    - low
-    - V-38561
-    - auditd
-    - patch
-
-- name: "LOW | V-38561 | PATCH | The audit system must be configured to audit all discretionary access control permission modifications using lsetxattr."
-  lineinfile:
-    line: "{{ item }}"
-    state: present
-    dest: /etc/audit/audit.rules
-  with_items:
-    - "-a always,exit -F arch=b64 -S lsetxattr -F auid>=500 -F auid!=4294967295 -k perm_mod"
-    - "-a always,exit -F arch=b64 -S lsetxattr -F auid=0 -k perm_mod"
-  when: audit_arch == 'b64'
-  tags:
-    - cat3
-    - low
-    - V-38561
-    - auditd
-    - patch
-
-- name: "LOW | V-38563 | PATCH | The audit system must be configured to audit all discretionary access control permission modifications using removexattr."
-  lineinfile:
-    line: "{{ item }}"
-    state: present
-    dest: /etc/audit/audit.rules
-  with_items:
-    - "-a always,exit -F arch=b32 -S removexattr -F auid>=500 -F auid!=4294967295 -k perm_mod"
-    - "-a always,exit -F arch=b32 -S removexattr -F auid=0 -k perm_mod"
-  tags:
-    - cat3
-    - low
-    - V-38563
-    - auditd
-    - patch
-
-- name: "LOW | V-38563 | PATCH | The audit system must be configured to audit all discretionary access control permission modifications using removexattr."
-  lineinfile:
-    line: "{{ item }}"
-    state: present
-    dest: /etc/audit/audit.rules
-  with_items:
-    - "-a always,exit -F arch=b64 -S removexattr -F auid>=500 -F auid!=4294967295 -k perm_mod"
-    - "-a always,exit -F arch=b64 -S removexattr -F auid=0 -k perm_mod"
-  when: audit_arch == 'b64'
-  tags:
-    - cat3
-    - low
-    - V-38563
-    - auditd
-    - patch
-
-- name: "LOW | V-38565 | PATCH | The audit system must be configured to audit all discretionary access control permission modifications using setxattr."
-  lineinfile:
-    line: "{{ item }}"
-    state: present
-    dest: /etc/audit/audit.rules
-  with_items:
-    - "-a always,exit -F arch=b32 -S setxattr -F auid>=500 -F auid!=4294967295 -k perm_mod"
-    - "-a always,exit -F arch=b32 -S setxattr -F auid=0 -k perm_mod"
-  tags:
-    - cat3
-    - low
-    - V-38565
-    - auditd
-    - patch
-
-- name: "LOW | V-38565 | PATCH | The audit system must be configured to audit all discretionary access control permission modifications using setxattr."
-  lineinfile:
-    line: "{{ item }}"
-    state: present
-    dest: /etc/audit/audit.rules
-  with_items:
-    - "-a always,exit -F arch=b64 -S setxattr -F auid>=500 -F auid!=4294967295 -k perm_mod"
-    - "-a always,exit -F arch=b64 -S setxattr -F auid=0 -k perm_mod"
-  when: audit_arch == 'b64'
-  tags:
-    - cat3
-    - low
-    - V-38565
-    - auditd
-    - patch
-
-- name: "LOW | V-38566 | PATCH | The audit system must be configured to audit failed attempts to access files and programs."
-  lineinfile:
+  - name: "LOW | V-38543 | PATCH | The audit system must be configured to audit all discretionary access control permission modifications using chmod."
+    lineinfile:
       line: "{{ item }}"
       state: present
       dest: /etc/audit/audit.rules
-  with_items:
-      - "-a always,exit -F arch=b32 -S creat -S open -S openat -S open_by_handle_at -S truncate -S ftruncate -F exit=-EACCES -F auid>=500 -F auid!=4294967295 -k access"
-      - "-a always,exit -F arch=b32 -S creat -S open -S openat -S open_by_handle_at -S truncate -S ftruncate -F exit=-EPERM -F auid>=500 -F auid!=4294967295 -k access"
-      - "-a always,exit -F arch=b32 -S creat -S open -S openat -S open_by_handle_at -S truncate -S ftruncate -F exit=-EACCES -F auid=0 -k access"
-      - "-a always,exit -F arch=b32 -S creat -S open -S openat -S open_by_handle_at -S truncate -S ftruncate -F exit=-EPERM -F auid=0 -k access"
-  tags:
+    with_items:
+      - "-a always,exit -F arch=b64 -S chmod -F auid>=500 -F auid!=4294967295 -k perm_mod"
+      - "-a always,exit -F arch=b64 -S chmod -F auid=0 -k perm_mod"
+    when: audit_arch == 'b64'
+    tags:
       - cat3
       - low
-      - V-38566
+      - V-38543
       - auditd
-      - access
       - patch
 
-- name: "LOW | V-38566 | PATCH | The audit system must be configured to audit failed attempts to access files and programs."
-  lineinfile:
+  - name: "LOW | V-38545 | PATCH | The audit system must be configured to audit all discretionary access control permission modifications using chown."
+    lineinfile:
       line: "{{ item }}"
       state: present
       dest: /etc/audit/audit.rules
-  with_items:
-      - "-a always,exit -F arch=b64 -S creat -S open -S openat -S open_by_handle_at -S truncate -S ftruncate -F exit=-EACCES -F auid>=500 -F auid!=4294967295 -k access"
-      - "-a always,exit -F arch=b64 -S creat -S open -S openat -S open_by_handle_at -S truncate -S ftruncate -F exit=-EPERM -F auid>=500 -F auid!=4294967295 -k access"
-      - "-a always,exit -F arch=b64 -S creat -S open -S openat -S open_by_handle_at -S truncate -S ftruncate -F exit=-EACCES -F auid=0 -k access"
-      - "-a always,exit -F arch=b64 -S creat -S open -S openat -S open_by_handle_at -S truncate -S ftruncate -F exit=-EPERM -F auid=0 -k access"
-  when: audit_arch == 'b64'
-  tags:
+    with_items:
+      - "-a always,exit -F arch=b32 -S chown -F auid>=500 -F auid!=4294967295 -k perm_mod"
+      - "-a always,exit -F arch=b32 -S chown -F auid=0 -k perm_mod"
+    tags:
       - cat3
       - low
-      - V-38566
+      - V-38545
       - auditd
-      - access
       - patch
+
+  - name: "LOW | V-38545 | PATCH | The audit system must be configured to audit all discretionary access control permission modifications using chown."
+    lineinfile:
+      line: "{{ item }}"
+      state: present
+      dest: /etc/audit/audit.rules
+    with_items:
+      - "-a always,exit -F arch=b64 -S chown -F auid>=500 -F auid!=4294967295 -k perm_mod"
+      - "-a always,exit -F arch=b64 -S chown -F auid=0 -k perm_mod"
+    when: audit_arch == 'b64'
+    tags:
+      - cat3
+      - low
+      - V-38545
+      - auditd
+      - patch
+
+  - name: "LOW | V-38547 | PATCH | The audit system must be configured to audit all discretionary access control permission modifications using fchmod."
+    lineinfile:
+      line: "{{ item }}"
+      state: present
+      dest: /etc/audit/audit.rules
+    with_items:
+      - "-a always,exit -F arch=b32 -S fchmod -F auid>=500 -F auid!=4294967295 -k perm_mod"
+      - "-a always,exit -F arch=b32 -S fchmod -F auid=0 -k perm_mod"
+    tags:
+      - cat3
+      - low
+      - V-38547
+      - auditd
+      - patch
+
+  - name: "LOW | V-38547 | PATCH | The audit system must be configured to audit all discretionary access control permission modifications using fchmod."
+    lineinfile:
+      line: "{{ item }}"
+      state: present
+      dest: /etc/audit/audit.rules
+    with_items:
+      - "-a always,exit -F arch=b64 -S fchmod -F auid>=500 -F auid!=4294967295 -k perm_mod"
+      - "-a always,exit -F arch=b64 -S fchmod -F auid=0 -k perm_mod"
+    when: audit_arch == 'b64'
+    tags:
+      - cat3
+      - low
+      - V-38547
+      - auditd
+      - patch
+
+  - name: "LOW | V-38550 | PATCH | The audit system must be configured to audit all discretionary access control permission modifications using fchmodat."
+    lineinfile:
+      line: "{{ item }}"
+      state: present
+      dest: /etc/audit/audit.rules
+    with_items:
+      - "-a always,exit -F arch=b32 -S fchmodat -F auid>=500 -F auid!=4294967295 -k perm_mod"
+      - "-a always,exit -F arch=b32 -S fchmodat -F auid=0 -k perm_mod"
+    tags:
+      - cat3
+      - low
+      - V-38550
+      - auditd
+      - patch
+
+  - name: "LOW | V-38550 | PATCH | The audit system must be configured to audit all discretionary access control permission modifications using fchmodat."
+    lineinfile:
+      line: "{{ item }}"
+      state: present
+      dest: /etc/audit/audit.rules
+    with_items:
+      - "-a always,exit -F arch=b64 -S fchmodat -F auid>=500 -F auid!=4294967295 -k perm_mod"
+      - "-a always,exit -F arch=b64 -S fchmodat -F auid=0 -k perm_mod"
+    when: audit_arch == 'b64'
+    tags:
+      - cat3
+      - low
+      - V-38550
+      - auditd
+      - patch
+
+  - name: "LOW | V-38552 | PATCH | The audit system must be configured to audit all discretionary access control permission modifications using fchown."
+    lineinfile:
+      line: "{{ item }}"
+      state: present
+      dest: /etc/audit/audit.rules
+    with_items:
+      - "-a always,exit -F arch=b32 -S fchown -F auid>=500 -F auid!=4294967295 -k perm_mod"
+      - "-a always,exit -F arch=b32 -S fchown -F auid=0 -k perm_mod"
+    tags:
+      - cat3
+      - low
+      - V-38552
+      - auditd
+      - patch
+
+  - name: "LOW | V-38552 | PATCH | The audit system must be configured to audit all discretionary access control permission modifications using fchown."
+    lineinfile:
+      line: "{{ item }}"
+      state: present
+      dest: /etc/audit/audit.rules
+    with_items:
+      - "-a always,exit -F arch=b64 -S fchown -F auid>=500 -F auid!=4294967295 -k perm_mod"
+      - "-a always,exit -F arch=b64 -S fchown -F auid=0 -k perm_mod"
+    when: audit_arch == 'b64'
+    tags:
+      - cat3
+      - low
+      - V-38552
+      - auditd
+      - patch
+
+  - name: "LOW | V-38554 | PATCH | The audit system must be configured to audit all discretionary access control permission modifications using fchownat."
+    lineinfile:
+      line: "{{ item }}"
+      state: present
+      dest: /etc/audit/audit.rules
+    with_items:
+      - "-a always,exit -F arch=b32 -S fchownat -F auid>=500 -F auid!=4294967295 -k perm_mod"
+      - "-a always,exit -F arch=b32 -S fchownat -F auid=0 -k perm_mod"
+    tags:
+      - cat3
+      - low
+      - V-38554
+      - auditd
+      - patch
+
+  - name: "LOW | V-38554 | PATCH | The audit system must be configured to audit all discretionary access control permission modifications using fchownat."
+    lineinfile:
+      line: "{{ item }}"
+      state: present
+      dest: /etc/audit/audit.rules
+    with_items:
+      - "-a always,exit -F arch=b64 -S fchownat -F auid>=500 -F auid!=4294967295 -k perm_mod"
+      - "-a always,exit -F arch=b64 -S fchownat -F auid=0 -k perm_mod"
+    when: audit_arch == 'b64'
+    tags:
+      - cat3
+      - low
+      - V-38554
+      - auditd
+      - patch
+
+  - name: "LOW | V-38556 | PATCH | The audit system must be configured to audit all discretionary access control permission modifications using fremovexattr."
+    lineinfile:
+      line: "{{ item }}"
+      state: present
+      dest: /etc/audit/audit.rules
+    with_items:
+      - "-a always,exit -F arch=b32 -S fremovexattr -F auid>=500 -F auid!=4294967295 -k perm_mod"
+      - "-a always,exit -F arch=b32 -S fremovexattr -F auid=0 -k perm_mod"
+    tags:
+      - cat3
+      - low
+      - V-38556
+      - auditd
+      - patch
+
+  - name: "LOW | V-38556 | PATCH | The audit system must be configured to audit all discretionary access control permission modifications using fremovexattr."
+    lineinfile:
+      line: "{{ item }}"
+      state: present
+      dest: /etc/audit/audit.rules
+    with_items:
+      - "-a always,exit -F arch=b64 -S fremovexattr -F auid>=500 -F auid!=4294967295 -k perm_mod"
+      - "-a always,exit -F arch=b64 -S fremovexattr -F auid=0 -k perm_mod"
+    when: audit_arch == 'b64'
+    tags:
+      - cat3
+      - low
+      - V-38556
+      - auditd
+      - patch
+
+  - name: "LOW | V-38557 | PATCH | The audit system must be configured to audit all discretionary access control permission modifications using fsetxattr."
+    lineinfile:
+      line: "{{ item }}"
+      state: present
+      dest: /etc/audit/audit.rules
+    with_items:
+      - "-a always,exit -F arch=b32 -S fsetxattr -F auid>=500 -F auid!=4294967295 -k perm_mod"
+      - "-a always,exit -F arch=b32 -S fsetxattr -F auid=0 -k perm_mod"
+    tags:
+      - cat3
+      - low
+      - V-38557
+      - auditd
+      - patch
+
+  - name: "LOW | V-38557 | PATCH | The audit system must be configured to audit all discretionary access control permission modifications using fsetxattr."
+    lineinfile:
+      line: "{{ item }}"
+      state: present
+      dest: /etc/audit/audit.rules
+    with_items:
+      - "-a always,exit -F arch=b64 -S fsetxattr -F auid>=500 -F auid!=4294967295 -k perm_mod"
+      - "-a always,exit -F arch=b64 -S fsetxattr -F auid=0 -k perm_mod"
+    when: audit_arch == 'b64'
+    tags:
+      - cat3
+      - low
+      - V-38557
+      - auditd
+      - patch
+
+  - name: "LOW | V-38558 | PATCH | The audit system must be configured to audit all discretionary access control permission modifications using lchown."
+    lineinfile:
+      line: "{{ item }}"
+      state: present
+      dest: /etc/audit/audit.rules
+    with_items:
+      - "-a always,exit -F arch=b32 -S lchown -F auid>=500 -F auid!=4294967295 -k perm_mod"
+      - "-a always,exit -F arch=b32 -S lchown -F auid=0 -k perm_mod"
+    tags:
+      - cat3
+      - low
+      - V-38558
+      - auditd
+      - patch
+
+  - name: "LOW | V-38558 | PATCH | The audit system must be configured to audit all discretionary access control permission modifications using lchown."
+    lineinfile:
+      line: "{{ item }}"
+      state: present
+      dest: /etc/audit/audit.rules
+    with_items:
+      - "-a always,exit -F arch=b64 -S lchown -F auid>=500 -F auid!=4294967295 -k perm_mod"
+      - "-a always,exit -F arch=b64 -S lchown -F auid=0 -k perm_mod"
+    when: audit_arch == 'b64'
+    tags:
+      - cat3
+      - low
+      - V-38558
+      - auditd
+      - patch
+
+  - name: "LOW | V-38559 | PATCH | The audit system must be configured to audit all discretionary access control permission modifications using lremovexattr."
+    lineinfile:
+      line: "{{ item }}"
+      state: present
+      dest: /etc/audit/audit.rules
+    with_items:
+      - "-a always,exit -F arch=b32 -S lremovexattr -F auid>=500 -F auid!=4294967295 -k perm_mod"
+      - "-a always,exit -F arch=b32 -S lremovexattr -F auid=0 -k perm_mod"
+    tags:
+      - cat3
+      - low
+      - V-38559
+      - auditd
+      - patch
+
+  - name: "LOW | V-38559 | PATCH | The audit system must be configured to audit all discretionary access control permission modifications using lremovexattr."
+    lineinfile:
+      line: "{{ item }}"
+      state: present
+      dest: /etc/audit/audit.rules
+    with_items:
+      - "-a always,exit -F arch=b64 -S lremovexattr -F auid>=500 -F auid!=4294967295 -k perm_mod"
+      - "-a always,exit -F arch=b64 -S lremovexattr -F auid=0 -k perm_mod"
+    when: audit_arch == 'b64'
+    tags:
+      - cat3
+      - low
+      - V-38559
+      - auditd
+      - patch
+
+  - name: "LOW | V-38561 | PATCH | The audit system must be configured to audit all discretionary access control permission modifications using lsetxattr."
+    lineinfile:
+      line: "{{ item }}"
+      state: present
+      dest: /etc/audit/audit.rules
+    with_items:
+      - "-a always,exit -F arch=b32 -S lsetxattr -F auid>=500 -F auid!=4294967295 -k perm_mod"
+      - "-a always,exit -F arch=b32 -S lsetxattr -F auid=0 -k perm_mod"
+    tags:
+      - cat3
+      - low
+      - V-38561
+      - auditd
+      - patch
+
+  - name: "LOW | V-38561 | PATCH | The audit system must be configured to audit all discretionary access control permission modifications using lsetxattr."
+    lineinfile:
+      line: "{{ item }}"
+      state: present
+      dest: /etc/audit/audit.rules
+    with_items:
+      - "-a always,exit -F arch=b64 -S lsetxattr -F auid>=500 -F auid!=4294967295 -k perm_mod"
+      - "-a always,exit -F arch=b64 -S lsetxattr -F auid=0 -k perm_mod"
+    when: audit_arch == 'b64'
+    tags:
+      - cat3
+      - low
+      - V-38561
+      - auditd
+      - patch
+
+  - name: "LOW | V-38563 | PATCH | The audit system must be configured to audit all discretionary access control permission modifications using removexattr."
+    lineinfile:
+      line: "{{ item }}"
+      state: present
+      dest: /etc/audit/audit.rules
+    with_items:
+      - "-a always,exit -F arch=b32 -S removexattr -F auid>=500 -F auid!=4294967295 -k perm_mod"
+      - "-a always,exit -F arch=b32 -S removexattr -F auid=0 -k perm_mod"
+    tags:
+      - cat3
+      - low
+      - V-38563
+      - auditd
+      - patch
+
+  - name: "LOW | V-38563 | PATCH | The audit system must be configured to audit all discretionary access control permission modifications using removexattr."
+    lineinfile:
+      line: "{{ item }}"
+      state: present
+      dest: /etc/audit/audit.rules
+    with_items:
+      - "-a always,exit -F arch=b64 -S removexattr -F auid>=500 -F auid!=4294967295 -k perm_mod"
+      - "-a always,exit -F arch=b64 -S removexattr -F auid=0 -k perm_mod"
+    when: audit_arch == 'b64'
+    tags:
+      - cat3
+      - low
+      - V-38563
+      - auditd
+      - patch
+
+  - name: "LOW | V-38565 | PATCH | The audit system must be configured to audit all discretionary access control permission modifications using setxattr."
+    lineinfile:
+      line: "{{ item }}"
+      state: present
+      dest: /etc/audit/audit.rules
+    with_items:
+      - "-a always,exit -F arch=b32 -S setxattr -F auid>=500 -F auid!=4294967295 -k perm_mod"
+      - "-a always,exit -F arch=b32 -S setxattr -F auid=0 -k perm_mod"
+    tags:
+      - cat3
+      - low
+      - V-38565
+      - auditd
+      - patch
+
+  - name: "LOW | V-38565 | PATCH | The audit system must be configured to audit all discretionary access control permission modifications using setxattr."
+    lineinfile:
+      line: "{{ item }}"
+      state: present
+      dest: /etc/audit/audit.rules
+    with_items:
+      - "-a always,exit -F arch=b64 -S setxattr -F auid>=500 -F auid!=4294967295 -k perm_mod"
+      - "-a always,exit -F arch=b64 -S setxattr -F auid=0 -k perm_mod"
+    when: audit_arch == 'b64'
+    tags:
+      - cat3
+      - low
+      - V-38565
+      - auditd
+      - patch
+
+  - name: "LOW | V-38566 | PATCH | The audit system must be configured to audit failed attempts to access files and programs."
+    lineinfile:
+        line: "{{ item }}"
+        state: present
+        dest: /etc/audit/audit.rules
+    with_items:
+        - "-a always,exit -F arch=b32 -S creat -S open -S openat -S open_by_handle_at -S truncate -S ftruncate -F exit=-EACCES -F auid>=500 -F auid!=4294967295 -k access"
+        - "-a always,exit -F arch=b32 -S creat -S open -S openat -S open_by_handle_at -S truncate -S ftruncate -F exit=-EPERM -F auid>=500 -F auid!=4294967295 -k access"
+        - "-a always,exit -F arch=b32 -S creat -S open -S openat -S open_by_handle_at -S truncate -S ftruncate -F exit=-EACCES -F auid=0 -k access"
+        - "-a always,exit -F arch=b32 -S creat -S open -S openat -S open_by_handle_at -S truncate -S ftruncate -F exit=-EPERM -F auid=0 -k access"
+    tags:
+        - cat3
+        - low
+        - V-38566
+        - auditd
+        - access
+        - patch
+
+  - name: "LOW | V-38566 | PATCH | The audit system must be configured to audit failed attempts to access files and programs."
+    lineinfile:
+        line: "{{ item }}"
+        state: present
+        dest: /etc/audit/audit.rules
+    with_items:
+        - "-a always,exit -F arch=b64 -S creat -S open -S openat -S open_by_handle_at -S truncate -S ftruncate -F exit=-EACCES -F auid>=500 -F auid!=4294967295 -k access"
+        - "-a always,exit -F arch=b64 -S creat -S open -S openat -S open_by_handle_at -S truncate -S ftruncate -F exit=-EPERM -F auid>=500 -F auid!=4294967295 -k access"
+        - "-a always,exit -F arch=b64 -S creat -S open -S openat -S open_by_handle_at -S truncate -S ftruncate -F exit=-EACCES -F auid=0 -k access"
+        - "-a always,exit -F arch=b64 -S creat -S open -S openat -S open_by_handle_at -S truncate -S ftruncate -F exit=-EPERM -F auid=0 -k access"
+    when: audit_arch == 'b64'
+    tags:
+        - cat3
+        - low
+        - V-38566
+        - auditd
+        - access
+        - patch
+  when: not rhel6stig_system_is_container
 
 - block:
     - name: "LOW | V-38567 | PATCH | The audit system must be configured to audit all use of setuid and setgid programs."
@@ -1186,6 +1194,7 @@
           state: present
           dest: /etc/audit/audit.rules
       with_items: "{{ setugid_programs.stdout_lines }}"
+  when: not rhel6stig_system_is_container
   tags:
       - cat3
       - low
@@ -1193,105 +1202,107 @@
       - auditd
       - patch
 
-- name: "LOW | V-38568 | AUDIT | The audit system must be configured to audit successful file system mounts."
-  command: grep -w "mount" /etc/audit/audit.rules
-  register: auditd_mount_audit
-  changed_when: no
-  check_mode: no
-  failed_when: no
-  tags:
-    - cat3
-    - low
-    - V-38568
-    - auditd
-    - audit
-
-- name: "LOW | V-38568 | PATCH | The audit system must be configured to audit successful file system mounts."
-  lineinfile:
-    line: "{{ item[0] % item.1 }}"
-    state: present
-    dest: /etc/audit/audit.rules
-  when:
-      - audit_arch == item.1 or
-        item.1 == 'b32' and rhel6stig_workaround_for_ssg_benchmark
-  with_nested:
-      -
-          - "-a always,exit -F arch=%s -S mount -F auid>=500 -F auid!=4294967295 -k export"
-          - "-a always,exit -F arch=%s -S mount -F auid=0 -k export"
-      -
-          - b32
-          - b64
-  tags:
-    - cat3
-    - low
-    - V-38568
-    - auditd
-    - patch
-
-- name: "LOW | V-38575 | AUDIT | The audit system must be configured to audit user deletions of files and programs."
-  command: grep -w "rmdir" /etc/audit/audit.rules
-  check_mode: no
-  changed_when: no
-  failed_when: no
-  register: auditd_rmdir_audit
-  tags:
+- block:
+  - name: "LOW | V-38568 | AUDIT | The audit system must be configured to audit successful file system mounts."
+    command: grep -w "mount" /etc/audit/audit.rules
+    register: auditd_mount_audit
+    changed_when: no
+    check_mode: no
+    failed_when: no
+    tags:
       - cat3
       - low
-      - V-38575
+      - V-38568
       - auditd
-      - delete
       - audit
 
-
-- name: "LOW | V-38575 | PATCH | The audit system must be configured to audit user deletions of files and programs."
-  lineinfile:
+  - name: "LOW | V-38568 | PATCH | The audit system must be configured to audit successful file system mounts."
+    lineinfile:
       line: "{{ item[0] % item.1 }}"
       state: present
       dest: /etc/audit/audit.rules
-  when:
-      - audit_arch == item.1 or
-        item.1 == 'b32' and rhel6stig_workaround_for_ssg_benchmark
-  with_nested:
-      -
-          - "-a always,exit -F arch=%s -S rmdir -S unlink -S unlinkat -S rename -S renameat -F auid>=500 -F auid!=4294967295 -k delete"
-          - "-a always,exit -F arch=%s -S rmdir -S unlink -S unlinkat -S rename -S renameat -F auid=0 -k delete"
-      -
-          - b32
-          - b64
-  tags:
+    when:
+        - audit_arch == item.1 or
+          item.1 == 'b32' and rhel6stig_workaround_for_ssg_benchmark
+    with_nested:
+        -
+            - "-a always,exit -F arch=%s -S mount -F auid>=500 -F auid!=4294967295 -k export"
+            - "-a always,exit -F arch=%s -S mount -F auid=0 -k export"
+        -
+            - b32
+            - b64
+    tags:
       - cat3
       - low
-      - V-38575
+      - V-38568
       - auditd
-      - delete
       - patch
 
-- name: "LOW | V-38578 | AUDIT | The audit system must be configured to audit changes to the /etc/sudoers file."
-  command: grep -w /etc/sudoers /etc/audit/audit.rules
-  register: auditd_sudoers_audit
-  changed_when: no
-  failed_when: no
-  check_mode: no
-  tags:
-      - cat3
-      - low
-      - V-38578
-      - auditd
-      - actions
-      - patch
+  - name: "LOW | V-38575 | AUDIT | The audit system must be configured to audit user deletions of files and programs."
+    command: grep -w "rmdir" /etc/audit/audit.rules
+    check_mode: no
+    changed_when: no
+    failed_when: no
+    register: auditd_rmdir_audit
+    tags:
+        - cat3
+        - low
+        - V-38575
+        - auditd
+        - delete
+        - audit
 
-- name: "LOW | V-38578 | PATCH | The audit system must be configured to audit changes to the /etc/sudoers file."
-  lineinfile:
-      state: present
-      dest: /etc/audit/audit.rules
-      line: '-w /etc/sudoers -p wa -k actions'
-  tags:
-      - cat3
-      - low
-      - V-38578
-      - auditd
-      - actions
-      - patch
+
+  - name: "LOW | V-38575 | PATCH | The audit system must be configured to audit user deletions of files and programs."
+    lineinfile:
+        line: "{{ item[0] % item.1 }}"
+        state: present
+        dest: /etc/audit/audit.rules
+    when:
+        - audit_arch == item.1 or
+          item.1 == 'b32' and rhel6stig_workaround_for_ssg_benchmark
+    with_nested:
+        -
+            - "-a always,exit -F arch=%s -S rmdir -S unlink -S unlinkat -S rename -S renameat -F auid>=500 -F auid!=4294967295 -k delete"
+            - "-a always,exit -F arch=%s -S rmdir -S unlink -S unlinkat -S rename -S renameat -F auid=0 -k delete"
+        -
+            - b32
+            - b64
+    tags:
+        - cat3
+        - low
+        - V-38575
+        - auditd
+        - delete
+        - patch
+
+  - name: "LOW | V-38578 | AUDIT | The audit system must be configured to audit changes to the /etc/sudoers file."
+    command: grep -w /etc/sudoers /etc/audit/audit.rules
+    register: auditd_sudoers_audit
+    changed_when: no
+    failed_when: no
+    check_mode: no
+    tags:
+        - cat3
+        - low
+        - V-38578
+        - auditd
+        - actions
+        - patch
+
+  - name: "LOW | V-38578 | PATCH | The audit system must be configured to audit changes to the /etc/sudoers file."
+    lineinfile:
+        state: present
+        dest: /etc/audit/audit.rules
+        line: '-w /etc/sudoers -p wa -k actions'
+    tags:
+        - cat3
+        - low
+        - V-38578
+        - auditd
+        - actions
+        - patch
+  when: not rhel6stig_system_is_container
 
 - name: "LOW | V-38584 | AUDIT | The xinetd service must be uninstalled if no network services utilizing it are enabled."
   command: rpm -q xinetd

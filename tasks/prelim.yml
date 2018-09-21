@@ -179,25 +179,37 @@
       - rsyslog
       - audit
 
-- name: "PRELIM | Set architecture for auditd tasks"
-  set_fact:
-      audit_arch: "b{{ ansible_architecture | regex_replace('.*(\\d\\d$)','\\1') }}"
-  tags:
-      - cat3
-      - auditd
+- block:
+  - name: "PRELIM | Set architecture for auditd tasks"
+    set_fact:
+        audit_arch: "b{{ ansible_architecture | regex_replace('.*(\\d\\d$)','\\1') }}"
 
-- name: "PRELIM | Get path of auditd log file"
-  shell: "grep '^log_file' /etc/audit/auditd.conf | sed s/^[^\\/]*//"
-  changed_when: no
-  check_mode: no
-  register: auditd_logfile
+  - name: "PRELIM | Make sure auditd is installed."
+    yum:
+        name: audit
+        state: present
+
+  - name: "PRELIM | Make sure auditd is running."
+    service:
+        name: auditd
+        state: started
+        enabled: yes
+
+  - name: "PRELIM | Get path of auditd log file"
+    shell: "grep '^log_file' /etc/audit/auditd.conf | sed s/^[^\\/]*//"
+    changed_when: no
+    check_mode: no
+    register: auditd_logfile
+  when: not rhel6stig_system_is_container
   tags:
       - cat2
+      - cat3
       - medium
       - V-38445
       - log_files
       - auditd
       - patch
+
 
 - name: "PRELIM | V-38573 V-38592 V-38501 | Configure pam_faillock."
   block:

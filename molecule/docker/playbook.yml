@@ -1,0 +1,38 @@
+---
+- name: Converge
+  hosts: all
+  pre_tasks:
+    - name: install packages for testing under docker
+      yum:
+        name: "{{ item }}"
+        state: present
+      with_items:
+        - bash
+        - selinux-policy
+        - libselinux-python
+        - openssh-server
+        - which
+
+    - name: Generate hostkey
+      service:
+        name: sshd
+        state: started
+        enabled: true
+
+  roles:
+    - role: RHEL6-STIG
+      rhel6stig_cat2: true
+      rhel6stig_cat3: true
+      rhel6stig_system_is_container: true
+
+  post_tasks:
+    - name: Check if rhel
+      command: which subscription-manager
+      ignore_errors: true
+      changed_when: false
+      register: sm
+
+    - name: Deregister from RH
+      redhat_subscription:
+        state: absent
+      when: not sm is failed

@@ -49,6 +49,7 @@
       file:
           path: "{{ auditd_logfile.stdout }}"
           group: root
+  when: not rhel6stig_system_is_container
   tags:
       - cat2
       - medium
@@ -162,6 +163,7 @@
       line: '\1 {{ rhel6stig_auditd_config["disk_full_action"] }}'
       dest: /etc/audit/auditd.conf
       backrefs: yes
+  when: not rhel6stig_system_is_container
   tags:
       - cat2
       - medium
@@ -219,6 +221,7 @@
       line: '\1 {{ rhel6stig_auditd_config["disk_full_action"] }}'
       dest: /etc/audit/auditd.conf
       backrefs: yes
+  when: not rhel6stig_system_is_container
   tags:
       - cat2
       - medium
@@ -254,6 +257,7 @@
       line: '\1 {{ rhel6stig_auditd_config["space_left_action"] }}'
       dest: /etc/audit/auditd.conf
       backrefs: yes
+  when: not rhel6stig_system_is_container
   tags:
       - cat2
       - medium
@@ -441,6 +445,7 @@
           path: "{{ item }}"
       with_items: "{{ audit_log_dir_perms_audit.stdout_lines }}"
       when: audit_log_dir_perms_audit.stdout
+  when: not rhel6stig_system_is_container
   tags:
       - cat2
       - medium
@@ -465,6 +470,7 @@
           path: "{{ item }}"
       with_items: "{{ audit_log_dir_owner_audit.stdout_lines }}"
       when: audit_log_dir_owner_audit.stdout
+  when: not rhel6stig_system_is_container
   tags:
       - cat2
       - medium
@@ -509,6 +515,7 @@
           path: "{{ item }}"
           mode: "u-x,g-wx,o-rwx"
       with_items: "{{ audit_log_file_perms_audit.stdout_lines }}"
+  when: not rhel6stig_system_is_container
   tags:
       - cat2
       - medium
@@ -1012,6 +1019,7 @@
       owner: root
       state: file
       follow: yes
+  when: not rhel6stig_system_is_container
   tags:
       - cat2
       - medium
@@ -1020,18 +1028,20 @@
       - grub
       - patch
 
-- name: "MEDIUM | V-38580 | PATCH | The audit system must be configured to audit the loading and unloading of dynamic kernel modules."
-  lineinfile:
-      backup: yes
-      line: -a always,exit -F arch={{ item }} -S init_module -S delete_module -k modules
-      dest: /etc/audit/audit.rules
-      state: present
-  when:
-      - audit_arch == item or
-        item == 'b32' and rhel6stig_workaround_for_ssg_benchmark
-  with_items:
-      - b32
-      - b64
+- block:
+  - name: "MEDIUM | V-38580 | PATCH | The audit system must be configured to audit the loading and unloading of dynamic kernel modules."
+    lineinfile:
+        backup: yes
+        line: -a always,exit -F arch={{ item }} -S init_module -S delete_module -k modules
+        dest: /etc/audit/audit.rules
+        state: present
+    when:
+        - audit_arch == item or
+          item == 'b32' and rhel6stig_workaround_for_ssg_benchmark
+    with_items:
+        - b32
+        - b64
+  when: not rhel6stig_system_is_container
   tags:
       - cat2
       - medium
@@ -1046,6 +1056,7 @@
       line: '{{ item }}'
       dest: /etc/audit/audit.rules
       state: present
+  when: not rhel6stig_system_is_container
   with_items:
       - -w /sbin/insmod -p x -k modules
       - -w /sbin/rmmod -p x -k modules
@@ -1064,6 +1075,7 @@
       group: root
       state: file
       follow: yes
+  when: not rhel6stig_system_is_container
   tags:
       - cat2
       - file_perms
@@ -1104,6 +1116,7 @@
       state: file
       mode: u-x,go-rwx
       follow: yes
+  when: not rhel6stig_system_is_container
   tags:
       - cat2
       - V-38583
@@ -1142,6 +1155,7 @@
           insertafter: '^#\s'
           regexp: password
       when: grub_auth_audit.rc == 1
+  when: not rhel6stig_system_is_container
   tags:
       - cat2
       - medium
@@ -1546,6 +1560,11 @@
       - patch
       - ntp
 
+- name: "MEDIUM | V-38622 | AUDIT | Mail relaying must be restricted."
+  command: rpm -q postfix
+  failed_when: no
+  register: postfix_check
+
 - name: "MEDIUM | V-38622 | PATCH | Mail relaying must be restricted."
   lineinfile:
       state: present
@@ -1554,7 +1573,7 @@
       regexp: '^inet_interfaces'
       line: 'inet_interfaces = localhost'
       insertafter: '^#(\s)+?inet_interfaces'
-  when: not rhel6stig_is_mail_relay
+  when: postfix_check.rc == 0 and not rhel6stig_is_mail_relay
   notify: restart postfix
   tags:
       - cat2
@@ -1613,6 +1632,7 @@
           name: auditd
           state: started
           enabled: yes
+  when: not rhel6stig_system_is_container
   tags:
       - cat2
       - medium
@@ -1668,6 +1688,7 @@
       regexp: '^#?max_log_file\b'
       line: max_log_file = {{ rhel6stig_auditd_config["max_log_file"] }}
   notify: restart auditd
+  when: not rhel6stig_system_is_container
   tags:
       - cat2
       - medium
@@ -1682,6 +1703,7 @@
       dest: /etc/audit/auditd.conf
       regexp: '^#?max_log_file_action\b'
       line: max_log_file_action = {{ rhel6stig_auditd_config["max_log_file_action"] }}
+  when: not rhel6stig_system_is_container
   notify: restart auditd
   tags:
       - cat2
@@ -1698,6 +1720,7 @@
       regexp: '^#?num_logs'
       line: num_logs = {{ rhel6stig_auditd_config["num_logs"] }}
   notify: restart auditd
+  when: not rhel6stig_system_is_container
   tags:
       - cat2
       - medium
@@ -1719,7 +1742,7 @@
       command: yum -y reinstall audit
       args:
           warn: no
-      when: audit_package_integrity_check_audit.stdout
+      when: audit_package_integrity_check_audit.stdout and not rhel6stig_system_is_container
   tags:
       - cat2
       - medium
@@ -1953,6 +1976,7 @@
       regexp: ^{{ item }}\s*=.*
       line: "{{ item }} = {{ rhel6stig_auditd_config[item] }}"
       dest: /etc/audit/auditd.conf
+  when: not rhel6stig_system_is_container
   with_items:
       - admin_space_left
       - space_left
@@ -1987,6 +2011,7 @@
     line: 'action_mail_acct = root'
     state: present
     dest: /etc/audit/auditd.conf
+  when: not rhel6stig_system_is_container
   tags:
       - cat2
       - medium
@@ -2103,6 +2128,7 @@
       line: '\1\2'
       backrefs: yes
       follow: yes
+  when: not rhel6stig_system_is_container
   tags:
       - cat2
       - medium
@@ -2159,6 +2185,7 @@
       regexp: '^admin_space_left_action'
       line: "admin_space_left_action = {{ rhel6stig_auditd_config['admin_space_left_action'] }}"
       dest: /etc/audit/auditd.conf
+  when: not rhel6stig_system_is_container
   tags:
       - cat2
       - medium
