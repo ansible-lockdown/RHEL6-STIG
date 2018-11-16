@@ -12,25 +12,30 @@
   tags:
       - always
 
-- include: prelim.yml
+- import_tasks: prelim.yml
   become: yes
   tags:
       - prelim_tasks
       - always
 
-- include: cat1.yml
-  static: no
+- include_tasks: cat1.yml
   when: rhel6stig_cat1 | bool
+  tags:
+      - cat1
+      - high
 
-- include: cat2.yml
-  static: no
+- include_tasks: cat2.yml
   when: rhel6stig_cat2 | bool
+  tags:
+      - cat2
+      - medium
 
-- include: cat3.yml
-  static: no
+- include_tasks: cat3.yml
   when: rhel6stig_cat3 | bool
+  tags:
+      - cat3
+      - low
 
-- include: post.yml
-  static: no
+- import_tasks: post.yml
   tags:
       - post_tasks
