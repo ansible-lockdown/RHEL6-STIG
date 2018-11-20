@@ -12,7 +12,7 @@
   tags:
       - always
 
-- include_tasks: prelim.yml
+- import_tasks: prelim.yml
   become: yes
   tags:
       - prelim_tasks
@@ -36,6 +36,6 @@
       - cat3
       - low
 
-- include_tasks: post.yml
+- import_tasks: post.yml
   tags:
       - post_tasks
