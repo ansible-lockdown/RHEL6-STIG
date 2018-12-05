@@ -62,6 +62,8 @@
 
 - name: "LOW | V-38447, V-38452, V-38453, V-38454 | AUDIT | Verify all rpm packages and store output for later use."
   command: rpm -Va
+  args:
+      warn: no
   changed_when: false
   failed_when: false
   register: rpm_verify_packages
@@ -1531,6 +1533,7 @@
 
 - name: "LOW | V-38640 | AUDIT | The Automatic Bug Reporting Tool (abrtd) service must not be running."
   command: service abrtd status
+  # TODO: likely this check could be integrated with the one above
   register: abrtd_service_running_audit
   changed_when: false
   failed_when: false
