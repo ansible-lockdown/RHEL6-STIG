@@ -19,18 +19,14 @@
       - always
 
 - include: cat1.yml
-  static: no
   when: rhel6stig_cat1 | bool
 
 - include: cat2.yml
-  static: no
   when: rhel6stig_cat2 | bool
 
 - include: cat3.yml
-  static: no
   when: rhel6stig_cat3 | bool
 
 - include: post.yml
-  static: no
   tags:
       - post_tasks
