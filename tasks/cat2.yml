@@ -1123,6 +1123,8 @@
     - name: "MEDIUM | V-38585 | PATCH | The system boot loader must require authentication."
       grub_crypt:
           password: "{{ rhel6stig_bootloader_password }}"
+      # TODO: update grub_crypt to always run even in check_mode
+      check_mode: no
       register: grub_pass
       when: grub_auth_audit.rc == 1
       tags:
@@ -1367,11 +1369,10 @@
 - block:
     - name: "MEDIUM | V-38605 | AUDIT | Make sure the cron package is installed"
       yum:
-          name: "{{item}}"
+          name:
+              - cronie
+              - cronie-anacron
           state: present
-      with_items:
-          - cronie
-          - cronie-anacron
 
     - name: "MEDIUM | V-38605 | PATCH | The cron service must be running"
       service:
@@ -1828,6 +1829,8 @@
 
     - name: "MEDIUM | V-38663 | PATCH | The system package management tool must verify permissions on all files and directories associated with the audit package."
       command: rpm --setperms audit
+      args:
+          warn: no
       when: audit_package_permissions_audit.stdout
   tags:
       - cat2
@@ -1850,6 +1853,8 @@
 
     - name: "MEDIUM | V-38664 | PATCH | The system package management tool must verify ownership on all files and directories associated with the audit package."
       command: rpm --setugids audit
+      args:
+          warn: no
       when: audit_package_ownership_audit.stdout
   tags:
       - cat2
@@ -1863,6 +1868,8 @@
 - block:
     - name: "MEDIUM | V-38665 | AUDIT | The system package management tool must verify group-ownership on all files and directories associated with the audit package."
       shell: rpm -V audit | grep '^......G'
+      args:
+          warn: no
       failed_when: no
       changed_when: no
       register: audit_package_group_ownership_audit
@@ -1870,6 +1877,8 @@
 
     - name: "MEDIUM | V-38665 | PATCH | The system package management tool must verify group-ownership on all files and directories associated with the audit package."
       command: rpm --setugids audit
+      args:
+          warn: no
       when: audit_package_group_ownership_audit.stdout
   tags:
       - cat2
