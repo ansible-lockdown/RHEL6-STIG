@@ -78,7 +78,7 @@
 - name: "LOW | V-38447 | AUDIT | The system package management tool must verify contents of all files associated with packages."
   command: rpm -qf {{ item | regex_replace('^..5......\s+(/.+)$', '\1') }}
   register: rpm_integrity_audit
-  when: item | match("^..5......[^c]*/.+$")
+  when: item is match("^..5......[^c]*/.+$")
   with_items: "{{ rpm_verify_packages.stdout_lines }}"
   check_mode: no
   tags:
@@ -101,7 +101,7 @@
 
 - name: "LOW | V-38452 | AUDIT | The system package management tool must verify permissions on all files and directories associated with packages."
   command: rpm -qf {{ item | regex_replace('^.M.......\s+[a-z]?\s*(/.+)$', '\1') }}
-  when: item | match("^.M.......\\s+.*?/.+$")
+  when: item is match("^.M.......\\s+.*?/.+$")
   register: rpm_file_permissions_audit
   with_items: "{{ rpm_verify_packages.stdout_lines }}"
   check_mode: no
@@ -124,7 +124,7 @@
 
 - name: "LOW | V-38453 | AUDIT | The system package management tool must verify group-ownership on all files and directories associated with packages."
   command: rpm -qf {{ item | regex_replace('^......G..\s+[a-z]?\s*(/.+)$', '\1') }}
-  when: item | match("^......G..\\s+.*?/.+$")
+  when: item is match("^......G..\\s+.*?/.+$")
   register: rpm_group_ownership_audit
   with_items: "{{ rpm_verify_packages.stdout_lines }}"
   check_mode: no
@@ -147,7 +147,7 @@
 
 - name: "LOW | V-38454 | AUDIT | The system package management tool must verify ownership on all files and directories associated with packages."
   command: rpm -qf {{ item | regex_replace('^.....U...\s+[a-z]?\s*(/.+)$', '\1') }}
-  when: item | match("^.....U...\\s+.*?/.+$")
+  when: item is match("^.....U...\\s+.*?/.+$")
   register: rpm_group_ownership_audit
   with_items: "{{ rpm_verify_packages.stdout_lines }}"
   check_mode: no

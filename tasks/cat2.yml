@@ -712,7 +712,7 @@
       with_items: "{{ rsyslog_logfiles.stdout_lines }}"
       register: result
       failed_when:
-          - result | failed
+          - result is failed
           - not result.state == 'absent'
       tags:
           - V-38518
@@ -726,7 +726,7 @@
       with_items: "{{ rsyslog_logfiles.stdout_lines }}"
       register: result
       failed_when:
-          - result | failed
+          - result is failed
           - not result.state == 'absent'
       tags:
           - V-38519
@@ -1572,7 +1572,7 @@
       with_items: "{{ rsyslog_logfiles.stdout_lines }}"
       register: result
       failed_when:
-          - result | failed
+          - result is failed
           - not result.state == 'absent'
 
     # As described in https://access.redhat.com/solutions/66805, the
@@ -1584,7 +1584,7 @@
           line: chmod u-x,go-rwx /var/log/boot.log
       register: result
       failed_when:
-          - result | failed
+          - result is failed
           - not result.state == 'absent'
   tags:
       - cat2
