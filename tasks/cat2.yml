@@ -2191,33 +2191,43 @@
       - tmpdir
       - patch
 
-- block:
-    - name: "MEDIUM | V-58901 | AUDIT | The sudo command must require authentication."
-      # find included configs
-      shell: cat /etc/sudoers | grep -w '^#include' | awk '{print $2}'
-      check_mode: no
-      changed_when: no
-      register: sudoers_include_audit
 
-    - name: "MEDIUM | V-58901 | AUDIT | The sudo command must require authentication."
-      # Find files found in the dirs of  #includedir directives
-      shell: cat /etc/sudoers | grep -w '^#includedir' | awk '{print $2}' | xargs -i find {} -type f
-      check_mode: no
-      changed_when: no
-      register: sudoers_includedirs_files
+- name: "MEDIUM | V-58901 | The sudo command must require authentication."
+  block:
+      - name: "MEDIUM | V-58901 | AUDIT | The sudo command must require authentication."
+        # find included configs
+        shell: cat /etc/sudoers | grep -w '^#include' | awk '{print $2}'
+        check_mode: no
+        changed_when: no
+        register: sudoers_include_audit
 
-    - name: "MEDIUM | V-58901 | AUDIT | The sudo command must require authentication."
-      # Combine lists
-      set_fact:
-          sudoer_configs: "{{ sudoers_include_audit.stdout_lines + sudoers_includedirs_files.stdout_lines + ['/etc/sudoers'] }}"
+      - name: "MEDIUM | V-58901 | AUDIT | The sudo command must require authentication."
+        # Find files found in the dirs of  #includedir directives
+        shell: cat /etc/sudoers | grep -w '^#includedir' | awk '{print $2}' | xargs -i find {} -type f
+        check_mode: no
+        changed_when: no
+        register: sudoers_includedirs_files
 
-    - name: "MEDIUM | V-58901 | PATCH | The sudo command must require authentication."
-      lineinfile:
-          dest: "{{ item }}"
-          line: \1\2
-          regexp: (.*)(!authenticate|NOPASSWD)(.*)
-          state: absent
-      with_items: "{{ sudoer_configs }}"
+      - name: "MEDIUM | V-58901 | AUDIT | The sudo command must require authentication."
+        # Combine lists
+        set_fact:
+            sudoer_configs: "{{ sudoers_include_audit.stdout_lines + sudoers_includedirs_files.stdout_lines + ['/etc/sudoers'] }}"
+
+      - name: "MEDIUM | V-58901 | PATCH | The sudo command must require authentication."
+        replace:
+            path: "{{ item }}"
+            regexp: '^([^#\n].*)NOPASSWD(.*)'
+            replace: '\1PASSWD\2'
+            validate: '/usr/sbin/visudo -cf %s'
+        with_items: "{{ sudoer_configs }}"
+
+      - name: "MEDIUM | V-58901 | PATCH | The sudo command must require authentication."
+        replace:
+            path: "{{ item }}"
+            regexp: '^([^#].*)!authenticate(.*)'
+            replace: '\1authenticate\2'
+            validate: '/usr/sbin/visudo -cf %s'
+        with_items: "{{ sudoer_configs }}"
   when: not rhel6stig_allow_sudo_without_password
   tags:
       - cat2
