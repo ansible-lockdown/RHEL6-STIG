@@ -2178,6 +2178,8 @@
 
 - name: "LOW | V-38702 | AUDIT | The FTP daemon must be configured for logging or verbose mode."
   command: rpm -q vsftpd
+  args:
+      warn: no
   register: vsftpd_service_installed_audit
   changed_when: false
   failed_when: false
