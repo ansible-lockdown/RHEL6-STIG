@@ -1296,19 +1296,6 @@
       - patch
 
 - name: "LOW | V-38584 | AUDIT | The xinetd service must be uninstalled if no network services utilizing it are enabled."
-  command: rpm -q xinetd
-  register: pkgs_xinetd_installed_audit
-  changed_when: false
-  failed_when: false
-  check_mode: no
-  tags:
-      - cat3
-      - low
-      - V-38584
-      - xinetd
-      - audit
-
-- name: "LOW | V-38584 | AUDIT | The xinetd service must be uninstalled if no network services utilizing it are enabled."
   shell: "chkconfig --list | sed -n '/xinetd based services/,$p'"
   register: pkgs_xinetd_services_audit
   changed_when: false
@@ -1332,20 +1319,6 @@
       - V-38584
       - xinetd
       - patch
-
-- name: "LOW | V-38590 | AUDIT | The system must allow locking of the console screen in text mode."
-  command: rpm -q screen
-  register: pkgs_screen_installed_audit
-  changed_when: false
-  failed_when: false
-  check_mode: no
-  tags:
-      - cat3
-      - low
-      - V-38590
-      - screen_lock
-      - screen
-      - audit
 
 - name: "LOW | V-38590 | PATCH | The system must allow locking of the console screen in text mode."
   yum:
@@ -1472,19 +1445,6 @@
       - V-38624
       - logrotate
       - syslog
-
-- name: "LOW | V-38627 | AUDIT | The openldap-servers package must not be installed unless required."
-  command: rpm -q openldap-servers
-  register: pkgs_openldap_server_installed_audit
-  changed_when: false
-  failed_when: false
-  check_mode: no
-  tags:
-      - cat3
-      - low
-      - V-38627
-      - openldap_server
-      - audit
 
 - name: "LOW | V-38627 | PATCH | The openldap-servers package must not be installed unless required."
   yum:
@@ -2046,19 +2006,6 @@
       - core_dump
       - patch
 
-- name: "LOW | V-38676 | AUDIT | The xorg-x11-server-common (X Windows) package must not be installed, unless required."
-  command: rpm -qi xorg-x11-server-common
-  register: pkgs_xwindows_installed_audit
-  changed_when: false
-  failed_when: false
-  check_mode: no
-  tags:
-      - cat3
-      - low
-      - V-38676
-      - xwindows
-      - audit
-
 - name: "LOW | V-38676 | PATCH | The xorg-x11-server-common (X Windows) package must not be installed, unless required."
   yum:
       name: "@X Window System"
@@ -2139,20 +2086,6 @@
       - V-38685
       - accounts
       - patch
-
-- name: "LOW | V-38687 | AUDIT | The system must provide VPN connectivity for communications over untrusted networks."
-  command: rpm -q openswan
-  register: pkgs_vpn_installed_audit
-  changed_when: false
-  failed_when: false
-  check_mode: no
-  tags:
-      - cat3
-      - low
-      - V-38687
-      - openswan
-      - vpn
-      - audit
 
 - name: "LOW | V-38687 | PATCH | The system must provide VPN connectivity for communications over untrusted networks."
   yum:
