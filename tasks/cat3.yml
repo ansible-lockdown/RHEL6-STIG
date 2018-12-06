@@ -1312,7 +1312,11 @@
   yum:
       name: xinetd
       state: absent
-  when: "not ':on' in pkgs_xinetd_services_audit.stdout"
+  when:
+      - not rhel6stig_xinetd_required
+      - "'on' not in pkgs_xinetd_services_audit.stdout"
+      # jinja 2.7 would be required for this better check
+      # pkgs_xinetd_services_audit.stdout_lines | select('match', 'on$') | list | length ==0
   tags:
       - cat3
       - low
