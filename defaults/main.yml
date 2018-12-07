@@ -213,6 +213,7 @@ rhel6stig_graphical_login_banner: 'You are accessing a U.S. Government (USG) Inf
 # Per-task variables
 
 # LOW
+rhel_06_000166: yes
 rhel_06_000530: yes
 rhel_06_000531: yes
 rhel_06_000532: yes

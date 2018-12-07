@@ -2305,6 +2305,25 @@
       - secontext
       - patch
 
+- name: "LOW | RHEL-06-000166 V-81441 | The audit system must be configured to audit all attempts to alter system time through adjtimex."
+  lineinfile:
+      state: present
+      dest: /etc/audit/audit.rules
+      line: "{{ item }}"
+  when:
+      - rhel_06_000166
+      - audit_arch in item or
+        'b32' in item and rhel6stig_workaround_for_ssg_benchmark
+  with_items:
+      - "-a always,exit -F arch=b32 -S adjtimex -k audit_time_rules"
+      - "-a always,exit -F arch=b64 -S adjtimex -S settimeofday -S clock_settime -k audit_time_rules"
+  tags:
+      - RHEL-06-000166
+      - V-81441
+      - auditd
+      - adjtimex
+
+
 - name: "LOW | RHEL-06-000530 V-81445 | The Red Hat Enterprise Linux operating system must mount /dev/shm with the nodev option."
   block:
       - name: "LOW | RHEL-06-000530 V-81445 | AUDIT | Refresh ansible_mounts"
