@@ -2305,3 +2305,76 @@
       - secontext
       - patch
 
+- name: "LOW | RHEL-06-000530 V-81445 | The Red Hat Enterprise Linux operating system must mount /dev/shm with the nodev option."
+  block:
+      - name: "LOW | RHEL-06-000530 V-81445 | AUDIT | Refresh ansible_mounts"
+        shell: grep -F /dev/shm /etc/fstab | awk '{print $4}'
+        check_mode: no
+        changed_when: no
+        register: rhel_06_000530_audit
+
+      - name: "LOW | RHEL-06-000530 V-81445 | PATCH | The Red Hat Enterprise Linux operating system must mount /dev/shm with the nodev option."
+        mount:
+            path: /dev/shm
+            state: mounted
+            src: "{{ dev_shm_mount.device|default('tmpfs') }}"
+            fstype: "{{ dev_shm_mount.fstype|default('tmpfs') }}"
+            opts: "{{ rhel_06_000530_audit.stdout | default('defaults', true) }},nodev"
+        when: "'nodev' not in rhel_06_000530_audit.stdout"
+        vars:
+            dev_shm_mount: "{{ ansible_mounts | json_query('[?mount == `/dev/shm`] | [0]') }}"
+  when:
+      - rhel_06_000530
+  tags:
+      - RHEL-06-000530
+      - V-81445
+
+
+- name: "LOW | RHEL-06-000531 V-81447 | The Red Hat Enterprise Linux operating system must mount /dev/shm with the nosuid option."
+  block:
+      - name: "LOW | RHEL-06-000531 V-81447 | AUDIT | Refresh ansible_mounts"
+        shell: grep -F /dev/shm /etc/fstab | awk '{print $4}'
+        check_mode: no
+        changed_when: no
+        register: rhel_06_000531_audit
+
+      - name: "LOW | RHEL-06-000531 V-81447 | PATCH | The Red Hat Enterprise Linux operating system must mount /dev/shm with the nosuid option."
+        mount:
+            path: /dev/shm
+            state: mounted
+            src: "{{ dev_shm_mount.device|default('tmpfs') }}"
+            fstype: "{{ dev_shm_mount.fstype|default('tmpfs') }}"
+            opts: "{{ rhel_06_000531_audit.stdout | default('defaults', true) }},nosuid"
+        when: "'nosuid' not in rhel_06_000531_audit.stdout"
+        vars:
+            dev_shm_mount: "{{ ansible_mounts | json_query('[?mount == `/dev/shm`] | [0]') }}"
+  when:
+      - rhel_06_000531
+  tags:
+      - RHEL-06-000531
+      - V-81447
+
+
+- name: "LOW | RHEL-06-000532 V-81449 | The Red Hat Enterprise Linux operating system must mount /dev/shm with the noexec option."
+  block:
+      - name: "LOW | RHEL-06-000532 V-81449 | AUDIT | The Red Hat Enterprise Linux operating system must mount /dev/shm with the noexec option."
+        shell: grep -F /dev/shm /etc/fstab | awk '{print $4}'
+        check_mode: no
+        changed_when: no
+        register: rhel_06_000532_audit
+
+      - name: "LOW | RHEL-06-000532 V-81449 | PATCH | The Red Hat Enterprise Linux operating system must mount /dev/shm with the noexec option."
+        mount:
+            path: /dev/shm
+            state: mounted
+            src: "{{ dev_shm_mount.device|default('tmpfs') }}"
+            fstype: "{{ dev_shm_mount.fstype|default('tmpfs') }}"
+            opts: "{{ rhel_06_000532_audit.stdout | default('defaults', true) }},noexec"
+        when: "'noexec' not in rhel_06_000532_audit.stdout"
+        vars:
+            dev_shm_mount: "{{ ansible_mounts | json_query('[?mount == `/dev/shm`] | [0]') }}"
+  when:
+      - rhel_06_000532
+  tags:
+      - RHEL-06-000532
+      - V-81449
