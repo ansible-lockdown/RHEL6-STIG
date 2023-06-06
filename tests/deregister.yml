@@ -1,6 +1,8 @@
+---
+
 - name: Red Hat subscription state
   hosts: all
-  become: yes
+  become: true
 
   vars:
     rhsub_state: absent

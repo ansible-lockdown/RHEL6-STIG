@@ -1,3 +1,5 @@
+---
+
 - name: Cleanup temp files
   file:
       path: "{{ item }}"

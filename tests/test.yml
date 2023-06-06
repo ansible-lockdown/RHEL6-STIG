@@ -1,5 +1,7 @@
+---
+
 - hosts: all
-  become: yes
+  become: true
   become_method: sudo
   roles:
     - ../../RHEL6-STIG

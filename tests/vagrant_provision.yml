@@ -1,6 +1,8 @@
+---
+
 - name: Setup hosts and apply STIG
   hosts: all
-  become: yes
+  become: true
 
   tasks:
     - name: Register system with RedHat
