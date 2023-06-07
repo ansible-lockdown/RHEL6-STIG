@@ -96,6 +96,7 @@
   command: "yum reinstall -y {{ item }}"
   failed_when: false
   with_items: "{{ rpm_integrity_audit.results | json_query('[?changed].stdout') | unique }}"  # noqa jinja[invalid]
+  when: rpm_integrity_audit is defined
   tags:
       - cat3
       - low
@@ -1454,7 +1455,7 @@
   yum:
       name: openldap-servers
       state: absent
-  when: falset rhel6stig_ldap_server
+  when: not rhel6stig_ldap_server
   tags:
       - cat3
       - low
@@ -2015,7 +2016,7 @@
   yum:
       name: "@X Window System"
       state: absent
-  when: falset rhel6stig_xwindows_required
+  when: not rhel6stig_xwindows_required
   tags:
       - cat3
       - low
@@ -2030,7 +2031,7 @@
   yum:
       name: xorg-x11-server-common
       state: absent
-  when: falset rhel6stig_xwindows_required
+  when: not rhel6stig_xwindows_required
   tags:
       - cat3
       - low

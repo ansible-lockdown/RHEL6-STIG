@@ -20,7 +20,7 @@
             owner: root
             group: root
             mode: 0644
-        when: falset iptables_config.stat.exists
+        when: not iptables_config.stat.exists
         notify: restart iptables
 
       - name: Flush handlers
@@ -57,7 +57,7 @@
             owner: root
             group: root
             mode: 0644
-        when: falset ip6tables_config.stat.exists and rhel6stig_ipv6_required
+        when: not ip6tables_config.stat.exists and rhel6stig_ipv6_required
         notify: restart ip6tables
 
       - name: Flush handlers

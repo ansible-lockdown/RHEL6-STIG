@@ -586,7 +586,7 @@
       reload: true
       sysctl_set: true
       ignoreerrors: true
-  when: falset rhel6stig_system_is_router
+  when: not rhel6stig_system_is_router
   tags:
       - cat2
       - V-38511
@@ -1410,7 +1410,7 @@
   yum:
       name: tftp-server
       state: absent
-  when: falset rhel6stig_tftp_required
+  when: not rhel6stig_tftp_required
   tags:
       - medium
       - cat2
@@ -1575,7 +1575,7 @@
       regexp: '^inet_interfaces'
       line: 'inet_interfaces = localhost'
       insertafter: '^#(\s)+?inet_interfaces'
-  when: falset rhel6stig_is_mail_relay
+  when: not rhel6stig_is_mail_relay
   notify: restart postfix
   tags:
       - cat2
@@ -1977,7 +1977,7 @@
       regexp: '^id:'
       line: 'id:3:initdefault:'
       backup: true
-  when: falset rhel6stig_xwindows_required
+  when: not rhel6stig_xwindows_required
   tags:
       - cat2
       - medium
@@ -2166,7 +2166,7 @@
   stat:
       path: "{{rhel6stig_aide_dbdir}}/{{rhel6stig_aide_dbfile}}"
   register: aide_dbfile
-  changed_when: falset aide_dbfile.stat.exists
+  changed_when: not aide_dbfile.stat.exists
   notify: init aide
   tags:
       - cat2
@@ -2268,7 +2268,7 @@
             replace: '\1authenticate\2'
             validate: '/usr/sbin/visudo -cf %s'
         with_items: "{{ sudoer_configs }}"
-  when: falset rhel6stig_allow_sudo_without_password
+  when: not rhel6stig_allow_sudo_without_password
   tags:
       - cat2
       - medium

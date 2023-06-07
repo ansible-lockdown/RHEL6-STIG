@@ -1017,7 +1017,7 @@
   check_mode: false
   changed_when: false
   register: tftp_server_install_audit
-  when: falset rhel6stig_tftp_required
+  when: not rhel6stig_tftp_required
   tags:
       - medium
       - cat2
@@ -1032,7 +1032,7 @@
   check_mode: false
   changed_when: false
   register: tftp_service_audit
-  when: falset rhel6stig_tftp_required and 'tftp' in xinetd_services.stdout
+  when: not rhel6stig_tftp_required and 'tftp' in xinetd_services.stdout
   tags:
       - medium
       - cat2
@@ -1133,7 +1133,7 @@
   register: mail_relay_audit
   failed_when: false
   changed_when: false
-  when: falset rhel6stig_is_mail_relay
+  when: not rhel6stig_is_mail_relay
   tags:
       - cat2
       - medium
