@@ -1,10 +1,12 @@
+---
+
 # CAT III
 - name: "LOW | V-38455 | AUDIT | The system must use a separate file system for /tmp"
   shell: mount | grep "on /tmp "
   register: tmp_mounted_audit
-  check_mode: no
-  ignore_errors: yes
-  changed_when: no
+  check_mode: false
+  ignore_errors: true
+  changed_when: false
   tags:
       - cat3
       - low
@@ -15,9 +17,9 @@
 - name: "LOW | V-38456 | AUDIT | The system must use a separate file system for /var"
   shell: mount | grep "on /var "
   register: var_mounted_audit
-  changed_when: no
-  ignore_errors: yes
-  check_mode: no
+  changed_when: false
+  ignore_errors: true
+  check_mode: false
   tags:
       - cat3
       - V-38456
@@ -28,9 +30,9 @@
 - name: "LOW | V-38463 | AUDIT | The system must use a separate file system for /var/log"
   shell: mount | grep "on /var/log "
   register: varlog_mounted_audit
-  check_mode: no
-  changed_when: no
-  ignore_errors: yes
+  check_mode: false
+  changed_when: false
+  ignore_errors: true
   tags:
       - cat3
       - high
@@ -41,9 +43,9 @@
 - name: "LOW | V-38467 | AUDIT | The system must use a separate file system for /var/log/audit"
   shell: mount | grep "on /var/log/audit "
   register: varlogaudit_mounted_audit
-  check_mode: no
-  changed_when: no
-  ignore_errors: yes
+  check_mode: false
+  changed_when: false
+  ignore_errors: true
   tags:
       - cat3
       - low
@@ -54,9 +56,9 @@
 - name: "LOW | V-38473 | AUDIT | The system must use a separate file system for user home directories"
   shell: mount | grep "on /home "
   register: home_mounted_audit
-  check_mode: no
-  changed_when: no
-  ignore_errors: yes
+  check_mode: false
+  changed_when: false
+  ignore_errors: true
   tags:
       - cat3
       - low
@@ -69,7 +71,7 @@
   changed_when: false
   failed_when: false
   register: missing_group_audit
-  check_mode: no
+  check_mode: false
   tags:
       - cat3
       - low
@@ -82,7 +84,7 @@
   changed_when: false
   failed_when: false
   register: duplicate_account_audit
-  check_mode: no
+  check_mode: false
   tags:
       - cat3
       - low
@@ -94,7 +96,7 @@
   shell: "lsblk | awk '$6 == \"part\" && $7 ~ /\\// {print $NF}' | xargs -I{} find {} -xdev -type d -perm -0002 \\! -perm -1000"
   changed_when: false
   register: stick_bit_public_dir_audit
-  check_mode: no
+  check_mode: false
   tags:
       - cat3
       - low
@@ -107,7 +109,7 @@
   shell: "lsblk | awk '$6 == \"part\" && $7 ~ /\\// {print $NF}' | xargs -I{} find {} -xdev -type d -perm -0002 -uid +499 -print"
   changed_when: false
   register: system_account_public_dir_audit
-  check_mode: no
+  check_mode: false
   tags:
       - cat3
       - low

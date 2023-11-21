@@ -1,6 +1,8 @@
+---
+
 - name: Apply STIG
   hosts: baseline_hosts
-  become: yes
+  become: true
 
   tasks:
     - name: Register system with RedHat

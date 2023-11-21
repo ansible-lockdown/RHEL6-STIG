@@ -1,3 +1,5 @@
+---
+
 - name: restart ntpd
   service:
       name: ntpd
@@ -30,8 +32,8 @@
 
 - name: unload usb-storage
   modprobe:
-    name: usb-storage
-    state: absent
+      name: usb-storage
+      state: absent
 
 - name: update postfix aliases.db
   command: newaliases
@@ -52,7 +54,7 @@
 - name: save iptables rules
   shell: iptables-save > /etc/sysconfig/iptables
   args:
-      warn: no
+      warn: false
   notify: restart iptables
 
 - name: restart ip6tables
@@ -63,7 +65,7 @@
 - name: save ip6tables rules
   shell: ip6tables-save  > /etc/sysconfig/ip6tables
   args:
-      warn: no
+      warn: false
   notify: restart ip6tables
 
 - name: restart vsftpd

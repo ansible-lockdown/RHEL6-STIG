@@ -1,9 +1,11 @@
+---
+
 rhel6stig_min_ansible_version: 2.3
 
 # Enable or disable remediation for each category
-rhel6stig_cat1: yes
-rhel6stig_cat2: no
-rhel6stig_cat3: no
+rhel6stig_cat1: true
+rhel6stig_cat2: true
+rhel6stig_cat3: true
 
 # workarounds for benchmarks that don't exactly match the STIG
 rhel6stig_workaround_for_ssg_benchmark: true
@@ -35,10 +37,10 @@ rhel6stig_gpg_key_loc:
 # Setting this to false will cause the playbook to execute tasks
 # that disable DHCP in /etc/sysconfig/network-scripts/ifcfg-eth*
 # and may leave your system in an unusable state after a reboot.
-rhel6stig_use_dhcp: yes
+rhel6stig_use_dhcp: true
 
 # Set to true to install all patches and updates available via yum
-rhel6stig_update_all_packages: yes
+rhel6stig_update_all_packages: true
 
 # Set maximum number of simultaneous system logins (V-38684)
 rhel6stig_maxlogins: 10
@@ -47,41 +49,41 @@ rhel6stig_maxlogins: 10
 rhel6stig_root_email_address: foo@baz.com
 
 # Set to 'true' if X Windows is needed in your environment
-rhel6stig_xwindows_required: no
+rhel6stig_xwindows_required: false
 
 # Assume ipv6 is not needed on the target system and disable it.
 # This will also skip tasks related to configuring ip6tables.
-rhel6stig_ipv6_required: yes
+rhel6stig_ipv6_required: true
 
 # If wireless interface is required and documented then enalbe this
 # to avoid removing all wireless interfaces
-rhel6stig_wireless_required: no
+rhel6stig_wireless_required: false
 
 # Whether or not XINETD is required
 # If you are using tftp-server or other xinetd services
 # THIS MUST ALSO be ENABLED
-rhel6stig_xinetd_required: no
+rhel6stig_xinetd_required: false
 
 # Whether or not TFTP is required
 # This will prevent the removal of tftp and tftp-server packages
 # and configure tftp to run securely
-rhel6stig_tftp_required: no
+rhel6stig_tftp_required: false
 
 # Whether or not RHN Satellion is required
 # This will disable rhnsd if set to False
-rhel6stig_rhnsatellite_required: no
+rhel6stig_rhnsatellite_required: false
 
 # Set to true if system is acting as a router
 # This will disable changing net.ipv4 settings as well as
 # allow the kernel to forward packets
-rhel6stig_system_is_router: no
+rhel6stig_system_is_router: false
 
 # Set to true if system is an authorized mail relay
 # This will disable the postfix settings V-38622
-rhel6stig_is_mail_relay: no
+rhel6stig_is_mail_relay: false
 
 # Set to true is sytem is an LDAP server
-rhel6stig_ldap_server: no
+rhel6stig_ldap_server: false
 
 # By default will create a random password with the same grub-crypt --sha-512
 # mechanism rebuilt as an Ansible module.
@@ -96,72 +98,72 @@ rhel6stig_bootloader_password: random
 # NTP configuration used in ntp.conf
 # These should be set to DoD authoritative time source
 rhel6stig_ntp_config_servers:
-  - 0.centos.pool.ntp.org
-  - 1.centos.pool.ntp.org
-  - 2.centos.pool.ntp.org
-  - 3.centos.pool.ntp.org
+    - 0.centos.pool.ntp.org
+    - 1.centos.pool.ntp.org
+    - 2.centos.pool.ntp.org
+    - 3.centos.pool.ntp.org
 
 rhel6stig_ntp_config_restrict:
-  - "-4 default kod nomodify notrap nopeer noquery"
-  - "-6 default kod nomodify notrap nopeer noquery"
-  - "127.0.0.1"
-  - "-6 ::1"
+    - "-4 default kod nomodify notrap nopeer noquery"
+    - "-6 default kod nomodify notrap nopeer noquery"
+    - "127.0.0.1"
+    - "-6 ::1"
 
 # V-38694
 rhel6stig_acct_max_inactive: 35
 
 rhel6stig_emergency_accounts: []
-  # - user: foo
-  #   expiration: 1632441600    # 2021-09-24. Time mush be in epoch.
+# - user: foo
+#   expiration: 1632441600    # 2021-09-24. Time mush be in epoch.
 
 # List of temporary accounts and their expiration dates
 # Format of expiration date is YYYY-MM-DD
 #
 rhel6stig_temporary_users: []
-  # - user: foo
-  #   expiration: 1632441600    # 2021-09-24. Time mush be in epoch.
+# - user: foo
+#   expiration: 1632441600    # 2021-09-24. Time mush be in epoch.
 
 # V-58901 The sudo command must require authentication
 # This fix requires passwords when using sudo and breaks many use-cases
 # Cloud images, Vagrant boxes, etc will no longer allow sudo without a password
 # Set this to "no" to enable the fix for V-58901
-rhel6stig_allow_sudo_without_password: yes
+rhel6stig_allow_sudo_without_password: true
 
 # Auditd.conf settings
 rhel6stig_auditd_config:
-  # V-38464 - compliant options SYSLOG|EXEC|SINGLE|HALT
-  disk_error_action: syslog
-  # V-38468 - compliant options SYSLOG|EXEC|SINGLE|HALT
-  disk_full_action: syslog
-  # V-38470 - compliant options EMAIL|SYSLOG
-  space_left_action: email
-  # V-38633 - compliant options 6 or higher (MB)
-  max_log_file: 6
-  # V-38634 - compliant options ROTATE
-  max_log_file_action: rotate
-  # V-38636 - compliant options 5 or higher
-  num_logs: 5
-  # V-38678 - must be set to locally defined value - default 75 MB
-  space_left: 75
-  # must be less than space_left
-  admin_space_left: 50
-  # V-38680 - compliant options - admin account to email
-  action_mail_acct: root
-  # Guidance says that anything but SINGLE results in finding
-  # then says SUSPEND or HALT are acceptable and that
-  # system where availability need is high will need to set this to
-  # something else entirely.
-  # NOTE: SINGLE user mode setting will break cloud systems.
-  # V-54381 - compliant options SINGLE|SUSPEND|HALT|EXEC|SYSLOG
-  admin_space_left_action: halt
-  # auditd_failure_flag
-  # 2    Tells your system to perform an immediate shutdown without
-  #      flushing any pending data to disk when the limits of your
-  #      audit system are exceeded. Because this shutdown is not a clean shutdown.
-  #      restrict the use of -f 2 to only the most security conscious environments
-  # 1    System continues to run, issues a warning and audit stops.
-  #      Use this for any other setup to avoid loss of data or data corruption.
-  auditd_failure_flag: 2
+    # V-38464 - compliant options SYSLOG|EXEC|SINGLE|HALT
+    disk_error_action: syslog
+    # V-38468 - compliant options SYSLOG|EXEC|SINGLE|HALT
+    disk_full_action: syslog
+    # V-38470 - compliant options EMAIL|SYSLOG
+    space_left_action: email
+    # V-38633 - compliant options 6 or higher (MB)
+    max_log_file: 6
+    # V-38634 - compliant options ROTATE
+    max_log_file_action: rotate
+    # V-38636 - compliant options 5 or higher
+    num_logs: 5
+    # V-38678 - must be set to locally defined value - default 75 MB
+    space_left: 75
+    # must be less than space_left
+    admin_space_left: 50
+    # V-38680 - compliant options - admin account to email
+    action_mail_acct: root
+    # Guidance says that anything but SINGLE results in finding
+    # then says SUSPEND or HALT are acceptable and that
+    # system where availability need is high will need to set this to
+    # something else entirely.
+    # NOTE: SINGLE user mode setting will break cloud systems.
+    # V-54381 - compliant options SINGLE|SUSPEND|HALT|EXEC|SYSLOG
+    admin_space_left_action: halt
+    # auditd_failure_flag
+    # 2    Tells your system to perform an immediate shutdown without
+    #      flushing any pending data to disk when the limits of your
+    #      audit system are exceeded. Because this shutdown is not a clean shutdown.
+    #      restrict the use of -f 2 to only the most security conscious environments
+    # 1    System continues to run, issues a warning and audit stops.
+    #      Use this for any other setup to avoid loss of data or data corruption.
+    auditd_failure_flag: 2
 
 # AIDE settings
 rhel6stig_aide_dbdir: /var/lib/aide
@@ -169,14 +171,14 @@ rhel6stig_aide_dbfile: aide.db.gz
 rhel6stig_aide_dbnewfile: aide.db.new.gz
 
 rhel6stig_aide_cron:
-  cron_user: root
-  cron_file: /etc/crontab
-  aide_job: '/usr/sbin/aide --check'
-  aide_minute: 04
-  aide_hour: 05
-  aide_day: '*'
-  aide_month: '*'
-  aide_weekday: '*'
+    cron_user: root
+    cron_file: /etc/crontab
+    aide_job: '/usr/sbin/aide --check'
+    aide_minute: 04
+    aide_hour: 05
+    aide_day: '*'
+    aide_month: '*'
+    aide_weekday: '*'
 
 # Firewall settings
 rhel6stig_firewall: iptables
@@ -209,11 +211,10 @@ rhel6stig_login_banner: |
 
 rhel6stig_graphical_login_banner: 'You are accessing a U.S. Government (USG) Information System (IS) that is provided for USG-authorized use only.  By using this IS (which includes any device attached to this IS), you consent to the following conditions:  The USG routinely intercepts and monitors communications on this IS for purposes including, but not limited to, penetration testing, COMSEC monitoring, network operations and defense, personnel misconduct (PM), law enforcement (LE), and counterintelligence (CI) investigations.  At any time, the USG may inspect and seize data stored on this IS.  Communications using, or data stored on, this IS are not private, are subject to routine monitoring, interception, and search, and may be disclosed or used for any USG-authorized purpose.  This IS includes security measures (e.g., authentication and access controls) to protect USG interests -- not for your personal benefit or privacy.  Notwithstanding the above, using this IS does not constitute consent to PM, LE or CI investigative searching or monitoring of the content of privileged communications, or work product, related to personal representation or services by attorneys, psychotherapists, or clergy, and their assistants. Such communications and work product are private and confidential. See User Agreement for details.'
 
-
 # Per-task variables
 
 # LOW
-rhel_06_000166: yes
-rhel_06_000530: yes
-rhel_06_000531: yes
-rhel_06_000532: yes
+rhel_06_000166: true
+rhel_06_000530: true
+rhel_06_000531: true
+rhel_06_000532: true

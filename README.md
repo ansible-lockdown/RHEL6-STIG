@@ -1,5 +1,5 @@
-RHEL 6 DISA STIG
-================
+# RHEL 6 DISA STIG
+
 [![Galaxy](https://img.shields.io/badge/galaxy-nousdefions.STIG--RHEL6-blue.svg?style=flat)](https://galaxy.ansible.com/nousdefions/STIG-RHEL6)
 
 Configure RHEL 6 to be DISA STIG compliant. CAT I findings will be corrected by default. CAT II and CAT III findings can be corrected by setting the appropriate variable to enable those tasks.
@@ -8,7 +8,7 @@ Not all findings can be remediated automatically, or they require more complex a
 
 This role **will make changes to the system** that could break things. This is not an auditing tool but rather a remediation tool to be used for system hardening before or after an audit has been conducted.
 
-## Installing from Ansible Galaxy ##
+## Installing from Ansible Galaxy
 
 To install this role with `ansible-galaxy` use the following command:
 
@@ -18,13 +18,12 @@ Based on [Red Hat Enterprise Linux 6 STIG Version 1 Release 18 - 2018-01-26](htt
 
 This repo originated from work done by [Sam Doran](https://github.com/samdoran/ansible-role-rhel6stig)
 
-Requirements
-------------
+## Requirements
 
 You should have a general understanding of the nature of the changes this role will make to the system. See the [DISA  IASE site](http://iase.disa.mil/stigs/os/unix-linux/Pages/index.aspx) for details.
 
-Role Variables
---------------
+## Role Variables
+
 There are many role variables defined in `defaults/main.yml`. Here are the most important ones. Feel free to look through `defaults/main.yml` to see what other configuration options are available.
 
 | Name              | Default Value       | Description          |
@@ -56,14 +55,11 @@ There are many role variables defined in `defaults/main.yml`. Here are the most 
 | `rhel6stig_bootloader_password` | [Randomly generated and encrypted string] | The new GRUB password to use. |
 | `rhel6stig_login_banner` | `[DOD banner]` | Banner used in `/etc/issue` and `/etc/issue.net` |
 
-
-Dependencies
-------------
+## Dependencies
 
 python-jmespath
 
-Example Playbooks
------------------
+## Example Playbooks
 
 Correct CAT I and CAT II findings but don't apply all updates.
 
@@ -108,24 +104,26 @@ Prompt for the GRUB password.
      - role: nousdefions.STIG-RHEL6
 ```
 
+## Tags
 
-Tags
-----
 Each task is tagged with its category, severity, whether or not it is a patch or audit task, and the finding ID, e.g., V-38462. In addition to these four basic tags that all tasks have, there are human-friendly tags such as "ssh" or "dod_logon_banner".
 
 A number of preliminary tasks that do things such as enumerate services on the system and check for the existence of various files will _always_ run unless explicitly skipped by using `--skip tags prelim_tasks`.
 
 Some examples of using tags:
 
-    # Only run tasks that secure ssh
-    ansible-playbook site.yml --tags ssh
+- Only run tasks that secure ssh
+  
+  ```sh
+  ansible-playbook site.yml --tags ssh
+  ```
 
-    # Don't change SNMP or postfix
-    ansible-playbook site.yml --skip-tags postfix,mail,snmp
+- Don't change SNMP or postfix
 
+  ```sh
+  ansible-playbook site.yml --skip-tags postfix,mail,snmp
+  ```
 
-License
--------
+## License
 
 MIT
-

@@ -1,3 +1,5 @@
+---
+
 - name: "MEDIUM | V-38443, V-38448, V-38449 | AUDIT | The /etc/gshadow file must be owned by root. The /etc/gshadow file must be group-owned by root. The /etc/gshadow file must have mode 0000"
   stat:
       path: /etc/gshadow
@@ -14,8 +16,8 @@
 - name: "MEDIUM | V-38444 | AUDIT | The systems local IPv6 firewall must implement a deny-all, allow-by-exception policy for inbound packets."
   shell: 'grep ":INPUT" /etc/sysconfig/ip6tables | awk ''{print $2}'''
   register: ipv6_inbound_packets_audit
-  changed_when: no
-  failed_when: no
+  changed_when: false
+  failed_when: false
   tags:
       - cat2
       - medium
@@ -27,8 +29,8 @@
 - name: "MEDIUM | V-38446 | AUDIT | The mail system must forward all mail for root to one or more system administrators."
   command: postmap -q root /etc/aliases
   register: postmap_root_audit
-  changed_when: no
-  failed_when: no
+  changed_when: false
+  failed_when: false
   tags:
       - cat2
       - medium
@@ -42,32 +44,32 @@
       path: /etc/passwd
   register: /etc/passwd_stat
   tags:
-    - cat2
-    - medium
-    - V-38450
-    - V-38451
-    - V-38457
-    - audit
-    - file_perms
+      - cat2
+      - medium
+      - V-38450
+      - V-38451
+      - V-38457
+      - audit
+      - file_perms
 
 - name: "MEDIUM | V-38458, V-38459, V-38461 | AUDIT | The /etc/group file must be owned by root. The /etc/group file must be group-owned by root.The /etc/group file must have mode 0644 or less permissive"
   stat:
       path: /etc/group
   register: /etc/group_stat
   tags:
-    - cat2
-    - medium
-    - V-38458
-    - V-38459
-    - V-38461
-    - audit
-    - file_perms
+      - cat2
+      - medium
+      - V-38458
+      - V-38459
+      - V-38461
+      - audit
+      - file_perms
 
 - name: "MEDIUM | V-38464 | AUDIT | The audit system must take appropriate action when there are disk errors on the audit storage volume."
   shell: grep disk_error_action /etc/audit/auditd.conf | cut -d = -f 2 | xargs basename
-  register:  disk_err_action_audit
-  changed_when: no
-  check_mode: no
+  register: disk_err_action_audit
+  changed_when: false
+  check_mode: false
   tags:
       - cat2
       - medium
@@ -77,9 +79,9 @@
 
 - name: "MEDIUM | V-38468 | AUDIT | The audit system must take appropriate action when the audit storage volume is full."
   shell: grep disk_full_action /etc/audit/auditd.conf | cut -d = -f 2 | xargs basename
-  register:  disk_full_action_audit
-  changed_when: no
-  check_mode: no
+  register: disk_full_action_audit
+  changed_when: false
+  check_mode: false
   tags:
       - cat2
       - medium
@@ -91,8 +93,8 @@
   script: sys_command_files_with_bad_perms.sh
   become_user: root
   register: system_files_perms_audit
-  changed_when: no
-  check_mode: no
+  changed_when: false
+  check_mode: false
   tags:
       - cat2
       - medium
@@ -102,9 +104,9 @@
 
 - name: "MEDIUM | V-38470 | AUDIT | The audit system must alert designated staff members when the audit storage volume approaches capacity."
   shell: grep space_left_action /etc/audit/auditd.conf | cut -d = -f 2 | xargs basename
-  register:  space_left_action_audit
-  changed_when: no
-  check_mode: no
+  register: space_left_action_audit
+  changed_when: false
+  check_mode: false
   tags:
       - cat2
       - medium
@@ -116,8 +118,8 @@
   script: sys_command_files_with_bad_owner.sh
   become_user: root
   register: sys_commands_owner_audit
-  check_mode: no
-  changed_when: no
+  check_mode: false
+  changed_when: false
   tags:
       - cat2
       - medium
@@ -128,8 +130,8 @@
 - name: "MEDIUM | V-38475 | AUDIT | The system must require passwords to contain a minimum of 14 characters."
   shell: grep -E '^PASS_MIN_LEN' /etc/login.defs | awk '{print $2}'
   register: min_pwd_len_audit
-  changed_when: no
-  check_mode: no
+  changed_when: false
+  check_mode: false
   tags:
       - cat2
       - medium
@@ -140,8 +142,8 @@
 - name: "MEDIUM | V-38477 | AUDIT | Users must not be able to change passwords more than once every 24 hours."
   shell: grep -E '^PASS_MIN_DAYS' /etc/login.defs | awk '{print $2}'
   register: pwd_min_days_audit
-  changed_when: no
-  check_mode: no
+  changed_when: false
+  check_mode: false
   tags:
       - cat2
       - medium
@@ -152,8 +154,8 @@
 - name: "MEDIUM | V-38479 | AUDIT | User passwords must be changed at least every 60 days."
   shell: "grep -E '^PASS_MAX_DAYS' /etc/login.defs | awk '{print $2}'"
   register: pwd_max_days_audit
-  changed_when: no
-  check_mode: no
+  changed_when: false
+  check_mode: false
   tags:
       - cat2
       - medium
@@ -163,8 +165,8 @@
 
 - name: "MEDIUM | V-38481 | AUDIT | System security patches and updates must be installed and up-to-date."
   command: yum check-update
-  failed_when: no
-  changed_when: no
+  failed_when: false
+  changed_when: false
   register: yum_pkgs_update_audit
   when: rhel6stig_update_all_packages
   tags:
@@ -178,7 +180,7 @@
 - name: "MEDIUM | V-38483 | AUDIT | The system package management tool must cryptographically verify the authenticity of system software packages during installation."
   shell: find /etc/yum{.conf,.repos.d/} -exec grep -ls '^gpgcheck=0' {} \;
   changed_when: false
-  check_mode: no
+  check_mode: false
   register: repo_crypto_check_audit
   tags:
       - cat2
@@ -192,8 +194,8 @@
 - name: "MEDIUM | V-38484 | AUDIT | The operating system, upon successful logon, must display to the user the date and time of the last logon or access via ssh."
   shell: "grep -i '^PrintLastLog' /etc/ssh/sshd_config | awk '{ print $2 }'"
   register: last_log_audit
-  changed_when: no
-  check_mode: no
+  changed_when: false
+  check_mode: false
   tags:
       - cat2
       - medium
@@ -203,10 +205,10 @@
 
 - name: "MEDIUM | V-38489 | AUDIT | A file integrity tool must be installed."
   command: rpm -q aide
-  failed_when: no
+  failed_when: false
   register: aide_installed_audit
-  changed_when: no
-  check_mode: no
+  changed_when: false
+  check_mode: false
   tags:
       - cat2
       - medium
@@ -218,9 +220,9 @@
 - name: "MEDIUM | V-38490 | AUDIT | The operating system must enforce requirements for the connection of mobile devices to operating systems"
   command: grep -rs usb-storage /etc/modprobe.conf /etc/modprobe.d
   register: usb_reqs_audit
-  failed_when: no
-  check_mode: no
-  changed_when: no
+  failed_when: false
+  check_mode: false
+  changed_when: false
   tags:
       - cat2
       - medium
@@ -233,24 +235,24 @@
 - name: "MEDIUM | V-38492 | AUDIT | The system must prevent the root account from logging in from virtual consoles."
   command: grep '^vc/[0-9]' /etc/securetty
   register: vc_root_login_audit
-  failed_when: no
-  check_mode: no
-  changed_when: no
+  failed_when: false
+  check_mode: false
+  changed_when: false
   tags:
-    - cat2
-    - medium
-    - V-38492
-    - audit
-    - virtual_consoles
-    - logon_settings
-    - tty
-    - root_access
+      - cat2
+      - medium
+      - V-38492
+      - audit
+      - virtual_consoles
+      - logon_settings
+      - tty
+      - root_access
 
 - name: "MEDIUM | V-38493 | AUDIT | Audit log directories must have mode 0755 or less permissive."
   shell: grep "^log_file" /etc/audit/auditd.conf|sed 's/^[^/]*//; s/[^/]*$//' | xargs -I % find % -type d -perm /022
-  changed_when: no
-  check_mode: no
-  failed_when: no
+  changed_when: false
+  check_mode: false
+  failed_when: false
   register: audit_log_dir_perms_audit
   tags:
       - cat2
@@ -264,9 +266,9 @@
 
 - name: "MEDIUM | V-38495 | AUDIT | Audit log files must be owned by root."
   shell: grep "^log_file" /etc/audit/auditd.conf|sed 's/^[^/]*//; s/[^/]*$//' | xargs -I % find % -type f ! -user root
-  changed_when: no
-  check_mode: no
-  failed_when: no
+  changed_when: false
+  check_mode: false
+  failed_when: false
   register: audit_log_dir_owner_audit
   tags:
       - cat2
@@ -277,13 +279,12 @@
       - auditd
       - audit_permissions
 
-
 - name: "MEDIUM | V-38496 | AUDIT | Default system accounts, other than root, must be locked"
   shell: >
    awk -F: '$1 !~ /^root$/ && $2 !~ /^[!*]/ {print $1}' /etc/shadow | xargs -I{} grep {} /etc/passwd | awk -F: '$3 < 500 {print $1}'
   register: unlocked_sys_accounts_audit
   changed_when: false
-  check_mode: no
+  check_mode: false
   tags:
       - cat2
       - medium
@@ -292,12 +293,11 @@
       - accounts
       - system_accounts
 
-
 - name: "MEDIUM | V-38498 | AUDIT | Audit log files must have mode 0640 or less permissive."
   shell: grep "^log_file" /etc/audit/auditd.conf|sed s/^[^\/]*//|xargs stat -c %n | xargs -I % find % -perm /137
   register: audit_log_file_perms_audit
-  changed_when: no
-  check_mode: no
+  changed_when: false
+  check_mode: false
   tags:
       - cat2
       - medium
@@ -311,7 +311,7 @@
 - name: "MEDIUM | V-38499 | AUDIT | The /etc/passwd file must not contain password hashes"
   shell: "awk -F: '($2 != \"x\") {print}' /etc/passwd"
   changed_when: false
-  check_mode: no
+  check_mode: false
   register: etc_password_hash_audit
   tags:
       - cat2
@@ -322,9 +322,9 @@
 
 - name: "MEDIUM | V-38500 | AUDIT | The root account must be the only account having a UID of 0"
   shell: "awk -F: '($3 == \"0\") {print}' /etc/passwd | grep -v root"
-  changed_when: no
-  check_mode: no
-  ignore_errors: yes
+  changed_when: false
+  check_mode: false
+  ignore_errors: true
   register: users_uid_0_audit
   tags:
       - cat2
@@ -335,9 +335,9 @@
 
 - name: "MEDIUM | V-38501 | AUDIT | The system must disable accounts after excessive login failures within a 15-minute interval."
   shell: "grep -h pam_faillock /etc/pam.d/system-auth /etc/pam.d/password-auth | grep fail_interval | awk -F'=' '{print $NF}'"
-  changed_when: no
-  check_mode: no
-  failed_when: no
+  changed_when: false
+  check_mode: false
+  failed_when: false
   register: login_failures_interval_audit
   tags:
       - medium
@@ -347,12 +347,11 @@
       - V-38501
       - pam
 
-
 - name: "MEDIUM | V-38501 | AUDIT | The system must disable accounts after excessive login failures within a 15-minute interval."
   shell: grep -h '^account\s*required\s*pam_faillock\.so' /etc/pam.d/system-auth /etc/pam.d/password-auth
-  changed_when: no
-  check_mode: no
-  failed_when: no
+  changed_when: false
+  check_mode: false
+  failed_when: false
   register: login_failures_account_require
   tags:
       - medium
@@ -362,14 +361,13 @@
       - V-38501
       - pam
 
-
 - name: "MEDIUM | V-38501 | AUDIT | The system must disable accounts after excessive login failures within a 15-minute interval."
   assert:
       that:
           - "{{ item | int }} >= 900"
           - "{{ login_failures_account_require.stdout_lines | length }} == 2"
   with_items: "{{ login_failures_interval_audit.stdout_lines }}"
-  failed_when: no
+  failed_when: false
   register: login_failures_interval_audit
   tags:
       - medium
@@ -399,8 +397,8 @@
 
 - name: "MEDIUM | V-38511 | AUDIT | IP forwarding for IPv4 must not be enabled, unless the system is a router."
   shell: "sysctl net.ipv4.ip_forward | awk '{print $3}'"
-  changed_when: no
-  check_mode: no
+  changed_when: false
+  check_mode: false
   register: ipv4_ip_forwarding_audit
   tags:
       - V-38511
@@ -410,11 +408,10 @@
       - ipv4
       - audit
 
-
 - name: "MEDIUM | V-38511 | AUDIT | IP forwarding for IPv4 must not be enabled, unless the system is a router."
   shell: "sysctl net.ipv4.ip_forward | awk '{print $3}'"
-  changed_when: no
-  check_mode: no
+  changed_when: false
+  check_mode: false
   register: ipv4_ip_forwarding_audit
   tags:
       - V-38511
@@ -426,9 +423,9 @@
 
 - name: "MEDIUM | V-38512 | AUDIT | The operating system must prevent public IPv4 access into an organizations internal networks except as appropriately mediated by managed interfaces employing boundary protection devices"
   command: service iptables status
-  check_mode: no
-  changed_when: no
-  failed_when: no
+  check_mode: false
+  changed_when: false
+  failed_when: false
   register: iptables_audit
   tags:
       - cat2
@@ -441,8 +438,8 @@
 
 - name: "MEDIUM | V-38513 | AUDIT | The systems local IPv4 firewall must implement a deny-all, allow-by-exception policy for inbound packets."
   shell: "grep ':INPUT' /etc/sysconfig/iptables | awk '{print $2}'"
-  changed_when: no
-  check_mode: no
+  changed_when: false
+  check_mode: false
   register: ipv4_fw_deny_all_audit
   tags:
       - V-38513
@@ -455,9 +452,9 @@
 
 - name: "MEDIUM | V-38514 | AUDIT | The Datagram Congestion Control Protocol (DCCP) must be disabled unless required."
   command: grep -rse "^install\s*dccp\s*/bin/true$" /etc/modprobe.conf /etc/modprobe.d
-  changed_when: no
-  check_mode: no
-  failed_when: no
+  changed_when: false
+  check_mode: false
+  failed_when: false
   register: dccp_audit
   tags:
       - V-38514
@@ -467,12 +464,11 @@
       - transport
       - audit
 
-
 - name: "MEDIUM | V-38515 | AUDIT | The Stream Control Transmission Protocol (SCTP) must be disabled unless required."
   command: grep -rse "^install\s*sctp\s*/bin/true$" /etc/modprobe.conf /etc/modprobe.d
-  changed_when: no
-  check_mode: no
-  failed_when: no
+  changed_when: false
+  check_mode: false
+  failed_when: false
   register: sctp_audit
   tags:
       - V-38515
@@ -482,12 +478,11 @@
       - transport
       - audit
 
-
 - name: "MEDIUM | V-38516 | AUDIT | The Transparent Inter-Process Communication (TIPC) protocol must be disabled unless required."
   command: grep -rse "^install\s*tipc\s*/bin/true$" /etc/modprobe.conf /etc/modprobe.d
-  changed_when: no
-  check_mode: no
-  failed_when: no
+  changed_when: false
+  check_mode: false
+  failed_when: false
   register: tipc_audit
   tags:
       - V-38516
@@ -496,14 +491,13 @@
       - tipc
       - transport
       - audit
-
 
 - name: "MEDIUM | V-38517 | AUDIT | The Transparent Inter-Process Communication (TIPC) protocol must be disabled unless required."
   command: grep -rse "^install\s*tipc\s*/bin/true$" /etc/modprobe.conf /etc/modprobe.d
   register: tipc_audit
   changed_when: false
   failed_when: false
-  check_mode: no
+  check_mode: false
   tags:
       - cat2
       - medium
@@ -511,7 +505,6 @@
       - tipc
       - transport
       - audit
-
 
 - name: "MEDIUM | V-38518 | AUDIT | All rsyslog-generated log files must be owned by root."
   stat:
@@ -529,9 +522,9 @@
 - name: "MEDIUM | V-38520 | AUDIT | The operating system must back up audit records on an organization defined frequency onto a different system or media than the system being audited.\n
          MEDIUM | V-38521 | AUDIT | The operating system must support the requirement to centrally manage the content of audit records generated by organization defined information system components."
   shell: grep -E '^\*\.\*\s*[@:]{1,2}[a-z.:]*' /etc/rsyslog.conf
-  changed_when: no
-  ignore_errors: yes
-  check_mode: no
+  changed_when: false
+  ignore_errors: true
+  check_mode: false
   register: rsyslog_log_mgmt_audit
   tags:
       - audit
@@ -544,8 +537,8 @@
 
 - name: "MEDIUM | V-38523 | AUDIT | The system must not accept IPv4 source-routed packets on any interface."
   shell: "sysctl net.ipv4.conf.all.accept_source_route | awk '{print $3}'"
-  changed_when: no
-  check_mode: no
+  changed_when: false
+  check_mode: false
   register: ipv4_source_routed_packets_any_int_audit
   tags:
       - cat2
@@ -557,11 +550,10 @@
       - kernel_parameters
       - network
 
-
 - name: "MEDIUM | V-38524 | AUDIT | The system must not accept ICMPv4 redirect packets on any interface."
   shell: "sysctl net.ipv4.conf.all.accept_redirects | awk '{print $3}'"
-  changed_when: no
-  check_mode: no
+  changed_when: false
+  check_mode: false
   register: icmpv4_redirect_packets_any_int_audit
   tags:
       - cat2
@@ -573,11 +565,10 @@
       - kernel_parameters
       - network
 
-
 - name: "MEDIUM | V-38526 | AUDIT | The system must not accept ICMPv4 secure redirect packets on any interface."
   shell: "sysctl net.ipv4.conf.all.secure_redirects | awk '{print $3}'"
-  changed_when: no
-  check_mode: no
+  changed_when: false
+  check_mode: false
   register: icmpv4_secure_redirect_packets_any_int_audit
   tags:
       - cat2
@@ -589,11 +580,10 @@
       - kernel_parameters
       - network
 
-
 - name: "MEDIUM | V-38529 | AUDIT | The system must not accept IPv4 source-routed packets by default."
   shell: "sysctl net.ipv4.conf.default.accept_source_route | awk '{print $3}'"
-  changed_when: no
-  check_mode: no
+  changed_when: false
+  check_mode: false
   register: ipv4_source_routed_packets_default_audit
   tags:
       - cat2
@@ -605,11 +595,10 @@
       - kernel_parameters
       - network
 
-
 - name: "MEDIUM | V-38532 | AUDIT | The system must not accept ICMPv4 secure redirect packets by default."
   shell: "sysctl net.ipv4.conf.default.secure_redirects | awk '{print $3}'"
-  changed_when: no
-  check_mode: no
+  changed_when: false
+  check_mode: false
   register: icmpv4_secure_redirects_default_audit
   tags:
       - medium
@@ -621,11 +610,10 @@
       - kernel_parameters
       - network
 
-
 - name: "MEDIUM | V-38539 | AUDIT | The system must be configured to use TCP syncookies when experiencing a TCP SYN flood."
   shell: "sysctl net.ipv4.tcp_syncookies | awk '{print $3}'"
-  changed_when: no
-  check_mode: no
+  changed_when: false
+  check_mode: false
   register: tcp_syncookies_audit
   tags:
       - cat2
@@ -637,11 +625,10 @@
       - kernel_parameters
       - network
 
-
 - name: "MEDIUM | V-38542 | AUDIT | The system must use a reverse-path filter for IPv4 network traffic when possible on all interfaces."
   shell: "sysctl net.ipv4.conf.all.rp_filter | awk '{print $3}'"
-  changed_when: no
-  check_mode: no
+  changed_when: false
+  check_mode: false
   register: ipv4_reverse_path_filter_all_int_audit
   tags:
       - cat2
@@ -653,11 +640,10 @@
       - kernel_parameters
       - network
 
-
 - name: "MEDIUM | V-38544 | AUDIT | The system must use a reverse-path filter for IPv4 network traffic when possible by default."
   shell: "sysctl net.ipv4.conf.default.rp_filter | awk '{print $3}'"
-  changed_when: no
-  check_mode: no
+  changed_when: false
+  check_mode: false
   register: ipv4_reverse_path_filter_default_audit
   tags:
       - cat2
@@ -669,11 +655,10 @@
       - kernel_parameters
       - network
 
-
 - name: "MEDIUM | V-38548 | AUDIT | The system must ignore ICMPv6 redirects by default."
   shell: "sysctl net.ipv6.conf.default.accept_redirects | awk '{print $3}'"
-  changed_when: no
-  check_mode: no
+  changed_when: false
+  check_mode: false
   register: icmpv6_ignore_redirects_default_audit
   tags:
       - cat2
@@ -686,15 +671,14 @@
       - network
 
 - name: |
-
          MEDIUM | V-38549 | AUDIT | The system must employ a local IPv6 firewall.
          MEDIUM | V-38551 | AUDIT | The operating system must connect to external networks or information systems only through managed IPv6 interfaces consisting of boundary protection devices arranged in accordance with an organizational security architecture.
          MEDIUM | V-38553 | AUDIT | The operating system must prevent public IPv6 access into an organizations internal networks, except as appropriately mediated by managed interfaces employing boundary protection devices.
   command: service ip6tables status
   when: rhel6stig_ipv6_required
-  failed_when: no
-  changed_when: no
-  check_mode: no
+  failed_when: false
+  changed_when: false
+  check_mode: false
   register: ip6tables_audit
   tags:
       - cat2
@@ -706,13 +690,12 @@
       - audit
 
 - name: |
-
          MEDIUM | V-38555 | AUDIT | The system must employ a local IPv4 firewall.
          MEDIUM | V-38560 | AUDIT | The operating system must connect to external networks or information systems only through managed IPv4 interfaces consisting of boundary protection devices arranged in accordance with an organizational security architecture.
   command: service iptables status
-  failed_when: no
-  changed_when: no
-  check_mode: no
+  failed_when: false
+  changed_when: false
+  check_mode: false
   register: iptables_audit
   tags:
       - cat2
@@ -725,8 +708,8 @@
 
 - name: "MEDIUM | V-38573 | AUDIT | The system must disable accounts after three consecutive unsuccessful logon attempts."
   shell: grep -h pam_faillock /etc/pam.d/system-auth /etc/pam.d/password-auth | grep deny=3
-  changed_when: no
-  check_mode: no
+  changed_when: false
+  check_mode: false
   register: logon_attempts_audit
   tags:
       - cat2
@@ -740,9 +723,9 @@
 
 - name: "MEDIUM | V-38574 | AUDIT | The system must use a FIPS 140-2 approved cryptographic hashing algorithm for generating account password hashes (system-auth)."
   shell: find /etc/pam.d/ -type f -not -name '*.*'
-  changed_when: no
+  changed_when: false
   register: pamd_files
-  failed_when: no
+  failed_when: false
   tags:
       - cat2
       - medium
@@ -753,11 +736,10 @@
       - audit
       - pam
 
-
 - name: "MEDIUM | V-38574 | AUDIT | The system must use a FIPS 140-2 approved cryptographic hashing algorithm for generating account password hashes (system-auth)."
   shell: "grep password -h /etc/pam.d/* | grep pam_unix.so | awk '{print $4}'"
-  changed_when: no
-  check_mode: no
+  changed_when: false
+  check_mode: false
   register: pam_pwd_hash_audit
   tags:
       - cat2
@@ -768,11 +750,10 @@
       - passwords
       - audit
 
-
 - name: "MEDIUM | V-38576 | AUDIT | The system must use a FIPS 140-2 approved cryptographic hashing algorithm for generating account password hashes (login.defs)"
   shell: "grep ENCRYPT_METHOD /etc/login.defs | awk '{print $2}'"
-  check_mode: no
-  changed_when: no
+  check_mode: false
+  changed_when: false
   register: login_defs_audit
   tags:
       - audit
@@ -781,11 +762,10 @@
       - V-38576
       - passwords
 
-
 - name: "MEDIUM | V-38577 | AUDIT | The system must use a FIPS 140-2 approved cryptographic hashing algorithm for generating account password hashes (libuser.conf)"
   shell: "grep crypt_style /etc/libuser.conf | awk '{print $3}'"
-  check_mode: no
-  changed_when: no
+  check_mode: false
+  changed_when: false
   register: libuser_audit
   tags:
       - cat2
@@ -793,7 +773,6 @@
       - audit
       - V-38577
       - passwords
-
 
 - name: |
 
@@ -803,7 +782,7 @@
   stat:
       path: /etc/grub.conf
   register: grub_conf_audit
-  check_mode: no
+  check_mode: false
   tags:
       - cat2
       - medium
@@ -816,23 +795,22 @@
 
 - name: "MEDIUM | V-38580 | AUDIT | The audit system must be configured to audit the loading and unloading of dynamic kernel modules."
   shell: egrep -e "(-w |-F path=)/sbin/insmod" /etc/audit/audit.rules; egrep -e "(-w |-F path=)/sbin/modprobe" /etc/audit/audit.rules; egrep -e "(-w |-F path=)/sbin/rmmod" /etc/audit/audit.rules;grep -w "init_module" /etc/audit/audit.rules; grep -w "init_module" /etc/audit/audit.rules
-  check_mode: no
-  changed_when: False
-  failed_when: no
+  check_mode: false
+  changed_when: false
+  failed_when: false
   register: dynamic_kernel_loading_audit
   tags:
-    - cat2
-    - medium
-    - audit
-    - kernel
-    - auditd
-    - V-38580
-
+      - cat2
+      - medium
+      - audit
+      - kernel
+      - auditd
+      - V-38580
 
 - name: "MEDIUM | V-38582 | AUDIT | The xinetd service must be disabled if no network services utilizing it are enabled"
   shell: "chkconfig --list | sed -n '/xinetd based services/,$p'"
-  changed_when: no
-  check_mode: no
+  changed_when: false
+  check_mode: false
   register: xinetd_services
   tags:
       - cat2
@@ -842,12 +820,11 @@
       - services
       - audit
 
-
 - name: "MEDIUM | V-38582 | AUDIT | The xinetd service must be disabled if no network services utilizing it are enabled"
   command: chkconfig "xinetd" --list
-  check_mode: no
-  failed_when: no
-  changed_when: no
+  check_mode: false
+  failed_when: false
+  changed_when: false
   register: xinetd_audit
   tags:
       - cat2
@@ -857,12 +834,11 @@
       - services
       - audit
 
-
 - name: "MEDIUM | V-38585 | AUDIT | The system boot loader must require authentication."
   command: grep password /etc/grub.conf
-  check_mode: no
-  failed_when: no
-  changed_when: no
+  check_mode: false
+  failed_when: false
+  changed_when: false
   register: grub_auth_audit
   tags:
       - cat2
@@ -872,11 +848,10 @@
       - passwords
       - audit
 
-
 - name: "MEDIUM | V-38586 | AUDIT | The system must require authentication upon booting into single-user and maintenance modes."
   command: grep SINGLE /etc/sysconfig/init
-  changed_when: no
-  check_mode: no
+  changed_when: false
+  check_mode: false
   register: single_user_mode_auth_audit
   tags:
       - cat2
@@ -885,12 +860,11 @@
       - root_access
       - audit
 
-
 - name: "MEDIUM | V-38588 | AUDIT | The system must not permit interactive boot."
   command: grep PROMPT /etc/sysconfig/init
-  check_mode: no
-  changed_when: no
-  failed_when: no
+  check_mode: false
+  changed_when: false
+  failed_when: false
   register: interactive_boot_audit
   tags:
       - cat2
@@ -899,11 +873,10 @@
       - interactive_boot
       - audit
 
-
 - name: "MEDIUM | V-38592 | AUDIT | The system must require administrator action to unlock an account locked by excessive failed login attempts."
   shell: grep -h pam_faillock /etc/pam.d/system-auth /etc/pam.d/password-auth | grep unlock_time
-  changed_when: no
-  check_mode: no
+  changed_when: false
+  check_mode: false
   register: admin_unlock_audit
   tags:
       - cat2
@@ -913,11 +886,10 @@
       - logon_settings
       - audit
 
-
 - name: "MEDIUM | V-38593 | AUDIT |  The Department of Defense (DoD) login banner must be displayed immediately prior to or as part of console login prompts"
   command: cat /etc/issue
-  changed_when: no
-  check_mode: no
+  changed_when: false
+  check_mode: false
   register: login_banner_audit
   tags:
       - cat2
@@ -927,11 +899,10 @@
       - dod_login_banner
       - audit
 
-
 - name: "MEDIUM | V-38596 | AUDIT | The system must implement virtual address space randomization."
   shell: "sysctl kernel.randomize_va_space | awk '{print $3}'"
-  changed_when: no
-  check_mode: no
+  changed_when: false
+  check_mode: false
   register: virt_addr_space_randomization_audit
   tags:
       - cat2
@@ -941,11 +912,10 @@
       - kernel
       - V-38596
 
-
 - name: "MEDIUM | V-38597 | AUDIT | The system must limit the ability of processes to have simultaneous write and execute access to memory."
   shell: "sysctl kernel.exec-shield | awk '{print $3}'"
-  changed_when: no
-  check_mode: no
+  changed_when: false
+  check_mode: false
   register: simultaneous_wr_memory_audit
   tags:
       - cat2
@@ -955,12 +925,11 @@
       - kernel
       - V-38597
 
-
 - name: "MEDIUM | V-38599 | AUDIT | The FTPS/FTP service on the system must be configured with the Department of Defense (DoD) login banner"
   shell: grep banner_file /etc/vsftpd/vsftpd.conf | cut -f2- -d'=' | xargs cat
-  failed_when: no
-  changed_when: no
-  check_mode: no
+  failed_when: false
+  changed_when: false
+  check_mode: false
   register: vsftpd_banner_audit
   tags:
       - cat2
@@ -971,11 +940,10 @@
       - logon_settings
       - audit
 
-
 - name: "MEDIUM | V-38600 | AUDIT | The system must not send ICMPv4 redirects by default."
   shell: "sysctl net.ipv4.conf.default.send_redirects | awk '{print $3}'"
-  changed_when: no
-  check_mode: no
+  changed_when: false
+  check_mode: false
   register: icmpv4_redirects_audit
   tags:
       - cat2
@@ -985,11 +953,10 @@
       - sysctl
       - audit
 
-
 - name: "MEDIUM | V-38601 | AUDIT | The system must not send ICMPv4 redirects from any interface."
   shell: "sysctl net.ipv4.conf.all.send_redirects | awk '{print $3}'"
-  changed_when: no
-  check_mode: no
+  changed_when: false
+  check_mode: false
   register: any_iface_icmp_redirect_audit
   tags:
       - medium
@@ -999,13 +966,12 @@
       - sysctl
       - audit
 
-
 - name: "MEDIUM | V-38603 | AUDIT | The ypserv package must not be installed."
   command: rpm -q ypserv
-  check_mode: no
-  changed_when: no
+  check_mode: false
+  changed_when: false
   register: ypserv_audit
-  failed_when: no
+  failed_when: false
   tags:
       - medium
       - V-38603
@@ -1014,12 +980,11 @@
       - ypserv
       - packages
 
-
 - name: "MEDIUM | V-38604 | AUDIT | The ypbind service must not be running."
   command: chkconfig ypbind --list
-  changed_when: no
-  failed_when: no
-  check_mode: no
+  changed_when: false
+  failed_when: false
+  check_mode: false
   register: ypbind_service_audit
   when: "'ypbind' in sysv_services.stdout"
   tags:
@@ -1030,12 +995,11 @@
       - ypbind
       - services
 
-
 - name: "MEDIUM | V-38605 | AUDIT | The cron service must be running"
   command: service crond status
-  changed_when: no
-  check_mode: no
-  failed_when: no
+  changed_when: false
+  check_mode: false
+  failed_when: false
   register: crond_status_audit
   when: "'crond' in sysv_services.stdout"
   tags:
@@ -1047,12 +1011,11 @@
       - V-38605
       - services
 
-
 - name: "MEDIUM | V-38606 | AUDIT | The tftp-server package must not be installed unless required."
   command: rpm -q tftp-server
-  failed_when: no
-  check_mode: no
-  changed_when: no
+  failed_when: false
+  check_mode: false
+  changed_when: false
   register: tftp_server_install_audit
   when: not rhel6stig_tftp_required
   tags:
@@ -1063,12 +1026,11 @@
       - packages
       - audit
 
-
 - name: "MEDIUM | V-38609 | AUDIT | The TFTP service must not be running."
   command: chkconfig tftp --list
-  failed_when: no
-  check_mode: no
-  changed_when: no
+  failed_when: false
+  check_mode: false
+  changed_when: false
   register: tftp_service_audit
   when: not rhel6stig_tftp_required and 'tftp' in xinetd_services.stdout
   tags:
@@ -1079,12 +1041,11 @@
       - tftp
       - services
 
-
 - name: "MEDIUM | V-38611 | AUDIT | The SSH daemon must ignore .rhosts files."
   command: grep -i IgnoreRhosts /etc/ssh/sshd_config
-  check_mode: no
-  failed_when: no
-  changed_when: no
+  check_mode: false
+  failed_when: false
+  changed_when: false
   register: sshd_rhosts_ignore_audit
   tags:
       - medium
@@ -1095,12 +1056,11 @@
       - sshd
       - audit
 
-
 - name: "MEDIUM | V-38612 | AUDIT | The SSH daemon must not allow host-based authentication."
   command: grep -i HostbasedAuthentication /etc/ssh/sshd_config
   register: sshd_host_based_authentication_audit
-  failed_when: no
-  changed_when: no
+  failed_when: false
+  changed_when: false
   tags:
       - cat2
       - medium
@@ -1108,11 +1068,10 @@
       - V-38612
       - sshd
 
-
 - name: "MEDIUM | V-38613 | AUDIT | The system must not permit root logins using remote access programs such as ssh."
   command: grep -i PermitRootLogin /etc/ssh/sshd_config
-  failed_when: no
-  changed_when: no
+  failed_when: false
+  changed_when: false
   register: sshd_root_login_audit
   tags:
       - cat2
@@ -1121,12 +1080,11 @@
       - V-38613
       - sshd
 
-
 - name: "MEDIUM | V-38617 | AUDIT | The SSH daemon must be configured to use only FIPS 140-2 approved ciphers."
   command: grep Ciphers /etc/ssh/sshd_config
   register: sshd_ciphers_audit
-  failed_when: no
-  changed_when: no
+  failed_when: false
+  changed_when: false
   tags:
       - cat2
       - medium
@@ -1134,12 +1092,11 @@
       - V-38617
       - sshd
 
-
 - name: "MEDIUM | V-38619 | AUDIT | There must be no .netrc files on the system."
   command: find /root /home -xdev -name .netrc
   register: netrc_files_audit
-  failed_when: no
-  changed_when: no
+  failed_when: false
+  changed_when: false
   tags:
       - cat2
       - MEDIUM
@@ -1147,12 +1104,11 @@
       - V-38619
       - netrc
 
-
 - name: "MEDIUM | V-38620 | AUDIT | The system clock must be synchronized continuously or at least daily."
   command: service ntpd status
   register: ntpd_service_status_audit
-  failed_when: no
-  changed_when: no
+  failed_when: false
+  changed_when: false
   tags:
       - cat2
       - medium
@@ -1160,12 +1116,11 @@
       - V-38620
       - ntp
 
-
 - name: "MEDIUM | V-38621 | AUDIT | The system clock must be synchronized to an authoritative DoD time source."
   command: grep -E '^server' /etc/ntp.conf
   register: ntp_server_audit
-  failed_when: no
-  changed_when: no
+  failed_when: false
+  changed_when: false
   tags:
       - cat2
       - medium
@@ -1173,12 +1128,11 @@
       - V-38621
       - ntp
 
-
 - name: "MEDIUM | V-38622 | AUDIT | Mail relaying must be restricted."
   command: grep ^inet_interfaces /etc/postfix/main.cf
   register: mail_relay_audit
-  failed_when: no
-  changed_when: no
+  failed_when: false
+  changed_when: false
   when: not rhel6stig_is_mail_relay
   tags:
       - cat2
@@ -1187,11 +1141,10 @@
       - V-38622
       - postfix
 
-
 - name: "MEDIUM | V-38624 | AUDIT | System logs must be rotated daily."
   shell: grep logrotate /var/log/cron*
-  changed_when: no
-  failed_when: no
+  changed_when: false
+  failed_when: false
   register: logrotate_audit
   tags:
       - cat2
@@ -1200,7 +1153,6 @@
       - V-38624
       - logrotate
       - syslog
-
 
 - name: "MEDIUM | V-38637 | AUDIT | The system package management tool must verify contents of all files associated with the audit package."
   shell: "rpm -V audit | awk '$1 ~ /..5/ && $2 != \"c\"'"
@@ -1229,7 +1181,7 @@
 - name: "MEDIUM | V-38652 | AUDIT | Remote file systems must be mounted with the 'nodev' option"
   shell: mount | grep 'type nfs' | grep -v 'nodev'
   args:
-      warn: no
+      warn: false
   changed_when: false
   register: nfs_mounts_missing_nodev
   failed_when: nfs_mounts_missing_nodev.stderr
@@ -1255,8 +1207,8 @@
 - name: "MEDIUM | V-38658 | AUDIT | The system must prohibit the reuse of passwords within five iterations."
   command: grep remember /etc/pam.d/system-auth
   register: password_reuse_audit
-  failed_when: no
-  changed_when: no
+  failed_when: false
+  changed_when: false
   tags:
       - cat2
       - medium
@@ -1264,12 +1216,11 @@
       - V-38658
       - pam
 
-
 - name: "MEDIUM | V-38660 | AUDIT | The snmpd service must use only SNMP protocol version 3 or newer."
   shell: 'grep ''v1\|v2c\|com2sec'' /etc/snmp/snmpd.conf | grep -v ''^#'''
   register: snmpd_version_audit
-  changed_when: no
-  failed_when: no
+  changed_when: false
+  failed_when: false
   tags:
       - cat2
       - medium
@@ -1277,12 +1228,11 @@
       - V-38660
       - snmpd
 
-
 - name: "MEDIUM | V-38663 | AUDIT | The system package management tool must verify permissions on all files and directories associated with the audit package."
   shell: rpm -V audit | grep '^.M'
   register: audit_package_permissions_audit
-  failed_when: no
-  changed_when: no
+  failed_when: false
+  changed_when: false
   tags:
       - cat2
       - medium
@@ -1292,12 +1242,11 @@
       - file_perms
       - rpm
 
-
 - name: "MEDIUM | V-38664 | AUDIT | The system package management tool must verify ownership on all files and directories associated with the audit package."
   shell: rpm -V audit | grep '^.....U'
   register: audit_package_ownership_audit
-  failed_when: no
-  changed_when: no
+  failed_when: false
+  changed_when: false
   tags:
       - cat2
       - medium
@@ -1307,12 +1256,11 @@
       - file_perms
       - rpm
 
-
 - name: "MEDIUM | V-38665 | AUDIT | The system package management tool must verify group-ownership on all files and directories associated with the audit package."
   shell: rpm -V audit | grep '^......G'
   register: audit_package_group_ownership_audit
-  failed_when: no
-  changed_when: no
+  failed_when: false
+  changed_when: false
   tags:
       - cat2
       - medium
@@ -1323,7 +1271,6 @@
       - rpm
 
 - name: |
-
         MEDIUM | V-38670 | AUDIT | The operating system must detect unauthorized changes to software and information.
         MEDIUM | V-38673 | AUDIT | The operating system must ensure unauthorized, security-relevant configuration changes detected are tracked.
         MEDIUM | V-38695 | AUDIT | A file integrity tool must be used at least weekly to check for unauthorized file changes, particularly the addition of unauthorized system libraries or binaries, or for unauthorized modification to authorized system libraries or binaries.
@@ -1332,8 +1279,8 @@
         MEDIUM | V-38700 | AUDIT | The operating system must provide a near real-time alert when any of the organization defined list of compromise or potential compromise indicators occurs.
   shell: grep aide {{ rhel6stig_aide_cron['cron_file'] }} /etc/cron.*/*
   register: aide_cron_audit
-  failed_when: no
-  changed_when: no
+  failed_when: false
+  changed_when: false
   tags:
       - cat2
       - medium
@@ -1350,8 +1297,8 @@
 - name: "MEDIUM | V-38674 | AUDIT | X Windows must not be enabled unless required."
   command: grep initdefault /etc/inittab
   register: runlevel_audit
-  failed_when: no
-  changed_when: no
+  failed_when: false
+  changed_when: false
   tags:
       - cat2
       - medium
@@ -1360,13 +1307,12 @@
       - xwindows
       - gui
 
-
 - name: "MEDIUM | V-38691 | AUDIT | The Bluetooth service must be disabled"
   command: chkconfig bluetooth --list
   register: bluetooth_service_audit
   changed_when: false
   failed_when: false
-  check_mode: no
+  check_mode: false
   tags:
       - cat2
       - medium
@@ -1389,9 +1335,9 @@
 - name: "MEDIUM | V-57569 | AUDIT | The noexec option must be added to the /tmp partition."
   command: egrep '^([^#[:space:]]+[[:space:]]+/tmp[[:space:]]+[^[:space:]]+[[:space:]]+)([^[:space:]]+)([[:space:]]+.*)$' /etc/fstab
   register: fstab_tmp_audit
-  changed_when: no
-  failed_when: no
-  check_mode: no
+  changed_when: false
+  failed_when: false
+  check_mode: false
   tags:
       - cat2
       - medium
@@ -1404,8 +1350,8 @@
   # find included configs
   shell: cat /etc/sudoers | grep -w '^#include' | awk '{print $2}'
   register: sudoers_include_audit
-  check_mode: no
-  changed_when: no
+  check_mode: false
+  changed_when: false
   tags:
       - cat2
       - medium
@@ -1417,8 +1363,8 @@
   # Find files found in the dirs of  #includedir directives
   shell: cat /etc/sudoers | grep -w '^#includedir' | awk '{print $2}' | xargs -i find {} -type f
   register: sudoers_includedirs_files
-  check_mode: no
-  changed_when: no
+  check_mode: false
+  changed_when: false
   tags:
       - cat2
       - medium

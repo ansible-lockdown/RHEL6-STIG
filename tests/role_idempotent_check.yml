@@ -1,6 +1,8 @@
-- name: Tets role idempotence
+---
+
+- name: Test role idempotence
   hosts: baseline_hosts
-  become: yes
+  become: true
 
   vars:
     extra_vars_file: extra_vars_vagrant.yml
@@ -11,7 +13,7 @@
       environment:
         ANSIBLE_STDOUT_CALLBACK: json
       delegate_to: localhost
-      become: no
+      become: false
       register: run_result
 
     - set_fact:

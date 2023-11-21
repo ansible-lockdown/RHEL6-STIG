@@ -1,29 +1,30 @@
 ---
+
 # Preliminary tasks that should always be run
-- block:
-    - name: "PRELIM | Make sure iptables is installed."
-      yum:
-          name: iptables
-          state: present
+- name: "PRELIM | Make sure iptables is installed."
+  block:
+      - name: "PRELIM | Make sure iptables is installed."
+        yum:
+            name: iptables
+            state: present
 
-    - name: "PRELIM | See if a default iptables config file exists"
-      stat:
-          path: /etc/sysconfig/iptables
-      register: iptables_config
+      - name: "PRELIM | See if a default iptables config file exists"
+        stat:
+            path: /etc/sysconfig/iptables
+        register: iptables_config
 
-    - name: "PRELIM | Copy up a sensible default firewall config"
-      copy:
-          src: etc_sysconfig_iptables
-          dest: /etc/sysconfig/iptables
-          owner: root
-          group: root
-          mode: 0644
-      when: not iptables_config.stat.exists
-      notify: restart iptables
+      - name: "PRELIM | Copy up a sensible default firewall config"
+        copy:
+            src: etc_sysconfig_iptables
+            dest: /etc/sysconfig/iptables
+            owner: root
+            group: root
+            mode: 0644
+        when: not iptables_config.stat.exists
+        notify: restart iptables
 
-    - name: Flush handlers
-      meta: flush_handlers
-
+      - name: Flush handlers
+        meta: flush_handlers
   tags:
       - V-38512
       - V-38513
@@ -37,29 +38,30 @@
       - medium
       - patch
 
-- block:
-    - name: "PRELIM | Make sure ip6tables is installed."
-      yum:
-          name: iptables-ipv6
-          state: present
+- name: "PRELIM | Make sure ip6tables is installed."
+  block:
+      - name: "PRELIM | Make sure ip6tables is installed."
+        yum:
+            name: iptables-ipv6
+            state: present
 
-    - name: "PRELIM | See if a default ip6tables config file exists"
-      stat:
-          path: /etc/sysconfig/ip6tables
-      register: ip6tables_config
+      - name: "PRELIM | See if a default ip6tables config file exists"
+        stat:
+            path: /etc/sysconfig/ip6tables
+        register: ip6tables_config
 
-    - name: "PRELIM | Copy up a sensible default firewall config"
-      copy:
-          src: etc_sysconfig_ip6tables
-          dest: /etc/sysconfig/ip6tables
-          owner: root
-          group: root
-          mode: 0644
-      when: not ip6tables_config.stat.exists and rhel6stig_ipv6_required
-      notify: restart ip6tables
+      - name: "PRELIM | Copy up a sensible default firewall config"
+        copy:
+            src: etc_sysconfig_ip6tables
+            dest: /etc/sysconfig/ip6tables
+            owner: root
+            group: root
+            mode: 0644
+        when: not ip6tables_config.stat.exists and rhel6stig_ipv6_required
+        notify: restart ip6tables
 
-    - name: Flush handlers
-      meta: flush_handlers
+      - name: Flush handlers
+        meta: flush_handlers
 
   tags:
       - cat2
@@ -78,7 +80,7 @@
   command: "awk -F: '{print $1}' /etc/passwd"
   register: users
   changed_when: false
-  check_mode: no
+  check_mode: false
   tags:
       - cat1
       - cat2
@@ -88,7 +90,7 @@
       awk -F: '$1 !~ /^root$/ && $2 !~ /^[!*]/ {print $1}' /etc/shadow
   register: unlocked_accounts
   changed_when: false
-  check_mode: no
+  check_mode: false
   tags:
       - cat1
       - cat2
@@ -99,7 +101,7 @@
       awk -F: '$1 !~ /^root$/ && $2 !~ /^[!*]/ {print $1}' /etc/shadow | xargs -I{} grep {} /etc/passwd | awk -F: '$3 < 500 {print $1}'
   register: unlocked_sys_accounts
   changed_when: false
-  check_mode: no
+  check_mode: false
   tags:
       - cat1
       - cat2
@@ -109,7 +111,7 @@
   shell: "grep -Ev '/home|root' /etc/passwd | cut -d : -f 1"
   register: system_users
   changed_when: false
-  check_mode: no
+  check_mode: false
   tags:
       - cat1
       - cat2
@@ -117,20 +119,20 @@
 
 # Get separate lists of SysV and xinetd services
 - name: "PRELIM | List SysV services"
-  shell: "chkconfig --list | sed '/^$/ d ; /xinetd based services:/ d ; /^\t/ d' | awk '{print $1}'"
+  shell: "chkconfig --list | sed '/^$/ d ; /xinetd based services:/ d ; /^\t/ d' | awk '{print $1}'"  # noqa no-tabs
   register: sysv_services
   changed_when: false
-  check_mode: no
+  check_mode: false
   tags:
       - cat1
       - cat2
       - cat3
 
 - name: "PRELIM | List xinetd services"
-  shell: "chkconfig --list | sed -n '/^\t/,$p' | sed 's/\t//' | cut -d : -f 1"
+  shell: "chkconfig --list | sed -n '/^\t/,$p' | sed 's/\t//' | cut -d : -f 1"  # noqa no-tabs
   register: xinetd_services
   changed_when: false
-  check_mode: no
+  check_mode: false
   tags:
       - cat1
       - cat2
@@ -141,7 +143,7 @@
   shell: grep -Pv "/(sh|nologin|dash)" /etc/shells | sed -r 's#/((bin|sbin|usr)/)+##'
   register: shells
   changed_when: false
-  check_mode: no
+  check_mode: false
   tags:
       - cat3
       - umask
@@ -152,7 +154,7 @@
   changed_when: false
   failed_when: false
   when: rhel6stig_cat3
-  check_mode: no
+  check_mode: false
   tags:
       - selinux
 
@@ -166,8 +168,8 @@
 
 - name: "PRELIM | Get list of rsyslog genarated log files"
   shell: "grep -P '^(?!#).*/' /etc/rsyslog.conf /etc/rsyslog.d/* | grep -v IncludeConfig | sed 's/-//'| awk 'NF==2 {print $2}'"
-  changed_when: no
-  check_mode: no
+  changed_when: false
+  check_mode: false
   register: rsyslog_logfiles
   tags:
       - cat2
@@ -188,8 +190,8 @@
 
 - name: "PRELIM | Get path of auditd log file"
   shell: "grep '^log_file' /etc/audit/auditd.conf | sed s/^[^\\/]*//"
-  changed_when: no
-  check_mode: no
+  changed_when: false
+  check_mode: false
   register: auditd_logfile
   tags:
       - cat2
@@ -258,7 +260,7 @@
   shell: 'awk ''/^[^#]/ { print $2; }'' /etc/fstab'
   changed_when: false
   register: fstab_mountpoints
-  check_mode: no
+  check_mode: false
   tags:
       - cat2
       - medium
@@ -271,7 +273,7 @@
       paths: /etc/sysconfig/network-scripts
       file_type: file
       patterns: ifcfg-eth*
-  check_mode: no
+  check_mode: false
   register: interface_config_files
   tags:
       - cat2

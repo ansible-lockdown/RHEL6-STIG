@@ -1,5 +1,5 @@
 [baseline_hosts]
-centos6 ansible_port=2200  ansible_ssh_private_key_file=.vagrant/machines/centos6-stig/virtualbox/private_key
+cent6 ansible_port=6022  ansible_ssh_private_key_file=.vagrant/machines/cent6/virtualbox/private_key ansible_ssh_common_args='-o HostKeyAlgorithms=+ssh-rsa'
 rhel6 ansible_port=2201 ansible_ssh_private_key_file=.vagrant/machines/rhel6-stig/virtualbox/private_key
 
 [baseline_hosts:vars]

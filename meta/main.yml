@@ -1,17 +1,19 @@
 ---
 galaxy_info:
-  author: "Dan Shepherd, Jon Davila, Sam Doran"
-  description: "Ansible role to apply RHEL 6 STIG"
-  company: "MindPoint Group"
-  license: MIT
-  min_ansible_version: 2.3
+    author: "Dan Shepherd, Jon Davila, Sam Doran"
+    description: "Ansible role to apply RHEL 6 STIG"
+    company: "MindPoint Group"
+    role_name: rhel6_stig
+    namespace: mindpointgroup
+    license: MIT
+    min_ansible_version: 2.3
 
-  platforms:
-  - name: EL
-    versions:
+    platforms:
+    - name: EL
+      versions:
       - 6
 
-  galaxy_tags:
+    galaxy_tags:
     - system
     - security
     - stig
